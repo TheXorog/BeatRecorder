@@ -10,7 +10,7 @@ Files are saved where-ever you set your output folder to in OBS.
 
 ## Requirements
 
-* [HttpStatus](https://github.com/opl-/beatsaber-http-status/) (And any other dependencies that HttpStatus has.)
+* [beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/) (And any other dependencies that HttpStatus has.)
 * [obs-websocket](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466/)
 
 ## How to set up
