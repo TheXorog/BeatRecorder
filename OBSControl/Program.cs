@@ -558,7 +558,7 @@ namespace OBSControl
 
         private static void ResetSettings()
         {
-            Objects.LoadedSettings.README = "!! R";
+            Objects.LoadedSettings.README = "!! Please check https://github.com/XorogVEVO/OBSControl for more info !!";
             Objects.LoadedSettings.ConfigVersion = 1;
             Objects.LoadedSettings.BeatSaberUrl = "127.0.0.1";
             Objects.LoadedSettings.BeatSaberPort = "6557";
