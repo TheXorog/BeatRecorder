@@ -43,7 +43,7 @@ namespace OBSControl
                     return;
                 }
 
-                if (Objects.LoadedSettings.ConfigVersion != 3)
+                if (Objects.LoadedSettings.ConfigVersion != 1)
                 {
                     ResetSettings();
                     return;
