@@ -24,6 +24,7 @@ Files are saved where-ever you set your output folder to in OBS.
 ## OBSControl not connecting?
 
 **AVG Antivirus is known to cause all kinds of issues** with connection-related things. (Credit to `Arro#6969` to help me discover this issue! <3)
+
 If you have AVG Antivirus installed, please uninstall it and find a better antivirus solution.
 
 If you ruled out your antivirus (through uninstalling it or deactivating it's protection), just create an issue or join my Discord like mentioned before.
