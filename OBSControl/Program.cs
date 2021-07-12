@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Octokit;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -14,6 +15,8 @@ namespace OBSControl
 {
     class Program
     {
+        public static string CurrentVersion = "1.1.0-RC1";
+
         static WebsocketClient BeatSaberWebSocket { get; set; }
         static WebsocketClient OBSWebSocket { get; set; }
 
@@ -23,7 +26,9 @@ namespace OBSControl
 
 
         static bool OBSRecording = false;
-        static CancellationToken CancelStopRecordingDelay { get; set; }
+        static bool OBSRecordingPaused = false;
+        static int RecordingSeconds = 0;
+        static CancellationTokenSource CancelStopRecordingDelay { get; set; }
 
 
         static void Main(string[] args)
@@ -33,27 +38,43 @@ namespace OBSControl
 
         private static async Task MainAsync(string[] args)
         {
-            Console.WriteLine("[OBSC] Loading settings..");
+            Console.Clear();
+            _logger.StartLogger();
+
+            _logger.LogInfo($"[OBSC] Writing to file {_logger.FileName}");
+
+            _logger.LogWarn("[OBSC] This application uses the UTC (+00:00) time offset.");
+
+            _logger.LogInfo("[OBSC] Loading settings..");
 
             if (File.Exists("Settings.json"))
             {
                 try
                 {
                     Objects.LoadedSettings = JsonConvert.DeserializeObject<Objects.Settings>(File.ReadAllText("Settings.json"));
+
+                    if (Objects.LoadedSettings.ConsoleLogLevel > 2)
+                    {
+                        _logger.LogLevel = Objects.LoadedSettings.ConsoleLogLevel;
+                    }
+                    else
+                        throw new Exception("Invalid Console Log Level.");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger.LogError($"[OBSC] Exception occured while loading config: {ex}");
                     ResetSettings();
                     return;
                 }
 
                 if (Objects.LoadedSettings.ConfigVersion != 2)
                 {
+                    _logger.LogError($"[OBSC] Old Config detected. Resetting..");
                     ResetSettings();
                     return;
                 }
 
-                Console.WriteLine("[OBSC] Settings loaded.");
+                _logger.LogInfo("[OBSC] Settings loaded.");
             }
             else
             {
@@ -61,7 +82,32 @@ namespace OBSControl
                 return;
             }
 
-            _ = Task.Run(async () =>
+            CancelStopRecordingDelay = new CancellationTokenSource();
+
+            await Task.Run(async () =>
+            {
+                try
+                {
+                    var github = new GitHubClient(new ProductHeaderValue("OBSControlUpdateCheck"));
+                    var repo = await github.Repository.Release.GetLatest("XorogVEVO", "OBSControl");
+
+                    _logger.LogInfo($"[OBSC] Current latest release is \"{repo.TagName}\". You're currently running: \"{CurrentVersion}\"");
+
+                    if (!CurrentVersion.Contains($"RC"))
+                    {
+                        if (repo.TagName != CurrentVersion)
+                        {
+                            _logger.LogCritical($"[OBSC] You're running an outdated version of OBSControl, please update at https://github.com/XorogVEVO/OBSControl/releases/latest.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"[OBSC] Unable to get latest version: {ex}");
+                }
+            });
+
+            _ = Task.Run(() =>
             {
                 // https://github.com/opl-/beatsaber-http-status/blob/master/protocol.md
 
@@ -86,19 +132,19 @@ namespace OBSControl
                 BeatSaberWebSocket.ReconnectionHappened.Subscribe(type =>
                 {
                     if (type.Type != ReconnectionType.Initial)
-                        Console.WriteLine($"[BS] Reconnected: {type.Type}");
+                        _logger.LogWarn($"[BS] Reconnected: {type.Type}");
                 });
 
                 BeatSaberWebSocket.DisconnectionHappened.Subscribe(type =>
                 {
-                    Console.WriteLine($"[BS] Disconnected: {type.Type}");
+                    _logger.LogError($"[BS] Disconnected: {type.Type}");
                 });
 
-                Console.WriteLine($"[BS] Connecting..");
+                _logger.LogInfo($"[BS] Connecting..");
                 BeatSaberWebSocket.Start().Wait();
             });
 
-            _ = Task.Run(async () =>
+            _ = Task.Run(() =>
             {
                 // https://github.com/Palakis/obs-websocket/blob/4.x-current/docs/generated/protocol.md
 
@@ -116,6 +162,7 @@ namespace OBSControl
 
                 string RequiredAuthenticationGuid = Guid.NewGuid().ToString();
                 string AuthenticationGuid = Guid.NewGuid().ToString();
+                string CheckIfRecording = Guid.NewGuid().ToString();
 
                 OBSWebSocket.MessageReceived.Subscribe(async msg =>
                 {
@@ -125,12 +172,13 @@ namespace OBSControl
 
                         if (required.authRequired)
                         {
-                            Console.WriteLine("[OBS] Authenticating..");
+                            _logger.LogInfo("[OBS] Authenticating..");
 
                             if (Objects.LoadedSettings.OBSPassword == "")
                             {
                                 await Task.Delay(1000);
-                                Console.WriteLine("[OBS] A password is required to log into your obs websocket.");
+                                _logger.LogInfo("[OBS] A password is required to log into your obs websocket.");
+                                await Task.Delay(1000);
                                 Console.Write("> ");
 
                                 // I was to lazy to write my own.. https://stackoverflow.com/questions/3404421/password-masking-console-application
@@ -156,42 +204,44 @@ namespace OBSControl
                                     }
                                     else if (key == ConsoleKey.Escape)
                                     {
-                                        Console.WriteLine("[OBS] Cancelled. Press any key to exit.");
+                                        _logger.LogInfo("[OBS] Cancelled. Press any key to exit.");
                                         Console.ReadKey();
                                         Environment.Exit(0);
                                         return;
                                     }
                                     else if (key == ConsoleKey.Enter)
                                     {
+                                        Console.Write("\r                                              \r");
                                         break;
                                     }
                                 }
 
-                                Console.WriteLine();
                                 if (key == ConsoleKey.Enter)
                                 {
                                     if (Objects.LoadedSettings.AskToSaveOBSPassword)
                                     {
                                         key = ConsoleKey.A;
 
-                                        Console.WriteLine("[OBS] Do you want to save this password in the config? (THIS WILL STORE THE PASSWORD IN PLAIN-TEXT, THIS CAN BE ACCESSED BY ANYONE WITH ACCESS TO YOUR FILES. THIS IS NOT RECOMMENDED!)");
+                                        _logger.LogWarn("[OBS] Do you want to save this password in the config? (THIS WILL STORE THE PASSWORD IN PLAIN-TEXT, THIS CAN BE ACCESSED BY ANYONE WITH ACCESS TO YOUR FILES. THIS IS NOT RECOMMENDED!)");
                                         while (key != ConsoleKey.Enter || key != ConsoleKey.Escape || key != ConsoleKey.Y || key != ConsoleKey.N)
                                         {
+                                            await Task.Delay(1000);
                                             Console.Write("[OBS] y/N > ");
 
                                             var keyInfo = Console.ReadKey(intercept: true);
+                                            Console.Write("\r                                              \r");
                                             key = keyInfo.Key;
 
                                             if (key == ConsoleKey.Escape)
                                             {
-                                                Console.WriteLine("[OBS] Cancelled. Press any key to exit.");
+                                                _logger.LogWarn("[OBS] Cancelled. Press any key to exit.");
                                                 Console.ReadKey();
                                                 Environment.Exit(0);
                                                 return;
                                             }
                                             else if (key == ConsoleKey.Y)
                                             {
-                                                Console.WriteLine("[OBS] Your password is now saved in the Settings.json.");
+                                                _logger.LogInfo("[OBS] Your password is now saved in the Settings.json.");
                                                 Objects.LoadedSettings.OBSPassword = Password;
                                                 Objects.LoadedSettings.AskToSaveOBSPassword = true;
 
@@ -200,8 +250,8 @@ namespace OBSControl
                                             }
                                             else if (key == ConsoleKey.N || key == ConsoleKey.Enter)
                                             {
-                                                Console.WriteLine("[OBS] Your password will not be saved. This wont be asked in the feature.");
-                                                Console.WriteLine("[OBS] To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
+                                                _logger.LogInfo("[OBS] Your password will not be saved. This wont be asked in the feature.");
+                                                _logger.LogInfo("[OBS] To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
                                                 Objects.LoadedSettings.OBSPassword = "";
                                                 Objects.LoadedSettings.AskToSaveOBSPassword = false;
 
@@ -220,36 +270,77 @@ namespace OBSControl
 
                             OBSWebSocket.Send($"{{\"request-type\":\"Authenticate\", \"message-id\":\"{AuthenticationGuid}\", \"auth\":\"{authResponse}\"}}");
                         }
+                        else
+                        {
+                            OBSWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
+                        }
                     }
-
-                    if (msg.Text.Contains($"\"message-id\":\"{AuthenticationGuid}\""))
+                    else if (msg.Text.Contains($"\"message-id\":\"{AuthenticationGuid}\""))
                     {
                         Objects.AuthenticationRequired required = JsonConvert.DeserializeObject<Objects.AuthenticationRequired>(msg.Text);
 
                         if (required.status == "ok")
                         {
-                            Console.WriteLine("[OBS] Authenticated.");
+                            _logger.LogInfo("[OBS] Authenticated.");
+
+                            OBSWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
                         }
                         else
                         {
-                            Console.WriteLine("[OBS] Failed to authenticate.");
+                            _logger.LogError("[OBS] Failed to authenticate. Please check your password or wait a few seconds to try authentication again.");
                             await OBSWebSocket.Stop(WebSocketCloseStatus.NormalClosure, "Shutting down");
 
                             await Task.Delay(1000);
 
-                            Console.WriteLine("[OBS] Re-trying..");
+                            _logger.LogInfo("[OBS] Re-trying..");
                             await OBSWebSocket.Start();
                             OBSWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
                         }
+                    }
+                    else if (msg.Text.Contains($"\"message-id\":\"{CheckIfRecording}\""))
+                    {
+                        Objects.RecordingStatus recordingStatus = JsonConvert.DeserializeObject<Objects.RecordingStatus>(msg.Text);
+
+                        OBSRecording = recordingStatus.isRecording;
+                        OBSRecordingPaused = recordingStatus.isRecordingPaused;
+
+                        if (recordingStatus.isRecording)
+                            _logger.LogWarn($"[OBS] A Recording is already running.");
                     }
 
                     if (msg.Text.Contains("\"update-type\":\"RecordingStopped\""))
                     {
                         Objects.RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<Objects.RecordingStopped>(msg.Text);
 
+                        _logger.LogInfo($"[OBS] Recording stopped.");
                         OBSRecording = false;
 
-                        _ = HandleFile(LastBeatmap, LastPerformance, RecordingStopped.recordingFilename);
+                        HandleFile(LastBeatmap, LastPerformance, RecordingStopped.recordingFilename, Objects.FinishedLastSong, Objects.FailedLastSong);
+                    }
+                    else if (msg.Text.Contains("\"update-type\":\"RecordingStarted\""))
+                    {
+                        _logger.LogInfo($"[OBS] Recording started.");
+                        OBSRecording = true;
+                        while (OBSRecording)
+                        {
+                            await Task.Delay(1000);
+
+                            if (!OBSRecordingPaused)
+                            {
+                                RecordingSeconds++;
+                            }
+                        }
+                        RecordingSeconds = 0;
+                    }
+                    else if (msg.Text.Contains("\"update-type\":\"RecordingPaused\""))
+                    {
+                        _logger.LogInfo($"[OBS] Recording paused.");
+                        OBSRecordingPaused = true;
+                    }
+                    else if (msg.Text.Contains("\"update-type\":\"RecordingResumed\""))
+                    {
+                        _logger.LogInfo($"[OBS] Recording resumed.");
+                        OBSRecordingPaused = false;
                     }
                 });
 
@@ -257,7 +348,7 @@ namespace OBSControl
                 {
                     if (type.Type != ReconnectionType.Initial)
                     {
-                        Console.WriteLine($"[OBS] Reconnected: {type.Type}");
+                        _logger.LogInfo($"[OBS] Reconnected: {type.Type}");
 
                         OBSWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
                     }
@@ -265,15 +356,15 @@ namespace OBSControl
 
                 OBSWebSocket.DisconnectionHappened.Subscribe(type =>
                 {
-                    Console.WriteLine($"[OBS] Disconnected: {type.Type}");
+                    _logger.LogError($"[OBS] Disconnected: {type.Type}");
                 });
 
-                Console.WriteLine($"[OBS] Connecting..");
+                _logger.LogInfo($"[OBS] Connecting..");
                 OBSWebSocket.Start().Wait();
 
                 OBSWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
 
-                Console.WriteLine($"[OBS] Connected.");
+                _logger.LogInfo($"[OBS] Connected.");
             });
 
             await Task.Delay(-1);
@@ -289,18 +380,18 @@ namespace OBSControl
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[BS] Unable to convert HttpStatus Message into an dictionary: {ex}");
+                _logger.LogCritical($"[BS] Unable to convert HttpStatus Message into an dictionary: {ex}");
                 return;
             }
 
             switch (_status.@event)
             {
                 case "hello":
-                    Console.WriteLine("[BS] Connected.");
+                    _logger.LogInfo("[BS] Connected.");
                     break;
 
                 case "songStart":
-                    Console.WriteLine("[BS] Song started.");
+                    _logger.LogInfo("[BS] Song started.");
 
                     Objects.FailedLastSong = false;
                     Objects.FinishedLastSong = false;
@@ -313,49 +404,28 @@ namespace OBSControl
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[BS] {ex}");
+                        _logger.LogError($"[BS] {ex}");
                         return;
                     }
                     break;
 
                 case "finished":
-                    Console.WriteLine("[BS] Song finished.");
+                    _logger.LogInfo("[BS] Song finished.");
 
                     LastPerformance = _status.status.performance;
                     Objects.FinishedLastSong = true;
-
-                    try
-                    {
-                        if (Objects.LoadedSettings.StopRecordingOn == "Event")
-                            _ = StopRecording();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[BS] {ex}");
-                        return;
-                    }
                     break;
 
                 case "failed":
-                    Console.WriteLine("[BS] Song failed.");
+                    _logger.LogInfo("[BS] Song failed.");
                     
                     LastPerformance = _status.status.performance;
                     Objects.FailedLastSong = true;
 
-                    try
-                    {
-                        if (Objects.LoadedSettings.StopRecordingOn == "Event")
-                            _ = StopRecording();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[BS] {ex}");
-                        return;
-                    }
                     break;
 
                 case "pause":
-                    Console.WriteLine("[BS] Song paused.");
+                    _logger.LogInfo("[BS] Song paused.");
 
                     try
                     {
@@ -365,13 +435,13 @@ namespace OBSControl
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[BS] {ex}");
+                        _logger.LogError($"[BS] {ex}");
                         return;
                     }
                     break;
 
                 case "resume":
-                    Console.WriteLine("[BS] Song resumed.");
+                    _logger.LogInfo("[BS] Song resumed.");
 
                     try
                     {
@@ -381,22 +451,21 @@ namespace OBSControl
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[BS] {ex}");
+                        _logger.LogError($"[BS] {ex}");
                         return;
                     }
                     break;
 
                 case "menu":
-                    Console.WriteLine("[BS] Menu entered.");
+                    _logger.LogInfo("[BS] Menu entered.");
 
                     try
                     {
-                        if (OBSWebSocket.IsStarted)
-                            OBSWebSocket.Send($"{{\"request-type\":\"StopRecording\", \"message-id\":\"StopRecording\"}}");
+                        _ = StopRecording(CancelStopRecordingDelay.Token);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[BS] {ex}");
+                        _logger.LogError($"[BS] {ex}");
                         return;
                     }
                     break;
@@ -412,16 +481,25 @@ namespace OBSControl
             if (OBSWebSocket.IsStarted)
             {
                 if (OBSRecording)
-                    await StopRecording(CancelStopRecordingDelay, true);
+                {
+                    CancelStopRecordingDelay.Cancel();
+                    await StopRecording(CancelStopRecordingDelay.Token, true);
+                }
 
-                CancelStopRecordingDelay = new CancellationToken();
-                CancelStopRecordingDelay.ThrowIfCancellationRequested();
+                CancelStopRecordingDelay = new CancellationTokenSource();
+
+                while (OBSRecording)
+                {
+                    Thread.Sleep(20);
+                }
+
+                Thread.Sleep(Objects.LoadedSettings.MininumWaitUntilRecordingCanStart);
 
                 OBSWebSocket.Send($"{{\"request-type\":\"StartRecording\", \"message-id\":\"StartRecording\"}}");
             }
             else
             {
-                Console.WriteLine("[OBS] The WebSocket isn't connected, no recording can be started.");
+                _logger.LogError("[OBS] The WebSocket isn't connected, no recording can be started.");
             }
         }
 
@@ -429,32 +507,36 @@ namespace OBSControl
         {
             if (OBSWebSocket.IsStarted)
             {
-                if (!ForceStop)
+                if (OBSRecording)
                 {
-                    if (Objects.LoadedSettings.StopRecordingDelay > 100 && Objects.LoadedSettings.StopRecordingDelay < 10000)
+                    if (!ForceStop)
                     {
-                        try
+                        if (Objects.LoadedSettings.StopRecordingDelay > 0 && Objects.LoadedSettings.StopRecordingDelay < 11)
                         {
-                            await Task.Delay(Objects.LoadedSettings.StopRecordingDelay, CancelToken);
+                            try
+                            {
+                                await Task.Delay(Objects.LoadedSettings.StopRecordingDelay * 1000, CancelToken);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                return;
+                            }
                         }
-                        catch (OperationCanceledException)
-                        {
-                            return;
-                        }
+                        else
+                            _logger.LogError("[OBS] The specified delay is not in between 1 and 10 seconds. The delay will be skipped.");
                     }
-                    else
-                        Console.WriteLine("[OBS] The specified delay is not in between 100 and 10000 milliseconds. The Delay will be skipped.");
-                }
 
-                OBSWebSocket.Send($"{{\"request-type\":\"StopRecording\", \"message-id\":\"StopRecording\"}}");
+                    OBSWebSocket.Send($"{{\"request-type\":\"StopRecording\", \"message-id\":\"StopRecording\"}}");
+                    return;
+                }
             }
             else
             {
-                Console.WriteLine("[OBS] The WebSocket isn't connected, no recording can be stopped.");
+                _logger.LogError("[OBS] The WebSocket isn't connected, no recording can be stopped.");
             }
         }
 
-        private static async Task HandleFile(Objects.Beatmap BeatmapInfo, Objects.Performance PerformanceInfo, string OldFileName)
+        private static void HandleFile(Objects.Beatmap BeatmapInfo, Objects.Performance PerformanceInfo, string OldFileName, bool FinishedLast, bool FailedLast)
         {
             if (BeatmapInfo != null)
             {
@@ -475,33 +557,41 @@ namespace OBSControl
                         if (PerformanceInfo.softFailed)
                         {
                             if (Objects.LoadedSettings.DeleteSoftFailed)
+                            {
+                                _logger.LogDebug($"[OBSC] Soft-Failed. Deletion requested.");
                                 DeleteFile = true;
+                            }
 
                             GeneratedAccuracy = $"NF-";
                         }
 
-                        if (Objects.FinishedLastSong)
+                        if (FinishedLast)
                             GeneratedAccuracy += $"{Math.Round((float)(((float)PerformanceInfo.score * (float)100) / (float)BeatmapInfo.maxScore), 2)}";
                         else
                         {
                             if (Objects.LoadedSettings.DeleteQuit)
                             {
+                                _logger.LogDebug($"[OBSC] Quit. Deletion requested.");
                                 DeleteFile = true;
 
                                 if (GeneratedAccuracy == "NF-")
                                     if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                     {
+                                        _logger.LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
                                         DeleteFile = false;
                                     }
                             }
 
-                            GeneratedAccuracy = $"QUIT";
+                            GeneratedAccuracy += $"QUIT";
                         }
 
-                        if (Objects.FailedLastSong)
+                        if (FailedLast)
                         {
                             if (Objects.LoadedSettings.DeleteFailed)
+                            {
+                                _logger.LogDebug($"[OBSC] Failed. Deletion requested.");
                                 DeleteFile = true;
+                            }
                             else
                                 DeleteFile = false;
 
@@ -540,6 +630,12 @@ namespace OBSControl
                         NewName = NewName.Replace("<raw-score>", $"0");
                 }
 
+                if (Objects.LoadedSettings.DeleteIfShorterThan + Objects.LoadedSettings.StopRecordingDelay > RecordingSeconds)
+                {
+                    _logger.LogDebug($"[OBSC] The recording is too short. Deletion requested.");
+                    DeleteFile = true;
+                }
+
                 if (NewName.Contains("<song-name>"))
                     NewName = NewName.Replace("<song-name>", BeatmapInfo.songName);
 
@@ -557,12 +653,7 @@ namespace OBSControl
 
                 if (NewName.Contains("<bpm>"))
                     NewName = NewName.Replace("<bpm>", BeatmapInfo.songBPM.ToString());
-
-                LastPerformance = null;
-                LastBeatmap = null;
-
-                await Task.Delay(500);
-
+                
                 if (File.Exists($"{OldFileName}"))
                 {
 
@@ -586,47 +677,48 @@ namespace OBSControl
                     {
                         if (!DeleteFile)
                         {
-                            Console.WriteLine($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{fileInfo.Extension}\"..");
+                            _logger.LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{fileInfo.Extension}\"..");
                             File.Move(OldFileName, NewFileName);
-                            Console.WriteLine($"[OBSC] Successfully renamed.");
+                            _logger.LogInfo($"[OBSC] Successfully renamed.");
                         }
                         else
                         {
-                            Console.WriteLine($"[OBSC] Deleting \"{fileInfo.Name}\"..");
+                            _logger.LogInfo($"[OBSC] Deleting \"{fileInfo.Name}\"..");
                             File.Delete(OldFileName);
-                            Console.WriteLine($"[OBSC] Successfully deleted.");
+                            _logger.LogInfo($"[OBSC] Successfully deleted.");
                         }
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[OBSC] {ex}.");
+                        _logger.LogError($"[OBSC] {ex}.");
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"[OBSC] {OldFileName} doesn't exist.");
+                    _logger.LogError($"[OBSC] {OldFileName} doesn't exist.");
                 }
             }
             else
             {
-                Console.WriteLine($"[OBSC] Last recorded file can't be renamed.");
+                _logger.LogError($"[OBSC] Last recorded file can't be renamed.");
             }
         }
 
         private static void ResetSettings()
         {
-            Objects.LoadedSettings.README = "!! Please check https://github.com/XorogVEVO/OBSControl for more info !!";
+            Objects.LoadedSettings.README = "!! Please check https://github.com/XorogVEVO/OBSControl for more info and explainations for each config options !!";
             Objects.LoadedSettings.ConfigVersion = 2;
+            Objects.LoadedSettings.ConsoleLogLevel = 3;
             Objects.LoadedSettings.BeatSaberUrl = "127.0.0.1";
             Objects.LoadedSettings.BeatSaberPort = "6557";
             Objects.LoadedSettings.OBSUrl = "127.0.0.1";
             Objects.LoadedSettings.OBSPort = "4444";
             Objects.LoadedSettings.OBSPassword = "";
             Objects.LoadedSettings.AskToSaveOBSPassword = true;
+            Objects.LoadedSettings.MininumWaitUntilRecordingCanStart = 500;
             Objects.LoadedSettings.PauseRecordingOnIngamePause = false;
             Objects.LoadedSettings.FileFormat = "[<rank>][<accuracy>][<max-combo>x] <song-name> - <song-author> [<mapper>]";
-            Objects.LoadedSettings.StopRecordingOn = "SceneChange";
-            Objects.LoadedSettings.StopRecordingDelay = 5000;
+            Objects.LoadedSettings.StopRecordingDelay = 5;
             Objects.LoadedSettings.DeleteIfShorterThan = 0;
             Objects.LoadedSettings.DeleteQuit = false;
             Objects.LoadedSettings.DeleteFailed = false;
@@ -643,11 +735,12 @@ namespace OBSControl
 
             File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
 
-            Console.WriteLine($"Please configure the application using the newly created Settings.json.");
-            Console.WriteLine($"");
-            Console.WriteLine($"Press any key to close application.");
-            Process.Start("notepad", "Settings.json");
-            Console.ReadKey();
+            _logger.LogInfo($"Please configure OBSControl using the config file that was just opened. If you're done, save and quit notepad and OBSControl will restart for you.");
+
+            var _Process = Process.Start("notepad", "Settings.json");
+            _Process.WaitForExit();
+
+            Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
             Environment.Exit(0);
         }
 

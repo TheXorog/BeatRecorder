@@ -17,15 +17,16 @@ namespace OBSControl
         {
             public string README { get; set; }
             public int ConfigVersion { get; set; }
+            public int ConsoleLogLevel { get; set; }
             public string BeatSaberUrl { get; set; }
             public string BeatSaberPort { get; set; }
             public string OBSUrl { get; set; }
             public string OBSPort { get; set; }
             public string OBSPassword { get; set; }
+            public int MininumWaitUntilRecordingCanStart { get; set; }
             public bool AskToSaveOBSPassword { get; set; }
             public bool PauseRecordingOnIngamePause { get; set; }
             public string FileFormat { get; set; }
-            public string StopRecordingOn { get; set; }
             public int StopRecordingDelay { get; set; }
             public int DeleteIfShorterThan { get; set; }
             public bool DeleteQuit { get; set; }
@@ -154,6 +155,12 @@ namespace OBSControl
             public string status { get; set; }
         }
 
+        public class RecordingStatus
+        {
+            public bool isRecording { get; set; }
+            public bool isRecordingPaused { get; set; }
+        }
+
         public class RecordingStopped
         {
             [JsonProperty("recordingFilename")]
@@ -171,6 +178,18 @@ namespace OBSControl
             [JsonProperty("rec-folder")]
             public string RecFolder { get; set; }
             public string status { get; set; }
+        }
+
+        // Shedule-based logger
+
+        public static List<LogEntry> LogsToPost = new List<LogEntry>();
+
+        public class LogEntry
+        {
+            public DateTime TimeOfEvent { get; set; }
+            public int LogLevel { get; set; }
+            public int LogCount { get; set; }
+            public string Message { get; set; }
         }
 
     }
