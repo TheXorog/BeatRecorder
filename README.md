@@ -32,30 +32,30 @@ If you ruled out your antivirus (through uninstalling it or deactivating it's pr
 ## Config Help
 
 * `README` - This really just redirects you here for help.
-
-* `ConfigVersion` - Please don't touch <3`
+<br></br>
+* `ConfigVersion` - Please don't touch <3
 * `ConsoleLogLevel` - The log level displayed in the console. I recommend leaving that alone.
-
+<br></br>
 * `BeatSaberUrl` - The IP/URL you use to connect to the HTTPStatus-WebSocket. Leave at default if you don't know any better.
 * `BeatSaberPort` - The Port you use to connect to the HTTPStatus-WebSocket. Leave at default if you don't know any better.
-
+<br></br>
 * `OBSUrl` - The IP/URL you use to connect to the OBS-WebSocket. Leave at default if you don't know any better.
 * `OBSPort` - The IP/URL you use to connect to the OBS-WebSocket. Leave at default if you don't know any better.
 * `OBSPassword` - The password you use to connect to the OBS-Websocket. OBSControl will ask for the password if you haven't put one in.
 * `AskToSaveOBSPassword` - This specifies if you want OBSControl to ask for a password. 
-
+<br></br>
 * `MininumWaitUntilRecordingCanStart` - The amount of milliseconds a new recording is gonna be delayed when forcing to restart a recording. Increase this if you find that your recordings don't restart after restarting a song.
-
+<br></br>
 * `PauseRecordingOnIngamePause` - Should your recording be paused when you pause your current song?
 * `FileFormat` - The format your files will be renamed to. Check Filename Placeholders below for more info.
 * `StopRecordingDelay` - How many seconds OBSControl should wait after you finish a song/leave the song to end the recording.
-
-* `DeleteIfShorterThan` - Delete the file if the recording is shorter than the specified amount of seconds
-* `DeleteQuit` - Delete the file if you quit the song
+<br></br>
+* `DeleteIfShorterThan` - Delete the file if the recording is shorter than the specified amount of seconds.
+* `DeleteQuit` - Delete the file if you quit the song.
 * `DeleteIfQuitAfterSoftFailed` - Delete the file if you quit the song after losing all your health with no fail.
 * `DeleteFailed` - Delete the file if you fail the song.
 * `DeleteSoftFailed` - Delete the file if you soft-fail¹ the song.
-
+<br></br>
 1: _Soft-Failing means losing all your health with no fail on._
 
 
