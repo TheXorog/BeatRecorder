@@ -16,11 +16,15 @@ namespace OBSControl
     {
         static WebsocketClient BeatSaberWebSocket { get; set; }
         static WebsocketClient OBSWebSocket { get; set; }
-        static HttpClient OBSHttpClient { get; set; }
 
         
-        static Objects.Performance LastPerformance {get; set;}
-        static Objects.Beatmap LastBeatmap {get; set;}
+        static Objects.Performance LastPerformance { get; set; }
+        static Objects.Beatmap LastBeatmap { get; set; }
+
+
+        static bool OBSRecording = false;
+        static CancellationToken CancelStopRecordingDelay { get; set; }
+
 
         static void Main(string[] args)
         {
@@ -43,7 +47,7 @@ namespace OBSControl
                     return;
                 }
 
-                if (Objects.LoadedSettings.ConfigVersion != 1)
+                if (Objects.LoadedSettings.ConfigVersion != 2)
                 {
                     ResetSettings();
                     return;
@@ -243,159 +247,9 @@ namespace OBSControl
                     {
                         Objects.RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<Objects.RecordingStopped>(msg.Text);
 
-                        if (LastBeatmap != null)
-                        {
-                            bool DeleteFile = false;
-                            string NewName = Objects.LoadedSettings.FileFormat;
+                        OBSRecording = false;
 
-                            if (LastPerformance != null)
-                            {
-                                // Generate FileName-based on Config File
-
-                                if (NewName.Contains("<rank>"))
-                                    NewName = NewName.Replace("<rank>", LastPerformance.rank);
-
-                                if (NewName.Contains("<accuracy>"))
-                                {
-                                    string GeneratedAccuracy = "";
-
-                                    if (LastPerformance.softFailed)
-                                    {
-                                        if (Objects.LoadedSettings.DeleteSoftFailed)
-                                            DeleteFile = true;
-
-                                        GeneratedAccuracy = $"NF-";
-                                    }
-
-                                    if (Objects.FinishedLastSong)
-                                        GeneratedAccuracy += $"{Math.Round((float)(((float)LastPerformance.score * (float)100) / (float)LastBeatmap.maxScore), 2)}";
-                                    else
-                                    {
-                                        if (Objects.LoadedSettings.DeleteQuit)
-                                        {
-                                            DeleteFile = true;
-
-                                            if (GeneratedAccuracy == "NF-")
-                                                if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
-                                                {
-                                                    DeleteFile = false;
-                                                }
-                                        }
-
-                                        GeneratedAccuracy = $"QUIT";
-                                    }
-
-                                    if (Objects.FailedLastSong)
-                                    {
-                                        if (Objects.LoadedSettings.DeleteFailed)
-                                            DeleteFile = true;
-
-                                        GeneratedAccuracy = $"FAILED";
-                                    }
-
-                                    NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
-                                }
-
-                                if (NewName.Contains("<max-combo>"))
-                                    NewName = NewName.Replace("<max-combo>", $"{LastPerformance.maxCombo}");
-
-                                if (NewName.Contains("<score>"))
-                                    NewName = NewName.Replace("<score>", $"{LastPerformance.score}");
-
-                                if (NewName.Contains("<raw-score>"))
-                                    NewName = NewName.Replace("<raw-score>", $"{LastPerformance.rawScore}");
-                            }
-                            else
-                            {
-                                // Generate FileName-based on Config File (but without performance stats)
-
-                                if (NewName.Contains("<rank>"))
-                                    NewName = NewName.Replace("<rank>", "Z");
-
-                                if (NewName.Contains("<accuracy>"))
-                                    NewName = NewName.Replace("<accuracy>", "00.00");
-
-                                if (NewName.Contains("<max-combo>"))
-                                    NewName = NewName.Replace("<max-combo>", $"0");
-
-                                if (NewName.Contains("<score>"))
-                                    NewName = NewName.Replace("<score>", $"0");
-
-                                if (NewName.Contains("<raw-score>"))
-                                    NewName = NewName.Replace("<raw-score>", $"0");
-                            }
-
-                            if (NewName.Contains("<song-name>"))
-                                NewName = NewName.Replace("<song-name>", LastBeatmap.songName);
-
-                            if (NewName.Contains("<song-author>"))
-                                NewName = NewName.Replace("<song-author>", LastBeatmap.songAuthorName);
-
-                            if (NewName.Contains("<song-sub-name>"))
-                                NewName = NewName.Replace("<song-sub-name>", LastBeatmap.songSubName);
-
-                            if (NewName.Contains("<mapper>"))
-                                NewName = NewName.Replace("<mapper>", LastBeatmap.levelAuthorName);
-
-                            if (NewName.Contains("<levelid>"))
-                                NewName = NewName.Replace("<levelid>", LastBeatmap.levelId);
-
-                            if (NewName.Contains("<bpm>"))
-                                NewName = NewName.Replace("<bpm>", LastBeatmap.songBPM.ToString());
-
-                            LastPerformance = null;
-                            LastBeatmap = null;
-
-                            await Task.Delay(500);
-
-                            if (File.Exists($"{RecordingStopped.recordingFilename}"))
-                            {
-
-                                string FileExist = "";
-
-                                FileInfo fileInfo = new FileInfo(RecordingStopped.recordingFilename);
-
-                                while (File.Exists($"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}"))
-                                {
-                                    FileExist += "_";
-                                }
-
-                                foreach (char b in Path.GetInvalidFileNameChars())
-                                {
-                                    NewName = NewName.Replace(b, '_');
-                                }
-
-                                string NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}";
-
-                                try
-                                {
-                                    if (!DeleteFile)
-                                    {
-                                        Console.WriteLine($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{fileInfo.Extension}\"..");
-                                        File.Move(RecordingStopped.recordingFilename, NewFileName);
-                                        Console.WriteLine($"[OBSC] Successfully renamed.");
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine($"[OBSC] Deleting \"{fileInfo.Name}\"..");
-                                        File.Delete(RecordingStopped.recordingFilename);
-                                        Console.WriteLine($"[OBSC] Successfully deleted.");
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine($"[OBSC] {ex}.");
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine($"[OBSC] {RecordingStopped.recordingFilename} doesn't exist.");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine($"[OBSC] Last recorded file can't be renamed.");
-                        }
+                        _ = HandleFile(LastBeatmap, LastPerformance, RecordingStopped.recordingFilename);
                     }
                 });
 
@@ -435,7 +289,7 @@ namespace OBSControl
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[BS] {ex}");
+                Console.WriteLine($"[BS] Unable to convert HttpStatus Message into an dictionary: {ex}");
                 return;
             }
 
@@ -455,8 +309,7 @@ namespace OBSControl
 
                     try
                     {
-                        if (OBSWebSocket.IsStarted)
-                            OBSWebSocket.Send($"{{\"request-type\":\"StartRecording\", \"message-id\":\"StartRecording\"}}");
+                        _ = StartRecording();
                     }
                     catch (Exception ex)
                     {
@@ -473,9 +326,8 @@ namespace OBSControl
 
                     try
                     {
-                        return;
-                        if (OBSWebSocket.IsStarted)
-                            OBSWebSocket.Send($"{{\"request-type\":\"StopRecording\", \"message-id\":\"StopRecording\"}}");
+                        if (Objects.LoadedSettings.StopRecordingOn == "Event")
+                            _ = StopRecording();
                     }
                     catch (Exception ex)
                     {
@@ -492,9 +344,8 @@ namespace OBSControl
 
                     try
                     {
-                        return;
-                        if (OBSWebSocket.IsStarted)
-                            OBSWebSocket.Send($"{{\"request-type\":\"StopRecording\", \"message-id\":\"StopRecording\"}}");
+                        if (Objects.LoadedSettings.StopRecordingOn == "Event")
+                            _ = StopRecording();
                     }
                     catch (Exception ex)
                     {
@@ -556,10 +407,216 @@ namespace OBSControl
             }
         }
 
+        private static async Task StartRecording()
+        {
+            if (OBSWebSocket.IsStarted)
+            {
+                if (OBSRecording)
+                    await StopRecording(CancelStopRecordingDelay, true);
+
+                CancelStopRecordingDelay = new CancellationToken();
+                CancelStopRecordingDelay.ThrowIfCancellationRequested();
+
+                OBSWebSocket.Send($"{{\"request-type\":\"StartRecording\", \"message-id\":\"StartRecording\"}}");
+            }
+            else
+            {
+                Console.WriteLine("[OBS] The WebSocket isn't connected, no recording can be started.");
+            }
+        }
+
+        private static async Task StopRecording(CancellationToken CancelToken, bool ForceStop = false)
+        {
+            if (OBSWebSocket.IsStarted)
+            {
+                if (!ForceStop)
+                {
+                    if (Objects.LoadedSettings.StopRecordingDelay > 100 && Objects.LoadedSettings.StopRecordingDelay < 10000)
+                    {
+                        try
+                        {
+                            await Task.Delay(Objects.LoadedSettings.StopRecordingDelay, CancelToken);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                        Console.WriteLine("[OBS] The specified delay is not in between 100 and 10000 milliseconds. The Delay will be skipped.");
+                }
+
+                OBSWebSocket.Send($"{{\"request-type\":\"StopRecording\", \"message-id\":\"StopRecording\"}}");
+            }
+            else
+            {
+                Console.WriteLine("[OBS] The WebSocket isn't connected, no recording can be stopped.");
+            }
+        }
+
+        private static async Task HandleFile(Objects.Beatmap BeatmapInfo, Objects.Performance PerformanceInfo, string OldFileName)
+        {
+            if (BeatmapInfo != null)
+            {
+                bool DeleteFile = false;
+                string NewName = Objects.LoadedSettings.FileFormat;
+
+                if (PerformanceInfo != null)
+                {
+                    // Generate FileName-based on Config File
+
+                    if (NewName.Contains("<rank>"))
+                        NewName = NewName.Replace("<rank>", PerformanceInfo.rank);
+
+                    if (NewName.Contains("<accuracy>"))
+                    {
+                        string GeneratedAccuracy = "";
+
+                        if (PerformanceInfo.softFailed)
+                        {
+                            if (Objects.LoadedSettings.DeleteSoftFailed)
+                                DeleteFile = true;
+
+                            GeneratedAccuracy = $"NF-";
+                        }
+
+                        if (Objects.FinishedLastSong)
+                            GeneratedAccuracy += $"{Math.Round((float)(((float)PerformanceInfo.score * (float)100) / (float)BeatmapInfo.maxScore), 2)}";
+                        else
+                        {
+                            if (Objects.LoadedSettings.DeleteQuit)
+                            {
+                                DeleteFile = true;
+
+                                if (GeneratedAccuracy == "NF-")
+                                    if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
+                                    {
+                                        DeleteFile = false;
+                                    }
+                            }
+
+                            GeneratedAccuracy = $"QUIT";
+                        }
+
+                        if (Objects.FailedLastSong)
+                        {
+                            if (Objects.LoadedSettings.DeleteFailed)
+                                DeleteFile = true;
+                            else
+                                DeleteFile = false;
+
+                            GeneratedAccuracy = $"FAILED";
+                        }
+
+                        NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
+                    }
+
+                    if (NewName.Contains("<max-combo>"))
+                        NewName = NewName.Replace("<max-combo>", $"{PerformanceInfo.maxCombo}");
+
+                    if (NewName.Contains("<score>"))
+                        NewName = NewName.Replace("<score>", $"{PerformanceInfo.score}");
+
+                    if (NewName.Contains("<raw-score>"))
+                        NewName = NewName.Replace("<raw-score>", $"{PerformanceInfo.rawScore}");
+                }
+                else
+                {
+                    // Generate FileName-based on Config File (but without performance stats)
+
+                    if (NewName.Contains("<rank>"))
+                        NewName = NewName.Replace("<rank>", "Z");
+
+                    if (NewName.Contains("<accuracy>"))
+                        NewName = NewName.Replace("<accuracy>", "00.00");
+
+                    if (NewName.Contains("<max-combo>"))
+                        NewName = NewName.Replace("<max-combo>", $"0");
+
+                    if (NewName.Contains("<score>"))
+                        NewName = NewName.Replace("<score>", $"0");
+
+                    if (NewName.Contains("<raw-score>"))
+                        NewName = NewName.Replace("<raw-score>", $"0");
+                }
+
+                if (NewName.Contains("<song-name>"))
+                    NewName = NewName.Replace("<song-name>", BeatmapInfo.songName);
+
+                if (NewName.Contains("<song-author>"))
+                    NewName = NewName.Replace("<song-author>", BeatmapInfo.songAuthorName);
+
+                if (NewName.Contains("<song-sub-name>"))
+                    NewName = NewName.Replace("<song-sub-name>", BeatmapInfo.songSubName);
+
+                if (NewName.Contains("<mapper>"))
+                    NewName = NewName.Replace("<mapper>", BeatmapInfo.levelAuthorName);
+
+                if (NewName.Contains("<levelid>"))
+                    NewName = NewName.Replace("<levelid>", BeatmapInfo.levelId);
+
+                if (NewName.Contains("<bpm>"))
+                    NewName = NewName.Replace("<bpm>", BeatmapInfo.songBPM.ToString());
+
+                LastPerformance = null;
+                LastBeatmap = null;
+
+                await Task.Delay(500);
+
+                if (File.Exists($"{OldFileName}"))
+                {
+
+                    string FileExist = "";
+
+                    FileInfo fileInfo = new FileInfo(OldFileName);
+
+                    while (File.Exists($"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}"))
+                    {
+                        FileExist += "_";
+                    }
+
+                    foreach (char b in Path.GetInvalidFileNameChars())
+                    {
+                        NewName = NewName.Replace(b, '_');
+                    }
+
+                    string NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}";
+
+                    try
+                    {
+                        if (!DeleteFile)
+                        {
+                            Console.WriteLine($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{fileInfo.Extension}\"..");
+                            File.Move(OldFileName, NewFileName);
+                            Console.WriteLine($"[OBSC] Successfully renamed.");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[OBSC] Deleting \"{fileInfo.Name}\"..");
+                            File.Delete(OldFileName);
+                            Console.WriteLine($"[OBSC] Successfully deleted.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[OBSC] {ex}.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[OBSC] {OldFileName} doesn't exist.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"[OBSC] Last recorded file can't be renamed.");
+            }
+        }
+
         private static void ResetSettings()
         {
             Objects.LoadedSettings.README = "!! Please check https://github.com/XorogVEVO/OBSControl for more info !!";
-            Objects.LoadedSettings.ConfigVersion = 1;
+            Objects.LoadedSettings.ConfigVersion = 2;
             Objects.LoadedSettings.BeatSaberUrl = "127.0.0.1";
             Objects.LoadedSettings.BeatSaberPort = "6557";
             Objects.LoadedSettings.OBSUrl = "127.0.0.1";
@@ -568,6 +625,9 @@ namespace OBSControl
             Objects.LoadedSettings.AskToSaveOBSPassword = true;
             Objects.LoadedSettings.PauseRecordingOnIngamePause = false;
             Objects.LoadedSettings.FileFormat = "[<rank>][<accuracy>][<max-combo>x] <song-name> - <song-author> [<mapper>]";
+            Objects.LoadedSettings.StopRecordingOn = "SceneChange";
+            Objects.LoadedSettings.StopRecordingDelay = 5000;
+            Objects.LoadedSettings.DeleteIfShorterThan = 0;
             Objects.LoadedSettings.DeleteQuit = false;
             Objects.LoadedSettings.DeleteFailed = false;
             Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed = false;

@@ -25,6 +25,9 @@ namespace OBSControl
             public bool AskToSaveOBSPassword { get; set; }
             public bool PauseRecordingOnIngamePause { get; set; }
             public string FileFormat { get; set; }
+            public string StopRecordingOn { get; set; }
+            public int StopRecordingDelay { get; set; }
+            public int DeleteIfShorterThan { get; set; }
             public bool DeleteQuit { get; set; }
             public bool DeleteIfQuitAfterSoftFailed { get; set; }
             public bool DeleteFailed { get; set; }
