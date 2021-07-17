@@ -47,6 +47,9 @@ namespace OBSControl
         public static bool FinishedLastSong = false;
         public static bool FailedLastSong = false;
 
+        public static bool FinishedCurrentSong = false;
+        public static bool FailedCurrentSong = false;
+
         public class Status
         {
             public Game game { get; set; }

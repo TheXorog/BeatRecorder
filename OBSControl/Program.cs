@@ -24,6 +24,9 @@ namespace OBSControl
         static Objects.Performance LastPerformance { get; set; }
         static Objects.Beatmap LastBeatmap { get; set; }
 
+        static Objects.Performance CurrentPerformance { get; set; }
+        static Objects.Beatmap CurrentBeatmap { get; set; }
+
 
         static bool OBSRecording = false;
         static bool OBSRecordingPaused = false;
@@ -393,10 +396,10 @@ namespace OBSControl
                 case "songStart":
                     _logger.LogInfo("[BS] Song started.");
 
-                    Objects.FailedLastSong = false;
-                    Objects.FinishedLastSong = false;
-                    LastBeatmap = _status.status.beatmap;
-                    LastPerformance = _status.status.performance;
+                    Objects.FailedCurrentSong = false;
+                    Objects.FinishedCurrentSong = false;
+                    CurrentBeatmap = _status.status.beatmap;
+                    CurrentPerformance = _status.status.performance;
 
                     try
                     {
@@ -412,15 +415,15 @@ namespace OBSControl
                 case "finished":
                     _logger.LogInfo("[BS] Song finished.");
 
-                    LastPerformance = _status.status.performance;
-                    Objects.FinishedLastSong = true;
+                    CurrentPerformance = _status.status.performance;
+                    Objects.FinishedCurrentSong = true;
                     break;
 
                 case "failed":
                     _logger.LogInfo("[BS] Song failed.");
-                    
-                    LastPerformance = _status.status.performance;
-                    Objects.FailedLastSong = true;
+
+                    CurrentPerformance = _status.status.performance;
+                    Objects.FailedCurrentSong = true;
 
                     break;
 
@@ -461,6 +464,11 @@ namespace OBSControl
 
                     try
                     {
+                        LastPerformance = CurrentPerformance;
+                        LastBeatmap = CurrentBeatmap;
+
+                        Objects.FinishedLastSong = Objects.FinishedCurrentSong;
+                        Objects.FailedLastSong = Objects.FailedCurrentSong;
                         _ = StopRecording(CancelStopRecordingDelay.Token);
                     }
                     catch (Exception ex)
@@ -471,7 +479,7 @@ namespace OBSControl
                     break;
 
                 case "scoreChanged":
-                    LastPerformance = _status.status.performance;
+                    CurrentPerformance = _status.status.performance;
                     break;
             }
         }
@@ -493,7 +501,13 @@ namespace OBSControl
                     Thread.Sleep(20);
                 }
 
-                Thread.Sleep(Objects.LoadedSettings.MininumWaitUntilRecordingCanStart);
+                if (Objects.LoadedSettings.MininumWaitUntilRecordingCanStart > 199 || Objects.LoadedSettings.MininumWaitUntilRecordingCanStart < 2001)
+                    Thread.Sleep(Objects.LoadedSettings.MininumWaitUntilRecordingCanStart);
+                else
+                {
+                    _logger.LogError("The MininumWaitUntilRecordingCanStart has to be between 200ms and 2000ms. Defaulting to a wait time of 800ms.");
+                    Thread.Sleep(800);
+                }
 
                 OBSWebSocket.Send($"{{\"request-type\":\"StartRecording\", \"message-id\":\"StartRecording\"}}");
             }
@@ -511,7 +525,7 @@ namespace OBSControl
                 {
                     if (!ForceStop)
                     {
-                        if (Objects.LoadedSettings.StopRecordingDelay > 0 && Objects.LoadedSettings.StopRecordingDelay < 11)
+                        if (Objects.LoadedSettings.StopRecordingDelay > 0 && Objects.LoadedSettings.StopRecordingDelay < 21)
                         {
                             try
                             {
@@ -523,7 +537,7 @@ namespace OBSControl
                             }
                         }
                         else
-                            _logger.LogError("[OBS] The specified delay is not in between 1 and 10 seconds. The delay will be skipped.");
+                            _logger.LogError("[OBS] The specified delay is not in between 1 and 20 seconds. The delay will be skipped.");
                     }
 
                     OBSWebSocket.Send($"{{\"request-type\":\"StopRecording\", \"message-id\":\"StopRecording\"}}");
