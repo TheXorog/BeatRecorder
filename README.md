@@ -44,11 +44,11 @@ If you ruled out your antivirus (through uninstalling it or deactivating it's pr
 * `OBSPassword` - The password you use to connect to the OBS-Websocket. OBSControl will ask for the password if you haven't put one in.
 * `AskToSaveOBSPassword` - This specifies if you want OBSControl to ask for a password. 
 <br></br>
-* `MininumWaitUntilRecordingCanStart` - The amount of milliseconds a new recording is gonna be delayed when forcing to restart a recording. Increase this if you find that your recordings don't restart after restarting a song.
+* `MininumWaitUntilRecordingCanStart` - The amount of milliseconds a new recording is gonna be delayed when forcing to restart a recording. Increase this if you find that your recordings don't restart after restarting a song. (min: `200`ms, max: `2000`ms)
 <br></br>
 * `PauseRecordingOnIngamePause` - Should your recording be paused when you pause your current song?
 * `FileFormat` - The format your files will be renamed to. Check Filename Placeholders below for more info.
-* `StopRecordingDelay` - How many seconds OBSControl should wait after you finish a song/leave the song to end the recording.
+* `StopRecordingDelay` - How many seconds OBSControl should wait after you finish a song/leave the song to end the recording. (min: `1` second, max: `20` seconds)
 <br></br>
 * `DeleteIfShorterThan` - Delete the file if the recording is shorter than the specified amount of seconds.
 * `DeleteQuit` - Delete the file if you quit the song.
@@ -62,8 +62,8 @@ If you ruled out your antivirus (through uninstalling it or deactivating it's pr
 ## Filename Placeholders
 
 The current default is: `[<rank>][<accuracy>][<max-combo>x] <song-name> - <song-author> [<mapper>]`
-<!-- * `<difficulty>` - The difficulty (e.g. `Expert`, `Expert+`) (`1.1.1+`) -->
-<!-- * `<short-difficulty>` - The difficulty but shorter (e.g. `EX`, `EX+`) (`1.1.1+`) -->
+* `<difficulty>` - The difficulty (e.g. `Expert`, `Expert+`) (`1.2.0+`)
+* `<short-difficulty>` - The difficulty but shorter (e.g. `EX`, `EX+`) (`1.2.0+`)
 * `<song-name>` - The song name
 * `<song-author>` - The song author
 * `<song-sub-name>` - The subtitle of the song (e.g. what kind of remix the song is)
