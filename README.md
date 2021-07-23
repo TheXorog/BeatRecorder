@@ -64,11 +64,13 @@ If you ruled out your antivirus (through uninstalling it or deactivating it's pr
 * `<song-name>` - The song name
 * `<song-author>` - The song author
 * `<song-sub-name>` - The subtitle of the song (e.g. what kind of remix the song is)
+<!-- * `<difficulty>` - The difficulty (e.g. `Expert`, `Expert+`) (`1.1.1+`) -->
+<!-- * `<short-difficulty>` - The difficulty but shorter (e.g. `EX`, `EX+`) (`1.1.1+`) -->
 * `<mapper>` - The person who made the map
 * `<levelid>` - The LevelID of the song (not the beatsaver id)
 * `<bpm>` - The beats per minute the song uses
 
-* `<rank>` - The Rank you got (B, A, S, SS, etc.)
+* `<rank>` - The Rank you got (`B`, `A`, `S`, `SS`, etc.)
 * `<accuracy>` - The accuracy you achieved (e.g. `91.31`, `FAILED`, `QUIT`)
 * `<max-combo>` - The best combo you achieved in that play
 * `<score>` - Your Score, with mod multipliers enabled
