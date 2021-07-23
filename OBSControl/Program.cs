@@ -667,7 +667,43 @@ namespace OBSControl
 
                 if (NewName.Contains("<bpm>"))
                     NewName = NewName.Replace("<bpm>", BeatmapInfo.songBPM.ToString());
-                
+
+                if (NewName.Contains("<difficulty>"))
+                {
+                    if (BeatmapInfo.difficulty.ToLower() == "easy")
+                        NewName = NewName.Replace("<long-difficulty>", "Easy");
+
+                    if (BeatmapInfo.difficulty.ToLower() == "normal")
+                        NewName = NewName.Replace("<long-difficulty>", "Normal");
+
+                    if (BeatmapInfo.difficulty.ToLower() == "hard")
+                        NewName = NewName.Replace("<long-difficulty>", "Hard");
+
+                    if (BeatmapInfo.difficulty.ToLower() == "expert")
+                        NewName = NewName.Replace("<long-difficulty>", "Expert");
+
+                    if (BeatmapInfo.difficulty.ToLower() == "expertplus")
+                        NewName = NewName.Replace("<long-difficulty>", "Expert+");
+                }
+
+                if (NewName.Contains("<short-difficulty>"))
+                {
+                    if (BeatmapInfo.difficulty.ToLower() == "easy")
+                        NewName = NewName.Replace("<long-difficulty>", "E");
+
+                    if (BeatmapInfo.difficulty.ToLower() == "normal")
+                        NewName = NewName.Replace("<long-difficulty>", "N");
+
+                    if (BeatmapInfo.difficulty.ToLower() == "hard")
+                        NewName = NewName.Replace("<long-difficulty>", "H");
+
+                    if (BeatmapInfo.difficulty.ToLower() == "expert")
+                        NewName = NewName.Replace("<long-difficulty>", "EX");
+
+                    if (BeatmapInfo.difficulty.ToLower() == "expertplus")
+                        NewName = NewName.Replace("<long-difficulty>", "EX+");
+                }
+
                 if (File.Exists($"{OldFileName}"))
                 {
 
