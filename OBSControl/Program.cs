@@ -3,6 +3,7 @@ using Octokit;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
@@ -96,12 +97,9 @@ namespace OBSControl
 
                     _logger.LogInfo($"[OBSC] Current latest release is \"{repo.TagName}\". You're currently running: \"{CurrentVersion}\"");
 
-                    if (!CurrentVersion.Contains($"RC"))
+                    if (repo.TagName != CurrentVersion)
                     {
-                        if (repo.TagName != CurrentVersion)
-                        {
-                            _logger.LogCritical($"[OBSC] You're running an outdated version of OBSControl, please update at https://github.com/XorogVEVO/OBSControl/releases/latest.");
-                        }
+                        _logger.LogCritical($"[OBSC] You're running an outdated version of OBSControl, please update at https://github.com/XorogVEVO/OBSControl/releases/latest.");
                     }
                 }
                 catch (Exception ex)
@@ -125,7 +123,7 @@ namespace OBSControl
 
                 BeatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/socket"), factory);
                 BeatSaberWebSocket.ReconnectTimeout = null;
-                BeatSaberWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(5);
+                BeatSaberWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(10);
 
                 BeatSaberWebSocket.MessageReceived.Subscribe(msg =>
                 {
@@ -140,7 +138,43 @@ namespace OBSControl
 
                 BeatSaberWebSocket.DisconnectionHappened.Subscribe(type =>
                 {
-                    _logger.LogError($"[BS] Disconnected: {type.Type}");
+                    try
+                    {
+                        Process[] processCollection = Process.GetProcesses();
+
+                        if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
+                        {
+                            _logger.LogWarn($"[BS] Couldn't find a BeatSaber process, is BeatSaber started? ({type.Type})");
+                        }
+                        else
+                        {
+                            bool FoundWebSocketDll = false;
+
+                            string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("beat")).MainModule.FileName;
+                            InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
+
+                            if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
+                            {
+                                if (Directory.GetFiles($"{InstallationDirectory}\\Plugins").Any(x => x.Contains("HTTPStatus") && x.EndsWith(".dll")))
+                                {
+                                    FoundWebSocketDll = true;
+                                }
+                            }
+                            else
+                            {
+                                _logger.LogCritical($"[BS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({type.Type})");
+                            }
+
+                            if (FoundWebSocketDll)
+                                _logger.LogCritical($"[BS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({type.Type})");
+                            else
+                                _logger.LogCritical($"[BS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({type.Type})");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Failed to check if beatsaber-http-status is installed: (Disconnect Reason: {type.Type}) {ex}");
+                    }
                 });
 
                 _logger.LogInfo($"[BS] Connecting..");
@@ -161,7 +195,7 @@ namespace OBSControl
 
                 OBSWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.OBSUrl}:{Objects.LoadedSettings.OBSPort}"), factory);
                 OBSWebSocket.ReconnectTimeout = null;
-                OBSWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(5);
+                OBSWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(10);
 
                 string RequiredAuthenticationGuid = Guid.NewGuid().ToString();
                 string AuthenticationGuid = Guid.NewGuid().ToString();
@@ -359,7 +393,43 @@ namespace OBSControl
 
                 OBSWebSocket.DisconnectionHappened.Subscribe(type =>
                 {
-                    _logger.LogError($"[OBS] Disconnected: {type.Type}");
+                    try
+                    {
+                        Process[] processCollection = Process.GetProcesses();
+
+                        if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("obs64") || x.ProcessName.ToLower().StartsWith("obs32")))
+                        {
+                            _logger.LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({type.Type})");
+                        }
+                        else
+                        {
+                            bool FoundWebSocketDll = false;
+
+                            string OBSInstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("obs64") || x.ProcessName.ToLower().StartsWith("obs32")).MainModule.FileName;
+                            OBSInstallationDirectory = OBSInstallationDirectory.Remove(OBSInstallationDirectory.LastIndexOf("\\bin"), OBSInstallationDirectory.Length - OBSInstallationDirectory.LastIndexOf("\\bin"));
+
+                            if (Directory.GetDirectories(OBSInstallationDirectory).Any(x => x.ToLower().EndsWith("obs-plugins")))
+                            {
+                                foreach (var b in Directory.GetDirectories($"{OBSInstallationDirectory}\\obs-plugins"))
+                                {
+                                    if (Directory.GetFiles(b).Any(x => x.Contains("obs-websocket") && x.EndsWith(".dll")))
+                                    {
+                                        FoundWebSocketDll = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (FoundWebSocketDll)
+                                _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({type.Type})");
+                            else
+                                _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({type.Type})");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Failed to check if obs-websocket is installed: (Disconnect Reason: {type.Type}) {ex}");
+                    }
                 });
 
                 _logger.LogInfo($"[OBS] Connecting..");
@@ -670,38 +740,22 @@ namespace OBSControl
 
                 if (NewName.Contains("<difficulty>"))
                 {
-                    if (BeatmapInfo.difficulty.ToLower() == "easy")
-                        NewName = NewName.Replace("<long-difficulty>", "Easy");
-
-                    if (BeatmapInfo.difficulty.ToLower() == "normal")
-                        NewName = NewName.Replace("<long-difficulty>", "Normal");
-
-                    if (BeatmapInfo.difficulty.ToLower() == "hard")
-                        NewName = NewName.Replace("<long-difficulty>", "Hard");
-
-                    if (BeatmapInfo.difficulty.ToLower() == "expert")
-                        NewName = NewName.Replace("<long-difficulty>", "Expert");
-
                     if (BeatmapInfo.difficulty.ToLower() == "expertplus")
-                        NewName = NewName.Replace("<long-difficulty>", "Expert+");
+                        NewName = NewName.Replace("<difficulty>", "Expert+");
+                    else
+                        NewName = NewName.Replace("<difficulty>", BeatmapInfo.difficulty);
+
+                    _logger.LogDebug(BeatmapInfo.difficulty);
                 }
 
                 if (NewName.Contains("<short-difficulty>"))
                 {
-                    if (BeatmapInfo.difficulty.ToLower() == "easy")
-                        NewName = NewName.Replace("<long-difficulty>", "E");
-
-                    if (BeatmapInfo.difficulty.ToLower() == "normal")
-                        NewName = NewName.Replace("<long-difficulty>", "N");
-
-                    if (BeatmapInfo.difficulty.ToLower() == "hard")
-                        NewName = NewName.Replace("<long-difficulty>", "H");
-
                     if (BeatmapInfo.difficulty.ToLower() == "expert")
-                        NewName = NewName.Replace("<long-difficulty>", "EX");
-
-                    if (BeatmapInfo.difficulty.ToLower() == "expertplus")
-                        NewName = NewName.Replace("<long-difficulty>", "EX+");
+                        NewName = NewName.Replace("<short-difficulty>", "EX");
+                    else if (BeatmapInfo.difficulty.ToLower() == "expert+" || BeatmapInfo.difficulty.ToLower() == "expertplus")
+                        NewName = NewName.Replace("<short-difficulty>", "EX+");
+                    else
+                        NewName = NewName.Replace("<short-difficulty>", BeatmapInfo.difficulty.Remove(1, BeatmapInfo.difficulty.Length - 1));
                 }
 
                 if (File.Exists($"{OldFileName}"))
@@ -721,13 +775,23 @@ namespace OBSControl
                         NewName = NewName.Replace(b, '_');
                     }
 
-                    string NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}";
+                    string FileExists = "";
+                    int FileExistsCount = 2;
+
+                    string NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{FileExists}{fileInfo.Extension}";
+
+                    while (File.Exists(NewFileName))
+                    {
+                        FileExist = $" ({FileExistsCount})";
+                        NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{FileExists}{fileInfo.Extension}";
+                        FileExistsCount++;
+                    }
 
                     try
                     {
                         if (!DeleteFile)
                         {
-                            _logger.LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{fileInfo.Extension}\"..");
+                            _logger.LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                             File.Move(OldFileName, NewFileName);
                             _logger.LogInfo($"[OBSC] Successfully renamed.");
                         }
