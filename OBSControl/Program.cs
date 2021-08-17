@@ -16,7 +16,8 @@ namespace OBSControl
 {
     class Program
     {
-        public static string CurrentVersion = "1.3.0-RC1";
+        public static string CurrentVersion = "1.3.0-RC2";
+        public static int ConfigVersion = 3;
 
         static WebsocketClient BeatSaberWebSocket { get; set; }
         static WebsocketClient BeatSaberWebSocketLiveData { get; set; }
@@ -89,7 +90,7 @@ namespace OBSControl
                     return;
                 }
 
-                if (Objects.LoadedSettings.ConfigVersion != 2)
+                if (Objects.LoadedSettings.ConfigVersion != ConfigVersion)
                 {
                     _logger.LogError($"[OBSC] Old Config detected. Resetting..");
                     ResetSettings();
@@ -1297,7 +1298,7 @@ namespace OBSControl
         private static void ResetSettings()
         {
             Objects.LoadedSettings.README = "!! Please check https://github.com/XorogVEVO/OBSControl for more info and explainations for each config options !!";
-            Objects.LoadedSettings.ConfigVersion = 3;
+            Objects.LoadedSettings.ConfigVersion = ConfigVersion;
             Objects.LoadedSettings.ConsoleLogLevel = 3;
             Objects.LoadedSettings.Mod = "http-status";
             Objects.LoadedSettings.BeatSaberUrl = "127.0.0.1";
