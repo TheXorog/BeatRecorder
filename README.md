@@ -6,7 +6,7 @@
 * **[What is this?](#what-is-this)**
 * **[Requirements](#requirements)**
 * **[How to set up](#how-to-set-up)**
-#### Config help
+#### Config
 * **[Config Help](#config-help)**
 * **[Filename Placeholders](#Filename-Placeholders)**
 #### Troubleshooting
