@@ -16,7 +16,7 @@ namespace OBSControl
 {
     class Program
     {
-        public static string CurrentVersion = "1.3.0-RC2";
+        public static string CurrentVersion = "1.3.0-RC3";
         public static int ConfigVersion = 3;
 
         static WebsocketClient BeatSaberWebSocket { get; set; }
@@ -586,10 +586,8 @@ namespace OBSControl
             await Task.Delay(-1);
         }
 
-        private static async void BeatSaberDataPullerMapData_MessageRecieved(string e)
+        private static void BeatSaberDataPullerMapData_MessageRecieved(string e)
         {
-            _logger.LogDebug($"[BS-DP1] WebSocketMessage:\n\n{e}\n");
-
             Objects.DataPullerMain _status = new Objects.DataPullerMain();
 
             try
@@ -630,7 +628,8 @@ namespace OBSControl
 
                     try
                     {
-                        await Task.Delay(200);
+                        DataPullerCurrentBeatmap = _status;
+
                         DataPullerLastPerformance = DataPullerCurrentPerformance;
                         DataPullerLastBeatmap = DataPullerCurrentBeatmap;
                         Objects.LastSongCombo = Objects.CurrentSongCombo;
@@ -689,8 +688,6 @@ namespace OBSControl
 
         private static void BeatSaberDataPullerLiveData_MessageRecieved(string e)
         {
-            _logger.LogDebug($"[BS-DP2] WebSocketMessage:\n\n{e}\n");
-
             Objects.DataPullerData _status = new Objects.DataPullerData();
 
             try
@@ -703,7 +700,10 @@ namespace OBSControl
                 return;
             }
 
-            DataPullerCurrentPerformance = _status;
+            if (DataPullerInLevel)
+                DataPullerCurrentPerformance = _status;
+            else
+                DataPullerLastPerformance = _status;
 
             if (Objects.CurrentSongCombo < _status.Combo)
                 Objects.CurrentSongCombo = _status.Combo;
@@ -711,8 +711,6 @@ namespace OBSControl
 
         private static void BeatSaberHttpStatus_MessageReceived(string e)
         {
-            _logger.LogDebug($"[BS-HS] WebSocketMessage:\n\n{e}\n");
-
             Objects.BeatSaberEvent _status = new Objects.BeatSaberEvent();
 
             try
@@ -1090,6 +1088,10 @@ namespace OBSControl
         {
             if (BeatmapInfo != null)
             {
+                _logger.LogDebug($"[OBSC] BeatmapInfo: {JsonConvert.SerializeObject(BeatmapInfo)}");
+                _logger.LogDebug($"[OBSC] PerformanceInfo: {JsonConvert.SerializeObject(PerformanceInfo)}");
+                _logger.LogDebug($"[OBSC] OldFileName: {OldFileName}");
+                _logger.LogDebug($"[OBSC] HighestCombo: {HighestCombo}");
                 bool DeleteFile = false;
                 string NewName = Objects.LoadedSettings.FileFormat;
 
@@ -1122,32 +1124,31 @@ namespace OBSControl
                         }
 
                         if (BeatmapInfo.LevelFinished)
-                            GeneratedAccuracy += $"{Math.Round((float)(((float)PerformanceInfo.ScoreWithMultipliers * (float)100) / (float)PerformanceInfo.ScoreWithMultipliers), 2)}";
-                        else
                         {
-                            if (BeatmapInfo.LevelQuit)
-                            {
-                                _logger.LogDebug($"[OBSC] Quit.");
-                                if (Objects.LoadedSettings.DeleteQuit)
-                                {
-                                    _logger.LogDebug($"[OBSC] Quit. Deletion requested.");
-                                    DeleteFile = true;
-
-                                    if (GeneratedAccuracy == "NF-")
-                                        if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
-                                        {
-                                            _logger.LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
-                                            DeleteFile = false;
-                                        }
-                                }
-
-                                GeneratedAccuracy += $"QUIT";
-                            }
+                            _logger.LogDebug($"[OBSC] Level finished");
+                            GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
                         }
-
-                        if (BeatmapInfo.LevelFailed && !BeatmapInfo.Modifiers.noFailOn0Energy)
+                        else if (BeatmapInfo.LevelQuit)
                         {
-                            _logger.LogDebug($"[OBSC] Failed.");
+                            _logger.LogDebug($"[OBSC] Level quit");
+                            if (Objects.LoadedSettings.DeleteQuit)
+                            {
+                                _logger.LogDebug($"[OBSC] Quit. Deletion requested.");
+                                DeleteFile = true;
+
+                                if (GeneratedAccuracy == "NF-")
+                                    if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
+                                    {
+                                        _logger.LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
+                                        DeleteFile = false;
+                                    }
+                            }
+
+                            GeneratedAccuracy += $"QUIT";
+                        }
+                        else if (BeatmapInfo.LevelFailed && !BeatmapInfo.Modifiers.noFailOn0Energy)
+                        {
+                            _logger.LogDebug($"[OBSC] Level failed.");
                             if (Objects.LoadedSettings.DeleteFailed)
                             {
                                 _logger.LogDebug($"[OBSC] Failed. Deletion requested.");
@@ -1159,6 +1160,7 @@ namespace OBSControl
                             GeneratedAccuracy = $"FAILED";
                         }
 
+                        _logger.LogDebug($"[OBSC] {GeneratedAccuracy}");
                         NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
                     }
 
@@ -1221,8 +1223,6 @@ namespace OBSControl
                         NewName = NewName.Replace("<difficulty>", "Expert+");
                     else
                         NewName = NewName.Replace("<difficulty>", BeatmapInfo.Difficulty);
-
-                    _logger.LogDebug(BeatmapInfo.Difficulty);
                 }
 
                 if (NewName.Contains("<short-difficulty>"))

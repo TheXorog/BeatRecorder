@@ -1,5 +1,21 @@
 # OBSControl
 
+## Table of Contents  
+
+#### General info and instructions
+* **[What is this?](#what-is-this)**
+* **[Requirements](#requirements)**
+* **[How to set up](#how-to-set-up)**
+#### Config help
+* **[Config Help](#config-help)**
+* **[Filename Placeholders](#Filename-Placeholders)**
+#### Troubleshooting
+* **[OBSControl not connecting?](#obscontrol-not-connecting)**
+* **[Notable differences between beatsaber-http-status and BSDataPuller](#notable-differences-between-beatsaber-http-status-and-bsdatapuller)**
+* **[Contributing or modifying the code](#Contributing-or-modifying-the-code)**
+
+## What is this?
+
 This application is for people who record their BeatSaber gameplay using OBS. It connects to **[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** or **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** to detect the current game-state and **[obs-websocket](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466/)** to automatically start and stop the recording.
 
 Files are saved where-ever you set your output folder to in OBS.
@@ -22,20 +38,6 @@ Files are saved where-ever you set your output folder to in OBS.
    1. **If you want to use BSDataPuller instead of beatsaber-http-status, set `Mod` to `datapuller` and change the `BeatSaberPort` to the port that datapuller uses (Default: `2946`)**
 4. After configuring, close notepad and check if the applications starts up.
 5. Profit
-
-## OBSControl not connecting?
-
-**AVG Antivirus is known to cause all kinds of issues** with connection-related things. (Credit to `Arro#6969` to help me discover this issue! <3)
-
-If you have AVG Antivirus installed, please uninstall it and find a better antivirus solution.
-
-If you ruled out your antivirus (through uninstalling it or deactivating it's protection), just create an issue or join my Discord like mentioned before.
-
-## Notable differences between beatsaber-http-status and BSDataPuller
-
-Any difference that affects the way OBSControl works will be documented here. Found more differences? You can create an issue with a detailed description.
-
-* Accuracy Calculation with BSDataPuller is based in your current progress instead of the whole song
 
 ## Config Help
 
@@ -87,6 +89,21 @@ The current default is: `[<rank>][<accuracy>][<max-combo>x] <song-name> - <song-
 * `<raw-score>` - Your Score, without mod multipliers enabled
 
 (If you potentially need more placeholders, create an issue and i'll see what i can do.)
+
+## OBSControl not connecting?
+
+**AVG Antivirus is known to cause all kinds of issues** with connection-related things. (Credit to `Arro#6969` to help me discover this issue! <3)
+
+If you have AVG Antivirus installed, please uninstall it and find a better antivirus solution.
+
+If you ruled out your antivirus (through uninstalling it or deactivating it's protection), just create an issue or join my Discord like mentioned before.
+
+## Notable differences between beatsaber-http-status and BSDataPuller
+
+Any difference that affects the way OBSControl works will be documented here. Found more differences? You can create an issue with a detailed description.
+
+* Accuracy Calculation with BSDataPuller is based in your current progress instead of the whole song
+* `<levelid>` uses the LevelHash instead of the ID
 
 ## Contributing or modifying the code
 
