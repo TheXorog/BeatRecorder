@@ -19,7 +19,8 @@ Files are saved where-ever you set your output folder to in OBS.
 1. Install all the previously mentioned dependencies.
 2. Download and unzip this application.
 3. Run it once, it'll ask you to input your Settings. Do so.
-4. And after configuring what you want, save the file and re-open the application.
+   1. **If you want to use BSDataPuller instead of beatsaber-http-status, set `Mod` to `datapuller` and change the `BeatSaberPort` to the port that datapuller uses (Default: `2946`)**
+4. After configuring, close notepad and check if the applications starts up.
 5. Profit
 
 ## OBSControl not connecting?
