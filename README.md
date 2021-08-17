@@ -1,6 +1,6 @@
 # OBSControl
 
-This application is for people who record their BeatSaber gameplay using OBS. It connects to [HttpStatus](https://github.com/opl-/beatsaber-http-status/) to detect the current game-state and [obs-websocket](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466/) to automatically start and stop the recording.
+This application is for people who record their BeatSaber gameplay using OBS. It connects to **[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** or **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** to detect the current game-state and **[obs-websocket](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466/)** to automatically start and stop the recording.
 
 Files are saved where-ever you set your output folder to in OBS.
 
@@ -10,8 +10,9 @@ Files are saved where-ever you set your output folder to in OBS.
 
 ## Requirements
 
-* [beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/) (And any other dependencies that HttpStatus has.)
-* [obs-websocket](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466/)
+* **[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** or **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)**
+<br></br>
+* **[obs-websocket](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466/)**
 
 ## How to set up
 
@@ -29,6 +30,12 @@ If you have AVG Antivirus installed, please uninstall it and find a better antiv
 
 If you ruled out your antivirus (through uninstalling it or deactivating it's protection), just create an issue or join my Discord like mentioned before.
 
+## Notable differences between beatsaber-http-status and BSDataPuller
+
+Any difference that affects the way OBSControl works will be documented here. Found more differences? You can create an issue with a detailed description.
+
+* Accuracy Calculation with BSDataPuller is based in your current progress instead of the whole song
+
 ## Config Help
 
 * `README` - This really just redirects you here for help.
@@ -36,8 +43,9 @@ If you ruled out your antivirus (through uninstalling it or deactivating it's pr
 * `ConfigVersion` - Please don't touch <3
 * `ConsoleLogLevel` - The log level displayed in the console. I recommend leaving that alone.
 <br></br>
-* `BeatSaberUrl` - The IP/URL you use to connect to the HTTPStatus-WebSocket. Leave at default if you don't know any better.
-* `BeatSaberPort` - The Port you use to connect to the HTTPStatus-WebSocket. Leave at default if you don't know any better.
+* `Mod` - The mod you want to use to connect to Beat Saber. (`http-status`, `datapuller`)
+* `BeatSaberUrl` - The IP/URL you use to connect to Beat Saber. Leave at default if you don't know any better.
+* `BeatSaberPort` - The Port you use to connect to Beat Saber. If you don't know any better, choose one of these ports depending on the mod you selected: `http-status`:`6557`, `datapuller`:`2946`
 <br></br>
 * `OBSUrl` - The IP/URL you use to connect to the OBS-WebSocket. Leave at default if you don't know any better.
 * `OBSPort` - The IP/URL you use to connect to the OBS-WebSocket. Leave at default if you don't know any better.

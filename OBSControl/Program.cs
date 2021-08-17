@@ -16,18 +16,31 @@ namespace OBSControl
 {
     class Program
     {
-        public static string CurrentVersion = "1.2.0";
+        public static string CurrentVersion = "1.3.0";
 
         static WebsocketClient BeatSaberWebSocket { get; set; }
+        static WebsocketClient BeatSaberWebSocketLiveData { get; set; }
         static WebsocketClient OBSWebSocket { get; set; }
 
-        
-        static Objects.Performance LastPerformance { get; set; }
-        static Objects.Beatmap LastBeatmap { get; set; }
+        // HttpStatus
 
-        static Objects.Performance CurrentPerformance { get; set; }
-        static Objects.Beatmap CurrentBeatmap { get; set; }
+        static Objects.Performance HttpStatusLastPerformance { get; set; }
+        static Objects.Beatmap HttpStatusLastBeatmap { get; set; }
 
+        static Objects.Performance HttpStatusCurrentPerformance { get; set; }
+        static Objects.Beatmap HttpStatusCurrentBeatmap { get; set; }
+
+        // DataPuller
+
+        static Objects.DataPullerData DataPullerLastPerformance { get; set; }
+        static Objects.DataPullerMain DataPullerLastBeatmap { get; set; }
+
+        static Objects.DataPullerData DataPullerCurrentPerformance { get; set; }
+        static Objects.DataPullerMain DataPullerCurrentBeatmap { get; set; }
+
+
+        static bool DataPullerInLevel = false;
+        static bool DataPullerPaused = false;
 
         static bool OBSRecording = false;
         static bool OBSRecordingPaused = false;
@@ -63,6 +76,11 @@ namespace OBSControl
                     }
                     else
                         throw new Exception("Invalid Console Log Level.");
+
+                    if (Objects.LoadedSettings.Mod != "http-status" && Objects.LoadedSettings.Mod != "datapuller")
+                    {
+                        throw new Exception("Invalid Mod selected.");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -86,6 +104,8 @@ namespace OBSControl
                 return;
             }
 
+            _logger.LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented)}\n");
+
             CancelStopRecordingDelay = new CancellationTokenSource();
 
             await Task.Run(async () =>
@@ -99,7 +119,9 @@ namespace OBSControl
 
                     if (repo.TagName != CurrentVersion)
                     {
-                        _logger.LogCritical($"[OBSC] You're running an outdated version of OBSControl, please update at https://github.com/XorogVEVO/OBSControl/releases/latest.");
+                        _logger.LogCritical($"[OBSC] You're running an outdated version of OBSControl, please update at https://github.com/XorogVEVO/OBSControl/releases/latest." +
+                                            $"\n\nWhat changed in the new version:\n\n" +
+                                            $"{repo.Body}\n");
                     }
                 }
                 catch (Exception ex)
@@ -108,78 +130,195 @@ namespace OBSControl
                 }
             });
 
-            _ = Task.Run(() =>
+            if (Objects.LoadedSettings.Mod == "datapuller")
             {
-                // https://github.com/opl-/beatsaber-http-status/blob/master/protocol.md
-
-                var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
+                _ = Task.Run(() =>
                 {
-                    Options =
+                    // https://github.com/kOFReadie/BSDataPuller
+
+                    var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
+                    {
+                        Options =
                             {
                                 KeepAliveInterval = TimeSpan.FromSeconds(5)
                             }
-                });
+                    });
 
+                    BeatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/BSDataPuller/MapData"), factory);
+                    BeatSaberWebSocket.ReconnectTimeout = null;
+                    BeatSaberWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(10);
 
-                BeatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/socket"), factory);
-                BeatSaberWebSocket.ReconnectTimeout = null;
-                BeatSaberWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(10);
-
-                BeatSaberWebSocket.MessageReceived.Subscribe(msg =>
-                {
-                    BeatSaberWebSocket_MessageReceived(msg.Text);
-                });
-
-                BeatSaberWebSocket.ReconnectionHappened.Subscribe(type =>
-                {
-                    if (type.Type != ReconnectionType.Initial)
-                        _logger.LogWarn($"[BS] Reconnected: {type.Type}");
-                });
-
-                BeatSaberWebSocket.DisconnectionHappened.Subscribe(type =>
-                {
-                    try
+                    BeatSaberWebSocket.MessageReceived.Subscribe(msg =>
                     {
-                        Process[] processCollection = Process.GetProcesses();
+                        BeatSaberDataPullerMapData_MessageRecieved(msg.Text);
+                    });
 
-                        if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
+                    BeatSaberWebSocket.ReconnectionHappened.Subscribe(type =>
+                    {
+                        if (type.Type != ReconnectionType.Initial)
+                            _logger.LogWarn($"[BS-DP1] Reconnected: {type.Type}");
+                    });
+
+                    BeatSaberWebSocket.DisconnectionHappened.Subscribe(type =>
+                    {
+                        try
                         {
-                            _logger.LogWarn($"[BS] Couldn't find a BeatSaber process, is BeatSaber started? ({type.Type})");
-                        }
-                        else
-                        {
-                            bool FoundWebSocketDll = false;
+                            Process[] processCollection = Process.GetProcesses();
 
-                            string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("beat")).MainModule.FileName;
-                            InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
-
-                            if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
+                            if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
                             {
-                                if (Directory.GetFiles($"{InstallationDirectory}\\Plugins").Any(x => x.Contains("HTTPStatus") && x.EndsWith(".dll")))
+                                _logger.LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({type.Type})");
+                            }
+                            else
+                            {
+                                bool FoundWebSocketDll = false;
+
+                                string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("beat")).MainModule.FileName;
+                                InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
+
+                                if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
                                 {
-                                    FoundWebSocketDll = true;
+                                    if (Directory.GetFiles($"{InstallationDirectory}\\Plugins").Any(x => x.Contains("DataPuller") && x.EndsWith(".dll")))
+                                    {
+                                        FoundWebSocketDll = true;
+                                    }
                                 }
+                                else
+                                {
+                                    _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({type.Type})");
+                                }
+
+                                if (FoundWebSocketDll)
+                                    _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({type.Type})");
+                                else
+                                    _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({type.Type})");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError($"[BS-DP1] Failed to check if BSDataPuller is installed: (Disconnect Reason: {type.Type}) {ex}");
+                        }
+                    });
+
+                    _logger.LogInfo($"[BS-DP1] Connecting..");
+                    BeatSaberWebSocket.Start().Wait();
+                    _logger.LogInfo("[BS-DP1] Connected.");
+                });
+
+                _ = Task.Run(() =>
+                    {
+                        // https://github.com/kOFReadie/BSDataPuller
+
+                        var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
+                        {
+                            Options =
+                                    {
+                                        KeepAliveInterval = TimeSpan.FromSeconds(5)
+                                    }
+                        });
+
+                        BeatSaberWebSocketLiveData = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/BSDataPuller/LiveData"), factory);
+                        BeatSaberWebSocketLiveData.ReconnectTimeout = null;
+                        BeatSaberWebSocketLiveData.ErrorReconnectTimeout = TimeSpan.FromSeconds(10);
+
+                        BeatSaberWebSocketLiveData.MessageReceived.Subscribe(msg =>
+                        {
+                            BeatSaberDataPullerLiveData_MessageRecieved(msg.Text);
+                        });
+
+                        BeatSaberWebSocketLiveData.ReconnectionHappened.Subscribe(type =>
+                        {
+                            if (type.Type != ReconnectionType.Initial)
+                                _logger.LogWarn($"[BS-DP2] Reconnected: {type.Type}");
+                        });
+
+                        BeatSaberWebSocketLiveData.DisconnectionHappened.Subscribe(type =>
+                        {
+                            if (BeatSaberWebSocket.IsRunning)
+                                _logger.LogError($"[BS-DP2] Disconnected: {type.Type}");
+                            else
+                                _logger.LogDebug($"[BS-DP2] Disconnected: {type.Type}");
+                        });
+
+                        _logger.LogDebug($"[BS-DP2] Connecting..");
+                        BeatSaberWebSocketLiveData.Start().Wait();
+                        _logger.LogDebug("[BS-DP2] Connected.");
+                    });
+            }
+            else if (Objects.LoadedSettings.Mod == "http-status")
+            {
+                _ = Task.Run(() =>
+                {
+                    // https://github.com/opl-/beatsaber-http-status/blob/master/protocol.md
+                    // https://github.com/kOFReadie/BSDataPuller
+
+                    var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
+                    {
+                        Options =
+                            {
+                                KeepAliveInterval = TimeSpan.FromSeconds(5)
+                            }
+                    });
+
+                    BeatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/socket"), factory);BeatSaberWebSocket.ReconnectTimeout = null;
+                    BeatSaberWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(10);
+
+                    BeatSaberWebSocket.MessageReceived.Subscribe(msg =>
+                    {
+                        BeatSaberHttpStatus_MessageReceived(msg.Text);
+                    });
+
+                    BeatSaberWebSocket.ReconnectionHappened.Subscribe(type =>
+                    {
+                        if (type.Type != ReconnectionType.Initial)
+                            _logger.LogWarn($"[BS-HS] Reconnected: {type.Type}");
+                    });
+
+                    BeatSaberWebSocket.DisconnectionHappened.Subscribe(type =>
+                    {
+                        try
+                        {
+                            Process[] processCollection = Process.GetProcesses();
+
+                            if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
+                            {
+                                _logger.LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({type.Type})");
                             }
                             else
                             {
-                                _logger.LogCritical($"[BS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({type.Type})");
+                                bool FoundWebSocketDll = false;
+
+                                string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("beat")).MainModule.FileName;
+                                InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
+
+                                if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
+                                {
+                                    if (Directory.GetFiles($"{InstallationDirectory}\\Plugins").Any(x => x.Contains("HTTPStatus") && x.EndsWith(".dll")))
+                                    {
+                                        FoundWebSocketDll = true;
+                                    }
+                                }
+                                else
+                                {
+                                    _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({type.Type})");
+                                }
+
+                                if (FoundWebSocketDll)
+                                    _logger.LogCritical($"[BS-HS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({type.Type})");
+                                else
+                                    _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({type.Type})");
                             }
-
-                            if (FoundWebSocketDll)
-                                _logger.LogCritical($"[BS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({type.Type})");
-                            else
-                                _logger.LogCritical($"[BS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({type.Type})");
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Failed to check if beatsaber-http-status is installed: (Disconnect Reason: {type.Type}) {ex}");
-                    }
-                });
+                        catch (Exception ex)
+                        {
+                            _logger.LogError($"[BS-HS] Failed to check if beatsaber-http-status is installed: (Disconnect Reason: {type.Type}) {ex}");
+                        }
+                    });
 
-                _logger.LogInfo($"[BS] Connecting..");
-                BeatSaberWebSocket.Start().Wait();
-            });
+                    _logger.LogInfo($"[BS-HS] Connecting..");
+                    BeatSaberWebSocket.Start().Wait();
+                });
+            }
 
             _ = Task.Run(() =>
             {
@@ -342,7 +481,7 @@ namespace OBSControl
                         OBSRecordingPaused = recordingStatus.isRecordingPaused;
 
                         if (recordingStatus.isRecording)
-                            _logger.LogWarn($"[OBS] A Recording is already running.");
+                            _logger.LogWarn($"[OBS] A recording is already running.");
                     }
 
                     if (msg.Text.Contains("\"update-type\":\"RecordingStopped\""))
@@ -352,7 +491,10 @@ namespace OBSControl
                         _logger.LogInfo($"[OBS] Recording stopped.");
                         OBSRecording = false;
 
-                        HandleFile(LastBeatmap, LastPerformance, RecordingStopped.recordingFilename, Objects.FinishedLastSong, Objects.FailedLastSong);
+                        if (Objects.LoadedSettings.Mod == "http-status")
+                            HttpStatusHandleFile(HttpStatusLastBeatmap, HttpStatusLastPerformance, RecordingStopped.recordingFilename, Objects.FinishedLastSong, Objects.FailedLastSong);
+                        else if (Objects.LoadedSettings.Mod == "datapuller")
+                            DataPullerHandleFile(DataPullerLastBeatmap, DataPullerLastPerformance, RecordingStopped.recordingFilename, Objects.LastSongCombo);
                     }
                     else if (msg.Text.Contains("\"update-type\":\"RecordingStarted\""))
                     {
@@ -443,8 +585,133 @@ namespace OBSControl
             await Task.Delay(-1);
         }
 
-        private static void BeatSaberWebSocket_MessageReceived(string e)
+        private static async void BeatSaberDataPullerMapData_MessageRecieved(string e)
         {
+            _logger.LogDebug($"[BS-DP1] WebSocketMessage:\n\n{e}\n");
+
+            Objects.DataPullerMain _status = new Objects.DataPullerMain();
+
+            try
+            {
+                _status = JsonConvert.DeserializeObject<Objects.DataPullerMain>(e);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"[BS-DP1] Unable to convert BSDataPuller message into an dictionary: {ex}");
+                return;
+            }
+
+            if (DataPullerInLevel != _status.InLevel)
+            {
+                if (!DataPullerInLevel && _status.InLevel)
+                {
+                    DataPullerInLevel = true;
+                    _logger.LogInfo("[BS-DP1] Song started.");
+
+                    DataPullerCurrentBeatmap = _status;
+
+                    try
+                    {
+                        Objects.CurrentSongCombo = 0;
+                        _ = StartRecording();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[BS-DP1] {ex}");
+                        return;
+                    }
+                }
+                else if (DataPullerInLevel && !_status.InLevel)
+                {
+                    DataPullerInLevel = false;
+                    DataPullerPaused = false;
+                    _logger.LogInfo("[BS-DP1] Menu entered.");
+
+                    try
+                    {
+                        await Task.Delay(200);
+                        DataPullerLastPerformance = DataPullerCurrentPerformance;
+                        DataPullerLastBeatmap = DataPullerCurrentBeatmap;
+                        Objects.LastSongCombo = Objects.CurrentSongCombo;
+
+                        _ = StopRecording(CancelStopRecordingDelay.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[BS-DP1] {ex}");
+                        return;
+                    }
+                }
+            }
+
+            if (_status.InLevel)
+            {
+                if (DataPullerPaused != _status.LevelPaused)
+                {
+                    if (!DataPullerPaused && _status.LevelPaused)
+                    {
+                        DataPullerPaused = true;
+                        _logger.LogInfo("[BS-DP1] Song paused.");
+
+                        try
+                        {
+                            if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                                if (OBSWebSocket.IsStarted)
+                                    OBSWebSocket.Send($"{{\"request-type\":\"PauseRecording\", \"message-id\":\"PauseRecording\"}}");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError($"[BS-DP1] {ex}");
+                            return;
+                        }
+                    }
+                    else if (DataPullerPaused && !_status.LevelPaused)
+                    {
+                        DataPullerPaused = false;
+                        _logger.LogInfo("[BS-DP1] Song resumed.");
+
+                        try
+                        {
+                            if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                                if (OBSWebSocket.IsStarted)
+                                    OBSWebSocket.Send($"{{\"request-type\":\"ResumeRecording\", \"message-id\":\"ResumeRecording\"}}");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError($"[BS-DP1] {ex}");
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void BeatSaberDataPullerLiveData_MessageRecieved(string e)
+        {
+            _logger.LogDebug($"[BS-DP2] WebSocketMessage:\n\n{e}\n");
+
+            Objects.DataPullerData _status = new Objects.DataPullerData();
+
+            try
+            {
+                _status = JsonConvert.DeserializeObject<Objects.DataPullerData>(e);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"[BS-DP2] Unable to convert BSDataPuller message into an dictionary: {ex}");
+                return;
+            }
+
+            DataPullerCurrentPerformance = _status;
+
+            if (Objects.CurrentSongCombo < _status.Combo)
+                Objects.CurrentSongCombo = _status.Combo;
+        }
+
+        private static void BeatSaberHttpStatus_MessageReceived(string e)
+        {
+            _logger.LogDebug($"[BS-HS] WebSocketMessage:\n\n{e}\n");
+
             Objects.BeatSaberEvent _status = new Objects.BeatSaberEvent();
 
             try
@@ -453,23 +720,23 @@ namespace OBSControl
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"[BS] Unable to convert HttpStatus Message into an dictionary: {ex}");
+                _logger.LogCritical($"[BS-HS] Unable to convert beatsaber-http-status message into an dictionary: {ex}");
                 return;
             }
 
             switch (_status.@event)
             {
                 case "hello":
-                    _logger.LogInfo("[BS] Connected.");
+                    _logger.LogInfo("[BS-HS] Connected.");
                     break;
 
                 case "songStart":
-                    _logger.LogInfo("[BS] Song started.");
+                    _logger.LogInfo("[BS-HS] Song started.");
 
                     Objects.FailedCurrentSong = false;
                     Objects.FinishedCurrentSong = false;
-                    CurrentBeatmap = _status.status.beatmap;
-                    CurrentPerformance = _status.status.performance;
+                    HttpStatusCurrentBeatmap = _status.status.beatmap;
+                    HttpStatusCurrentPerformance = _status.status.performance;
 
                     try
                     {
@@ -477,28 +744,30 @@ namespace OBSControl
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS] {ex}");
+                        _logger.LogError($"[BS-HS] {ex}");
                         return;
                     }
                     break;
 
                 case "finished":
-                    _logger.LogInfo("[BS] Song finished.");
+                    _logger.LogInfo("[BS-HS] Song finished.");
 
-                    CurrentPerformance = _status.status.performance;
+                    HttpStatusCurrentPerformance = _status.status.performance;
+                    HttpStatusLastPerformance = HttpStatusCurrentPerformance;
                     Objects.FinishedCurrentSong = true;
                     break;
 
                 case "failed":
-                    _logger.LogInfo("[BS] Song failed.");
+                    _logger.LogInfo("[BS-HS] Song failed.");
 
-                    CurrentPerformance = _status.status.performance;
+                    HttpStatusCurrentPerformance = _status.status.performance;
+                    HttpStatusLastPerformance = HttpStatusCurrentPerformance;
                     Objects.FailedCurrentSong = true;
 
                     break;
 
                 case "pause":
-                    _logger.LogInfo("[BS] Song paused.");
+                    _logger.LogInfo("[BS-HS] Song paused.");
 
                     try
                     {
@@ -508,13 +777,13 @@ namespace OBSControl
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS] {ex}");
+                        _logger.LogError($"[BS-HS] {ex}");
                         return;
                     }
                     break;
 
                 case "resume":
-                    _logger.LogInfo("[BS] Song resumed.");
+                    _logger.LogInfo("[BS-HS] Song resumed.");
 
                     try
                     {
@@ -524,18 +793,18 @@ namespace OBSControl
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS] {ex}");
+                        _logger.LogError($"[BS-HS] {ex}");
                         return;
                     }
                     break;
 
                 case "menu":
-                    _logger.LogInfo("[BS] Menu entered.");
+                    _logger.LogInfo("[BS-HS] Menu entered.");
 
                     try
                     {
-                        LastPerformance = CurrentPerformance;
-                        LastBeatmap = CurrentBeatmap;
+                        HttpStatusLastPerformance = HttpStatusCurrentPerformance;
+                        HttpStatusLastBeatmap = HttpStatusCurrentBeatmap;
 
                         Objects.FinishedLastSong = Objects.FinishedCurrentSong;
                         Objects.FailedLastSong = Objects.FailedCurrentSong;
@@ -543,13 +812,13 @@ namespace OBSControl
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS] {ex}");
+                        _logger.LogError($"[BS-HS] {ex}");
                         return;
                     }
                     break;
 
                 case "scoreChanged":
-                    CurrentPerformance = _status.status.performance;
+                    HttpStatusCurrentPerformance = _status.status.performance;
                     break;
             }
         }
@@ -620,7 +889,7 @@ namespace OBSControl
             }
         }
 
-        private static void HandleFile(Objects.Beatmap BeatmapInfo, Objects.Performance PerformanceInfo, string OldFileName, bool FinishedLast, bool FailedLast)
+        private static void HttpStatusHandleFile(Objects.Beatmap BeatmapInfo, Objects.Performance PerformanceInfo, string OldFileName, bool FinishedLast, bool FailedLast)
         {
             if (BeatmapInfo != null)
             {
@@ -744,8 +1013,6 @@ namespace OBSControl
                         NewName = NewName.Replace("<difficulty>", "Expert+");
                     else
                         NewName = NewName.Replace("<difficulty>", BeatmapInfo.difficulty);
-
-                    _logger.LogDebug(BeatmapInfo.difficulty);
                 }
 
                 if (NewName.Contains("<short-difficulty>"))
@@ -818,11 +1085,221 @@ namespace OBSControl
             }
         }
 
+        private static void DataPullerHandleFile(Objects.DataPullerMain BeatmapInfo, Objects.DataPullerData PerformanceInfo, string OldFileName, int HighestCombo)
+        {
+            if (BeatmapInfo != null)
+            {
+                bool DeleteFile = false;
+                string NewName = Objects.LoadedSettings.FileFormat;
+
+                if (PerformanceInfo != null)
+                {
+                    // Generate FileName-based on Config File
+
+                    if (NewName.Contains("<rank>"))
+                    {
+                        if (PerformanceInfo.Rank != "" && PerformanceInfo.Rank != null)
+                            NewName = NewName.Replace("<rank>", PerformanceInfo.Rank);
+                        else
+                            NewName = NewName.Replace("<rank>", "E");
+                    }
+
+                    if (NewName.Contains("<accuracy>"))
+                    {
+                        string GeneratedAccuracy = "";
+
+                        if (BeatmapInfo.LevelFailed && BeatmapInfo.Modifiers.noFailOn0Energy)
+                        {
+                            _logger.LogDebug($"[OBSC] Soft-Failed.");
+                            if (Objects.LoadedSettings.DeleteSoftFailed)
+                            {
+                                _logger.LogDebug($"[OBSC] Soft-Failed. Deletion requested.");
+                                DeleteFile = true;
+                            }
+
+                            GeneratedAccuracy = $"NF-";
+                        }
+
+                        if (BeatmapInfo.LevelFinished)
+                            GeneratedAccuracy += $"{Math.Round((float)(((float)PerformanceInfo.ScoreWithMultipliers * (float)100) / (float)PerformanceInfo.ScoreWithMultipliers), 2)}";
+                        else
+                        {
+                            if (BeatmapInfo.LevelQuit)
+                            {
+                                _logger.LogDebug($"[OBSC] Quit.");
+                                if (Objects.LoadedSettings.DeleteQuit)
+                                {
+                                    _logger.LogDebug($"[OBSC] Quit. Deletion requested.");
+                                    DeleteFile = true;
+
+                                    if (GeneratedAccuracy == "NF-")
+                                        if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
+                                        {
+                                            _logger.LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
+                                            DeleteFile = false;
+                                        }
+                                }
+
+                                GeneratedAccuracy += $"QUIT";
+                            }
+                        }
+
+                        if (BeatmapInfo.LevelFailed && !BeatmapInfo.Modifiers.noFailOn0Energy)
+                        {
+                            _logger.LogDebug($"[OBSC] Failed.");
+                            if (Objects.LoadedSettings.DeleteFailed)
+                            {
+                                _logger.LogDebug($"[OBSC] Failed. Deletion requested.");
+                                DeleteFile = true;
+                            }
+                            else
+                                DeleteFile = false;
+
+                            GeneratedAccuracy = $"FAILED";
+                        }
+
+                        NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
+                    }
+
+                    if (NewName.Contains("<max-combo>"))
+                        NewName = NewName.Replace("<max-combo>", $"{HighestCombo}");
+
+                    if (NewName.Contains("<score>"))
+                        NewName = NewName.Replace("<score>", $"{PerformanceInfo.ScoreWithMultipliers}");
+
+                    if (NewName.Contains("<raw-score>"))
+                        NewName = NewName.Replace("<raw-score>", $"{PerformanceInfo.Score}");
+                }
+                else
+                {
+                    // Generate FileName-based on Config File (but without performance stats)
+
+                    if (NewName.Contains("<rank>"))
+                        NewName = NewName.Replace("<rank>", "Z");
+
+                    if (NewName.Contains("<accuracy>"))
+                        NewName = NewName.Replace("<accuracy>", "00.00");
+
+                    if (NewName.Contains("<max-combo>"))
+                        NewName = NewName.Replace("<max-combo>", $"0");
+
+                    if (NewName.Contains("<score>"))
+                        NewName = NewName.Replace("<score>", $"0");
+
+                    if (NewName.Contains("<raw-score>"))
+                        NewName = NewName.Replace("<raw-score>", $"0");
+                }
+
+                if (Objects.LoadedSettings.DeleteIfShorterThan + Objects.LoadedSettings.StopRecordingDelay > RecordingSeconds)
+                {
+                    _logger.LogDebug($"[OBSC] The recording is too short. Deletion requested.");
+                    DeleteFile = true;
+                }
+
+                if (NewName.Contains("<song-name>"))
+                    NewName = NewName.Replace("<song-name>", BeatmapInfo.SongName);
+
+                if (NewName.Contains("<song-author>"))
+                    NewName = NewName.Replace("<song-author>", BeatmapInfo.SongAuthor);
+
+                if (NewName.Contains("<song-sub-name>"))
+                    NewName = NewName.Replace("<song-sub-name>", BeatmapInfo.SongSubName);
+
+                if (NewName.Contains("<mapper>"))
+                    NewName = NewName.Replace("<mapper>", BeatmapInfo.Mapper);
+
+                if (NewName.Contains("<levelid>") && BeatmapInfo.Hash != null)
+                        NewName = NewName.Replace("<levelid>", BeatmapInfo.Hash.ToString());
+
+                if (NewName.Contains("<bpm>"))
+                    NewName = NewName.Replace("<bpm>", BeatmapInfo.BPM.ToString());
+
+                if (NewName.Contains("<difficulty>"))
+                {
+                    if (BeatmapInfo.Difficulty.ToLower() == "expertplus")
+                        NewName = NewName.Replace("<difficulty>", "Expert+");
+                    else
+                        NewName = NewName.Replace("<difficulty>", BeatmapInfo.Difficulty);
+
+                    _logger.LogDebug(BeatmapInfo.Difficulty);
+                }
+
+                if (NewName.Contains("<short-difficulty>"))
+                {
+                    if (BeatmapInfo.Difficulty.ToLower() == "expert")
+                        NewName = NewName.Replace("<short-difficulty>", "EX");
+                    else if (BeatmapInfo.Difficulty.ToLower() == "expert+" || BeatmapInfo.Difficulty.ToLower() == "expertplus")
+                        NewName = NewName.Replace("<short-difficulty>", "EX+");
+                    else
+                        NewName = NewName.Replace("<short-difficulty>", BeatmapInfo.Difficulty.Remove(1, BeatmapInfo.Difficulty.Length - 1));
+                }
+
+                if (File.Exists($"{OldFileName}"))
+                {
+
+                    string FileExist = "";
+
+                    FileInfo fileInfo = new FileInfo(OldFileName);
+
+                    while (File.Exists($"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}"))
+                    {
+                        FileExist += "_";
+                    }
+
+                    foreach (char b in Path.GetInvalidFileNameChars())
+                    {
+                        NewName = NewName.Replace(b, '_');
+                    }
+
+                    string FileExists = "";
+                    int FileExistsCount = 2;
+
+                    string NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{FileExists}{fileInfo.Extension}";
+
+                    while (File.Exists(NewFileName))
+                    {
+                        FileExist = $" ({FileExistsCount})";
+                        NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{FileExists}{fileInfo.Extension}";
+                        FileExistsCount++;
+                    }
+
+                    try
+                    {
+                        if (!DeleteFile)
+                        {
+                            _logger.LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
+                            File.Move(OldFileName, NewFileName);
+                            _logger.LogInfo($"[OBSC] Successfully renamed.");
+                        }
+                        else
+                        {
+                            _logger.LogInfo($"[OBSC] Deleting \"{fileInfo.Name}\"..");
+                            File.Delete(OldFileName);
+                            _logger.LogInfo($"[OBSC] Successfully deleted.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[OBSC] {ex}.");
+                    }
+                }
+                else
+                {
+                    _logger.LogError($"[OBSC] {OldFileName} doesn't exist.");
+                }
+            }
+            else
+            {
+                _logger.LogError($"[OBSC] Last recorded file can't be renamed.");
+            }
+        }
+
         private static void ResetSettings()
         {
             Objects.LoadedSettings.README = "!! Please check https://github.com/XorogVEVO/OBSControl for more info and explainations for each config options !!";
-            Objects.LoadedSettings.ConfigVersion = 2;
+            Objects.LoadedSettings.ConfigVersion = 3;
             Objects.LoadedSettings.ConsoleLogLevel = 3;
+            Objects.LoadedSettings.Mod = "http-status";
             Objects.LoadedSettings.BeatSaberUrl = "127.0.0.1";
             Objects.LoadedSettings.BeatSaberPort = "6557";
             Objects.LoadedSettings.OBSUrl = "127.0.0.1";
