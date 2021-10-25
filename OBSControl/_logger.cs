@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Threading;
 
 namespace OBSControl
 {
@@ -47,7 +48,7 @@ namespace OBSControl
                     {
                         if (Objects.LogsToPost.Count() == 0)
                         {
-                            await Task.Delay(500);
+                            Thread.Sleep(10);
                             continue;
                         }
 
