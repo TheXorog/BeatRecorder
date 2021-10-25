@@ -64,13 +64,6 @@ namespace OBSControl
                     return;
                 }
 
-                if (Objects.LoadedSettings.ConfigVersion != ConfigVersion)
-                {
-                    _logger.LogError($"[OBSC] Old Config detected. Resetting..");
-                    ResetSettings();
-                    return;
-                }
-
                 _logger.LogInfo("[OBSC] Settings loaded.");
             }
             else
