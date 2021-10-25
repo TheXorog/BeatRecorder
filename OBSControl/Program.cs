@@ -19,9 +19,9 @@ namespace OBSControl
         public static string CurrentVersion = "1.3.0-RC3";
         public static int ConfigVersion = 3;
 
-        static WebsocketClient BeatSaberWebSocket { get; set; }
-        static WebsocketClient BeatSaberWebSocketLiveData { get; set; }
-        static WebsocketClient OBSWebSocket { get; set; }
+        internal static WebsocketClient BeatSaberWebSocket { get; set; }
+        internal static WebsocketClient BeatSaberWebSocketLiveData { get; set; }
+        internal static WebsocketClient OBSWebSocket { get; set; }
 
         // DataPuller
 
@@ -317,251 +317,19 @@ namespace OBSControl
                 OBSWebSocket.ReconnectTimeout = null;
                 OBSWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(10);
 
-                string RequiredAuthenticationGuid = Guid.NewGuid().ToString();
-                string AuthenticationGuid = Guid.NewGuid().ToString();
-                string CheckIfRecording = Guid.NewGuid().ToString();
-
-                OBSWebSocket.MessageReceived.Subscribe(async msg =>
-                {
-                    if (msg.Text.Contains($"\"message-id\":\"{RequiredAuthenticationGuid}\""))
-                    {
-                        OBSWebSocketObjects.AuthenticationRequired required = JsonConvert.DeserializeObject<OBSWebSocketObjects.AuthenticationRequired>(msg.Text);
-
-                        if (required.authRequired)
-                        {
-                            _logger.LogInfo("[OBS] Authenticating..");
-
-                            if (Objects.LoadedSettings.OBSPassword == "")
-                            {
-                                await Task.Delay(1000);
-                                _logger.LogInfo("[OBS] A password is required to log into your obs websocket.");
-                                await Task.Delay(1000);
-                                Console.Write("> ");
-
-                                // I was to lazy to write my own.. https://stackoverflow.com/questions/3404421/password-masking-console-application
-
-                                string Password = "";
-
-                                ConsoleKey key = ConsoleKey.A;
-
-                                while (key != ConsoleKey.Enter || key != ConsoleKey.Escape)
-                                {
-                                    var keyInfo = Console.ReadKey(intercept: true);
-                                    key = keyInfo.Key;
-
-                                    if (key == ConsoleKey.Backspace && Password.Length > 0)
-                                    {
-                                        Console.Write("\b \b");
-                                        Password = Password[0..^1];
-                                    }
-                                    else if (!char.IsControl(keyInfo.KeyChar))
-                                    {
-                                        Console.Write("*");
-                                        Password += keyInfo.KeyChar;
-                                    }
-                                    else if (key == ConsoleKey.Escape)
-                                    {
-                                        _logger.LogInfo("[OBS] Cancelled. Press any key to exit.");
-                                        Console.ReadKey();
-                                        Environment.Exit(0);
-                                        return;
-                                    }
-                                    else if (key == ConsoleKey.Enter)
-                                    {
-                                        Console.Write("\r                                              \r");
-                                        break;
-                                    }
-                                }
-
-                                if (key == ConsoleKey.Enter)
-                                {
-                                    if (Objects.LoadedSettings.AskToSaveOBSPassword)
-                                    {
-                                        key = ConsoleKey.A;
-
-                                        _logger.LogWarn("[OBS] Do you want to save this password in the config? (THIS WILL STORE THE PASSWORD IN PLAIN-TEXT, THIS CAN BE ACCESSED BY ANYONE WITH ACCESS TO YOUR FILES. THIS IS NOT RECOMMENDED!)");
-                                        while (key != ConsoleKey.Enter || key != ConsoleKey.Escape || key != ConsoleKey.Y || key != ConsoleKey.N)
-                                        {
-                                            await Task.Delay(1000);
-                                            Console.Write("[OBS] y/N > ");
-
-                                            var keyInfo = Console.ReadKey(intercept: true);
-                                            Console.Write("\r                                              \r");
-                                            key = keyInfo.Key;
-
-                                            if (key == ConsoleKey.Escape)
-                                            {
-                                                _logger.LogWarn("[OBS] Cancelled. Press any key to exit.");
-                                                Console.ReadKey();
-                                                Environment.Exit(0);
-                                                return;
-                                            }
-                                            else if (key == ConsoleKey.Y)
-                                            {
-                                                _logger.LogInfo("[OBS] Your password is now saved in the Settings.json.");
-                                                Objects.LoadedSettings.OBSPassword = Password;
-                                                Objects.LoadedSettings.AskToSaveOBSPassword = true;
-
-                                                File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
-                                                break;
-                                            }
-                                            else if (key == ConsoleKey.N || key == ConsoleKey.Enter)
-                                            {
-                                                _logger.LogInfo("[OBS] Your password will not be saved. This wont be asked in the feature.");
-                                                _logger.LogInfo("[OBS] To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
-                                                Objects.LoadedSettings.OBSPassword = "";
-                                                Objects.LoadedSettings.AskToSaveOBSPassword = false;
-
-                                                File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    Objects.LoadedSettings.OBSPassword = Password;
-                                }
-                            }
-
-                            string secret = HashEncode(Objects.LoadedSettings.OBSPassword + required.salt);
-                            string authResponse = HashEncode(secret + required.challenge);
-
-                            OBSWebSocket.Send($"{{\"request-type\":\"Authenticate\", \"message-id\":\"{AuthenticationGuid}\", \"auth\":\"{authResponse}\"}}");
-                        }
-                        else
-                        {
-                            OBSWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
-                        }
-                    }
-                    else if (msg.Text.Contains($"\"message-id\":\"{AuthenticationGuid}\""))
-                    {
-                        OBSWebSocketObjects.AuthenticationRequired required = JsonConvert.DeserializeObject<OBSWebSocketObjects.AuthenticationRequired>(msg.Text);
-
-                        if (required.status == "ok")
-                        {
-                            _logger.LogInfo("[OBS] Authenticated.");
-
-                            OBSWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
-                        }
-                        else
-                        {
-                            _logger.LogError("[OBS] Failed to authenticate. Please check your password or wait a few seconds to try authentication again.");
-                            await OBSWebSocket.Stop(WebSocketCloseStatus.NormalClosure, "Shutting down");
-
-                            await Task.Delay(1000);
-
-                            _logger.LogInfo("[OBS] Re-trying..");
-                            await OBSWebSocket.Start();
-                            OBSWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
-                        }
-                    }
-                    else if (msg.Text.Contains($"\"message-id\":\"{CheckIfRecording}\""))
-                    {
-                        OBSWebSocketObjects.RecordingStatus recordingStatus = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStatus>(msg.Text);
-
-                        OBSWebSocketObjects.OBSRecording = recordingStatus.isRecording;
-                        OBSWebSocketObjects.OBSRecordingPaused = recordingStatus.isRecordingPaused;
-
-                        if (recordingStatus.isRecording)
-                            _logger.LogWarn($"[OBS] A recording is already running.");
-                    }
-
-                    if (msg.Text.Contains("\"update-type\":\"RecordingStopped\""))
-                    {
-                        OBSWebSocketObjects.RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStopped>(msg.Text);
-
-                        _logger.LogInfo($"[OBS] Recording stopped.");
-                        OBSWebSocketObjects.OBSRecording = false;
-
-                        if (Objects.LoadedSettings.Mod == "http-status")
-                            HttpStatus.HandleFile(HttpStatusObjects.HttpStatusLastBeatmap, HttpStatusObjects.HttpStatusLastPerformance, RecordingStopped.recordingFilename, HttpStatusObjects.FinishedLastSong, HttpStatusObjects.FailedLastSong);
-                        else if (Objects.LoadedSettings.Mod == "datapuller")
-                            DataPuller.HandleFile(DataPullerObjects.DataPullerLastBeatmap, DataPullerObjects.DataPullerLastPerformance, RecordingStopped.recordingFilename, DataPullerObjects.LastSongCombo);
-                    }
-                    else if (msg.Text.Contains("\"update-type\":\"RecordingStarted\""))
-                    {
-                        _logger.LogInfo($"[OBS] Recording started.");
-                        OBSWebSocketObjects.OBSRecording = true;
-                        while (OBSWebSocketObjects.OBSRecording)
-                        {
-                            await Task.Delay(1000);
-
-                            if (!OBSWebSocketObjects.OBSRecordingPaused)
-                            {
-                                OBSWebSocketObjects.RecordingSeconds++;
-                            }
-                        }
-                        OBSWebSocketObjects.RecordingSeconds = 0;
-                    }
-                    else if (msg.Text.Contains("\"update-type\":\"RecordingPaused\""))
-                    {
-                        _logger.LogInfo($"[OBS] Recording paused.");
-                        OBSWebSocketObjects.OBSRecordingPaused = true;
-                    }
-                    else if (msg.Text.Contains("\"update-type\":\"RecordingResumed\""))
-                    {
-                        _logger.LogInfo($"[OBS] Recording resumed.");
-                        OBSWebSocketObjects.OBSRecordingPaused = false;
-                    }
-                });
-
-                OBSWebSocket.ReconnectionHappened.Subscribe(type =>
-                {
-                    if (type.Type != ReconnectionType.Initial)
-                    {
-                        _logger.LogInfo($"[OBS] Reconnected: {type.Type}");
-
-                        OBSWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
-                    }
-                });
-
-                OBSWebSocket.DisconnectionHappened.Subscribe(type =>
-                {
-                    try
-                    {
-                        Process[] processCollection = Process.GetProcesses();
-
-                        if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("obs64") || x.ProcessName.ToLower().StartsWith("obs32")))
-                        {
-                            _logger.LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({type.Type})");
-                        }
-                        else
-                        {
-                            bool FoundWebSocketDll = false;
-
-                            string OBSInstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("obs64") || x.ProcessName.ToLower().StartsWith("obs32")).MainModule.FileName;
-                            OBSInstallationDirectory = OBSInstallationDirectory.Remove(OBSInstallationDirectory.LastIndexOf("\\bin"), OBSInstallationDirectory.Length - OBSInstallationDirectory.LastIndexOf("\\bin"));
-
-                            if (Directory.GetDirectories(OBSInstallationDirectory).Any(x => x.ToLower().EndsWith("obs-plugins")))
-                            {
-                                foreach (var b in Directory.GetDirectories($"{OBSInstallationDirectory}\\obs-plugins"))
-                                {
-                                    if (Directory.GetFiles(b).Any(x => x.Contains("obs-websocket") && x.EndsWith(".dll")))
-                                    {
-                                        FoundWebSocketDll = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (FoundWebSocketDll)
-                                _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({type.Type})");
-                            else
-                                _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({type.Type})");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Failed to check if obs-websocket is installed: (Disconnect Reason: {type.Type}) {ex}");
-                    }
-                });
+                OBSWebSocket.MessageReceived.Subscribe(msg => { _ = OBSWebSocketEvents.MessageReceived(msg); });
+                OBSWebSocket.ReconnectionHappened.Subscribe(type => { OBSWebSocketEvents.Reconnected(type); });
+                OBSWebSocket.DisconnectionHappened.Subscribe(type => { OBSWebSocketEvents.Disconnected(type); });
 
                 _logger.LogInfo($"[OBS] Connecting..");
                 OBSWebSocket.Start().Wait();
 
-                OBSWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
+                OBSWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{OBSWebSocketEvents.RequiredAuthenticationGuid}\"}}");
 
                 _logger.LogInfo($"[OBS] Connected.");
             });
+
+            // Leave this thread running to not disconnect from the websocket
 
             await Task.Delay(-1);
         }
@@ -895,7 +663,8 @@ namespace OBSControl
                 try
                 {
                     File.Copy("Settings.json", "Settings.json.old");
-                } catch { }
+                }
+                catch { }
             }
 
             File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
@@ -907,17 +676,6 @@ namespace OBSControl
 
             Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
             Environment.Exit(0);
-        }
-
-        // Used for authentication with OBS Websocket if authentication is required ("Borrowed" from https://github.com/BarRaider/obs-websocket-dotnet/blob/268b7f6c52d8daf8e8d08cf517812009c6f9cc26/obs-websocket-dotnet/OBSWebsocket.cs#L797)
-        protected static string HashEncode(string input)
-        {
-            using var sha256 = new SHA256Managed();
-
-            byte[] textBytes = Encoding.ASCII.GetBytes(input);
-            byte[] hash = sha256.ComputeHash(textBytes);
-
-            return System.Convert.ToBase64String(hash);
         }
     }
 }
