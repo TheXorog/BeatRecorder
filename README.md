@@ -83,6 +83,7 @@ The current default is: `[<rank>][<accuracy>][<max-combo>x] <song-name> - <song-
 <br></br>
 * `<rank>` - The Rank you got (`B`, `A`, `S`, `SS`, etc.)
 * `<accuracy>` - The accuracy you achieved (e.g. `91.31`, `FAILED`, `QUIT`)
+* `<misses>` - The times you missed notes (`1.4.0+`)
 * `<max-combo>` - The best combo you achieved in that play
 * `<score>` - Your Score, with mod multipliers enabled
 * `<raw-score>` - Your Score, without mod multipliers enabled
