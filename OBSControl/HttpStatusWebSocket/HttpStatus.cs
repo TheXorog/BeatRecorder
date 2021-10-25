@@ -262,6 +262,9 @@ namespace OBSControl
 
                     if (NewName.Contains("<raw-score>"))
                         NewName = NewName.Replace("<raw-score>", $"{PerformanceInfo.rawScore}");
+
+                    if (NewName.Contains("<misses>"))
+                        NewName = NewName.Replace("<misses>", $"{PerformanceInfo.missedNotes}");
                 }
                 else
                 {
@@ -281,6 +284,9 @@ namespace OBSControl
 
                     if (NewName.Contains("<raw-score>"))
                         NewName = NewName.Replace("<raw-score>", $"0");
+
+                    if (NewName.Contains("<misses>"))
+                        NewName = NewName.Replace("<misses>", $"0");
                 }
 
                 if (Objects.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
