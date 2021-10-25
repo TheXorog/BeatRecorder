@@ -172,7 +172,7 @@ namespace OBSControl
 
             Objects.LogsToPost.Add(new Objects.LogEntry
             {
-                TimeOfEvent = DateTime.UtcNow,
+                TimeOfEvent = DateTime.Now,
                 LogLevel = 4,
                 LogCount = TotalLogs,
                 Message = message
@@ -185,7 +185,7 @@ namespace OBSControl
             
             Objects.LogsToPost.Add(new Objects.LogEntry
             {
-                TimeOfEvent = DateTime.UtcNow,
+                TimeOfEvent = DateTime.Now,
                 LogLevel = 3,
                 LogCount = TotalLogs,
                 Message = message
@@ -198,7 +198,7 @@ namespace OBSControl
             
             Objects.LogsToPost.Add(new Objects.LogEntry
             {
-                TimeOfEvent = DateTime.UtcNow,
+                TimeOfEvent = DateTime.Now,
                 LogLevel = 2,
                 LogCount = TotalLogs,
                 Message = message
@@ -211,7 +211,7 @@ namespace OBSControl
 
             Objects.LogsToPost.Add(new Objects.LogEntry
             {
-                TimeOfEvent = DateTime.UtcNow,
+                TimeOfEvent = DateTime.Now,
                 LogLevel = 1,
                 LogCount = TotalLogs,
                 Message = message
@@ -224,7 +224,7 @@ namespace OBSControl
 
             Objects.LogsToPost.Add(new Objects.LogEntry
             {
-                TimeOfEvent = DateTime.UtcNow,
+                TimeOfEvent = DateTime.Now,
                 LogLevel = 0,
                 LogCount = TotalLogs,
                 Message = message

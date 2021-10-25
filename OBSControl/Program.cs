@@ -35,8 +35,6 @@ namespace OBSControl
 
             _logger.LogInfo($"[OBSC] Writing to file {_logger.FileName}");
 
-            _logger.LogWarn("[OBSC] This application uses the UTC (+00:00) time offset.");
-
             _logger.LogInfo("[OBSC] Loading settings..");
 
             if (File.Exists("Settings.json"))
