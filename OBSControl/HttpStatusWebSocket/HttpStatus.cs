@@ -34,7 +34,8 @@ namespace OBSControl
                     break;
 
                 case "songStart":
-                    _logger.LogInfo("[BS-HS] Song started.");
+                    _logger.LogDebug("[BS-HS] Song started.");
+                    _logger.LogInfo($"[BS-HS] Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
 
                     HttpStatusObjects.FailedCurrentSong = false;
                     HttpStatusObjects.FinishedCurrentSong = false;
@@ -102,7 +103,8 @@ namespace OBSControl
                     break;
 
                 case "menu":
-                    _logger.LogInfo("[BS-HS] Menu entered.");
+                    _logger.LogDebug("[BS-HS] Menu entered.");
+                    _logger.LogInfo($"[BS-HS] Stopped playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
 
                     try
                     {

@@ -32,7 +32,8 @@ namespace OBSControl
                 if (!DataPullerObjects.DataPullerInLevel && _status.InLevel)
                 {
                     DataPullerObjects.DataPullerInLevel = true;
-                    _logger.LogInfo("[BS-DP1] Song started.");
+                    _logger.LogDebug("[BS-DP1] Song started.");
+                    _logger.LogInfo($"[BS-DP1] Started playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
                     DataPullerObjects.DataPullerCurrentBeatmap = _status;
 
@@ -51,7 +52,8 @@ namespace OBSControl
                 {
                     DataPullerObjects.DataPullerInLevel = false;
                     DataPullerObjects.DataPullerPaused = false;
-                    _logger.LogInfo("[BS-DP1] Menu entered.");
+                    _logger.LogDebug("[BS-DP1] Menu entered.");
+                    _logger.LogInfo($"[BS-DP1] Stopped playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
                     try
                     {
