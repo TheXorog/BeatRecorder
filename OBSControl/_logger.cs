@@ -154,7 +154,7 @@ namespace OBSControl
                                     break;
                             }
 
-                            Objects.LogsToPost.Dequeue();
+                            Objects.LogsToPost.Remove(b);
                         }
                     }
                     catch (Exception)
@@ -170,7 +170,7 @@ namespace OBSControl
         {
             TotalLogs++;
 
-            Objects.LogsToPost.Enqueue(new Objects.LogEntry
+            Objects.LogsToPost.Add(new Objects.LogEntry
             {
                 TimeOfEvent = DateTime.UtcNow,
                 LogLevel = 4,
@@ -183,7 +183,7 @@ namespace OBSControl
         {
             TotalLogs++;
             
-            Objects.LogsToPost.Enqueue(new Objects.LogEntry
+            Objects.LogsToPost.Add(new Objects.LogEntry
             {
                 TimeOfEvent = DateTime.UtcNow,
                 LogLevel = 3,
@@ -196,7 +196,7 @@ namespace OBSControl
         {
             TotalLogs++;
             
-            Objects.LogsToPost.Enqueue(new Objects.LogEntry
+            Objects.LogsToPost.Add(new Objects.LogEntry
             {
                 TimeOfEvent = DateTime.UtcNow,
                 LogLevel = 2,
@@ -209,7 +209,7 @@ namespace OBSControl
         {
             TotalLogs++;
 
-            Objects.LogsToPost.Enqueue(new Objects.LogEntry
+            Objects.LogsToPost.Add(new Objects.LogEntry
             {
                 TimeOfEvent = DateTime.UtcNow,
                 LogLevel = 1,
@@ -222,7 +222,7 @@ namespace OBSControl
         {
             TotalLogs++;
 
-            Objects.LogsToPost.Enqueue(new Objects.LogEntry
+            Objects.LogsToPost.Add(new Objects.LogEntry
             {
                 TimeOfEvent = DateTime.UtcNow,
                 LogLevel = 0,
