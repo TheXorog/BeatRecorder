@@ -3,12 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OBSControl
 {
     class OBSWebSocketObjects
     {
+        internal static bool OBSRecording = false;
+        internal static bool OBSRecordingPaused = false;
+        internal static int RecordingSeconds = 0;
+        internal static CancellationTokenSource CancelStopRecordingDelay { get; set; }
+
         public class AuthenticationRequired
         {
             public bool authRequired { get; set; }

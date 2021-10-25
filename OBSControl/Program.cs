@@ -29,12 +29,6 @@ namespace OBSControl
         static bool DataPullerInLevel = false;
         static bool DataPullerPaused = false;
 
-        static bool OBSRecording = false;
-        static bool OBSRecordingPaused = false;
-        static int RecordingSeconds = 0;
-        static CancellationTokenSource CancelStopRecordingDelay { get; set; }
-
-
         static void Main(string[] args)
         {
             MainAsync(args).ConfigureAwait(true).GetAwaiter().GetResult();
@@ -93,7 +87,7 @@ namespace OBSControl
 
             _logger.LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented)}\n");
 
-            CancelStopRecordingDelay = new CancellationTokenSource();
+            OBSWebSocketObjects.CancelStopRecordingDelay = new CancellationTokenSource();
 
             await Task.Run(async () =>
             {
@@ -464,8 +458,8 @@ namespace OBSControl
                     {
                         OBSWebSocketObjects.RecordingStatus recordingStatus = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStatus>(msg.Text);
 
-                        OBSRecording = recordingStatus.isRecording;
-                        OBSRecordingPaused = recordingStatus.isRecordingPaused;
+                        OBSWebSocketObjects.OBSRecording = recordingStatus.isRecording;
+                        OBSWebSocketObjects.OBSRecordingPaused = recordingStatus.isRecordingPaused;
 
                         if (recordingStatus.isRecording)
                             _logger.LogWarn($"[OBS] A recording is already running.");
@@ -476,7 +470,7 @@ namespace OBSControl
                         OBSWebSocketObjects.RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStopped>(msg.Text);
 
                         _logger.LogInfo($"[OBS] Recording stopped.");
-                        OBSRecording = false;
+                        OBSWebSocketObjects.OBSRecording = false;
 
                         if (Objects.LoadedSettings.Mod == "http-status")
                             HttpStatusHandleFile(HttpStatusObjects.HttpStatusLastBeatmap, HttpStatusObjects.HttpStatusLastPerformance, RecordingStopped.recordingFilename, HttpStatusObjects.FinishedLastSong, HttpStatusObjects.FailedLastSong);
@@ -486,27 +480,27 @@ namespace OBSControl
                     else if (msg.Text.Contains("\"update-type\":\"RecordingStarted\""))
                     {
                         _logger.LogInfo($"[OBS] Recording started.");
-                        OBSRecording = true;
-                        while (OBSRecording)
+                        OBSWebSocketObjects.OBSRecording = true;
+                        while (OBSWebSocketObjects.OBSRecording)
                         {
                             await Task.Delay(1000);
 
-                            if (!OBSRecordingPaused)
+                            if (!OBSWebSocketObjects.OBSRecordingPaused)
                             {
-                                RecordingSeconds++;
+                                OBSWebSocketObjects.RecordingSeconds++;
                             }
                         }
-                        RecordingSeconds = 0;
+                        OBSWebSocketObjects.RecordingSeconds = 0;
                     }
                     else if (msg.Text.Contains("\"update-type\":\"RecordingPaused\""))
                     {
                         _logger.LogInfo($"[OBS] Recording paused.");
-                        OBSRecordingPaused = true;
+                        OBSWebSocketObjects.OBSRecordingPaused = true;
                     }
                     else if (msg.Text.Contains("\"update-type\":\"RecordingResumed\""))
                     {
                         _logger.LogInfo($"[OBS] Recording resumed.");
-                        OBSRecordingPaused = false;
+                        OBSWebSocketObjects.OBSRecordingPaused = false;
                     }
                 });
 
@@ -620,7 +614,7 @@ namespace OBSControl
                         DataPullerObjects.DataPullerLastBeatmap = DataPullerObjects.DataPullerCurrentBeatmap;
                         DataPullerObjects.LastSongCombo = DataPullerObjects.CurrentSongCombo;
 
-                        _ = StopRecording(CancelStopRecordingDelay.Token);
+                        _ = StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token);
                     }
                     catch (Exception ex)
                     {
@@ -793,7 +787,7 @@ namespace OBSControl
 
                         HttpStatusObjects.FinishedLastSong = HttpStatusObjects.FinishedCurrentSong;
                         HttpStatusObjects.FailedLastSong = HttpStatusObjects.FailedCurrentSong;
-                        _ = StopRecording(CancelStopRecordingDelay.Token);
+                        _ = StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token);
                     }
                     catch (Exception ex)
                     {
@@ -812,15 +806,15 @@ namespace OBSControl
         {
             if (OBSWebSocket.IsStarted)
             {
-                if (OBSRecording)
+                if (OBSWebSocketObjects.OBSRecording)
                 {
-                    CancelStopRecordingDelay.Cancel();
-                    await StopRecording(CancelStopRecordingDelay.Token, true);
+                    OBSWebSocketObjects.CancelStopRecordingDelay.Cancel();
+                    await StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token, true);
                 }
 
-                CancelStopRecordingDelay = new CancellationTokenSource();
+                OBSWebSocketObjects.CancelStopRecordingDelay = new CancellationTokenSource();
 
-                while (OBSRecording)
+                while (OBSWebSocketObjects.OBSRecording)
                 {
                     Thread.Sleep(20);
                 }
@@ -845,7 +839,7 @@ namespace OBSControl
         {
             if (OBSWebSocket.IsStarted)
             {
-                if (OBSRecording)
+                if (OBSWebSocketObjects.OBSRecording)
                 {
                     if (!ForceStop)
                     {
@@ -968,7 +962,7 @@ namespace OBSControl
                         NewName = NewName.Replace("<raw-score>", $"0");
                 }
 
-                if (Objects.LoadedSettings.DeleteIfShorterThan + Objects.LoadedSettings.StopRecordingDelay > RecordingSeconds)
+                if (Objects.LoadedSettings.DeleteIfShorterThan + Objects.LoadedSettings.StopRecordingDelay > OBSWebSocketObjects.RecordingSeconds)
                 {
                     _logger.LogDebug($"[OBSC] The recording is too short. Deletion requested.");
                     DeleteFile = true;
@@ -1179,7 +1173,7 @@ namespace OBSControl
                         NewName = NewName.Replace("<raw-score>", $"0");
                 }
 
-                if (Objects.LoadedSettings.DeleteIfShorterThan + Objects.LoadedSettings.StopRecordingDelay > RecordingSeconds)
+                if (Objects.LoadedSettings.DeleteIfShorterThan + Objects.LoadedSettings.StopRecordingDelay > OBSWebSocketObjects.RecordingSeconds)
                 {
                     _logger.LogDebug($"[OBSC] The recording is too short. Deletion requested.");
                     DeleteFile = true;
