@@ -22,6 +22,23 @@ namespace OBSControl
             _logger.FileName = $"logs/{DateTime.UtcNow.ToString("dd-MM-yyyy_HH-mm-ss")}.log";
             _logger.OpenedFile = File.Open(_logger.FileName, FileMode.Append);
 
+            foreach (var b in Directory.GetFiles("logs"))
+            {
+                try
+                {
+                    FileInfo fi = new(b);
+                    if (fi.CreationTimeUtc < DateTime.UtcNow.AddDays(-3))
+                    {
+                        fi.Delete();
+                        _logger.LogDebug($"{fi.Name} deleted");
+                    }
+                }
+                catch (Exception)
+                {
+                    _logger.LogError($"Couldn't delete log file {b}");
+                }
+            }
+
             _ = Task.Run(async () =>
             {
                 while (true)
