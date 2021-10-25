@@ -9,7 +9,18 @@ namespace OBSControl
 {
     class Objects
     {
-        // Settings
+        public static ConnectionTypeWarning LastDP1Warning { get; set; }
+        public static ConnectionTypeWarning LastHttpStatusWarning { get; set; }
+        public static ConnectionTypeWarning LastOBSWarning { get; set; }
+
+        public enum ConnectionTypeWarning
+        {
+            CONNECTED,
+            MOD_INSTALLED,
+            MOD_NOT_INSTALLED,
+            NOT_MODDED,
+            NO_PROCESS
+        }
 
         public static Settings LoadedSettings = new Settings();
 

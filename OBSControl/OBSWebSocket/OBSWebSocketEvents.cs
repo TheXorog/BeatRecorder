@@ -207,6 +207,8 @@ namespace OBSControl
             {
                 _logger.LogInfo($"[OBS] Reconnected: {msg.Type}");
 
+                Objects.LastOBSWarning = Objects.ConnectionTypeWarning.CONNECTED;
+
                 Program.obsWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
             }
         }
@@ -219,7 +221,9 @@ namespace OBSControl
 
                 if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("obs64") || x.ProcessName.ToLower().StartsWith("obs32")))
                 {
-                    _logger.LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({msg.Type})");
+                    if (Objects.LastOBSWarning != Objects.ConnectionTypeWarning.NO_PROCESS)
+                        _logger.LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({msg.Type})");
+                    Objects.LastOBSWarning = Objects.ConnectionTypeWarning.NO_PROCESS;
                 }
                 else
                 {
@@ -241,9 +245,17 @@ namespace OBSControl
                     }
 
                     if (FoundWebSocketDll)
-                        _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({msg.Type})");
+                    {
+                        if (Objects.LastOBSWarning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
+                            _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({msg.Type})");
+                        Objects.LastOBSWarning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
+                    }
                     else
-                        _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({msg.Type})");
+                    {
+                        if (Objects.LastOBSWarning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
+                            _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({msg.Type})");
+                        Objects.LastOBSWarning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
+                    }
                 }
             }
             catch (Exception ex)

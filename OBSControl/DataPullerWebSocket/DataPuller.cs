@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Websocket.Client;
 using Websocket.Client.Models;
@@ -50,6 +51,7 @@ namespace OBSControl
                 }
                 else if (DataPullerObjects.DataPullerInLevel && !_status.InLevel)
                 {
+                    Thread.Sleep(500);
                     DataPullerObjects.DataPullerInLevel = false;
                     DataPullerObjects.DataPullerPaused = false;
                     _logger.LogDebug("[BS-DP1] Menu entered.");
@@ -139,13 +141,18 @@ namespace OBSControl
         internal static void MapDataReconnected(ReconnectionInfo msg)
         {
             if (msg.Type != ReconnectionType.Initial)
+            {
                 _logger.LogWarn($"[BS-DP1] Reconnected: {msg.Type}");
+                Objects.LastDP1Warning = Objects.ConnectionTypeWarning.CONNECTED;
+            }
         }
 
         internal static void LiveDataReconnected(ReconnectionInfo msg)
         {
             if (msg.Type != ReconnectionType.Initial)
+            {
                 _logger.LogWarn($"[BS-DP2] Reconnected: {msg.Type}");
+            }
         }
 
         internal static void MapDataDisconnected(DisconnectionInfo msg)
@@ -156,7 +163,9 @@ namespace OBSControl
 
                 if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
                 {
-                    _logger.LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                    if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.NO_PROCESS)
+                        _logger.LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                    Objects.LastDP1Warning = Objects.ConnectionTypeWarning.NO_PROCESS;
                 }
                 else
                 {
@@ -174,13 +183,23 @@ namespace OBSControl
                     }
                     else
                     {
-                        _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
+                        if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.NOT_MODDED)
+                            _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
+                        Objects.LastDP1Warning = Objects.ConnectionTypeWarning.NOT_MODDED;
                     }
 
                     if (FoundWebSocketDll)
-                        _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                    {
+                        if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
+                            _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                        Objects.LastDP1Warning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
+                    }
                     else
-                        _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                    {
+                        if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
+                            _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                        Objects.LastDP1Warning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
+                    }
                 }
             }
             catch (Exception ex)
@@ -274,7 +293,7 @@ namespace OBSControl
                         }
                         else
                         {
-                            if (!BeatmapInfo.LevelFailed && !BeatmapInfo.LevelQuit && !BeatmapInfo.LevelFinished)
+                            if (!BeatmapInfo.LevelQuit && !BeatmapInfo.LevelFinished)
                             {
                                 _logger.LogDebug($"[OBSC] Level restarted");
                                 if (Objects.LoadedSettings.DeleteQuit)

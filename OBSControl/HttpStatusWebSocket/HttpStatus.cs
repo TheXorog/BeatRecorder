@@ -132,6 +132,8 @@ namespace OBSControl
         {
             if (msg.Type != ReconnectionType.Initial)
                 _logger.LogWarn($"[BS-HS] Reconnected: {msg.Type}");
+
+            Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.CONNECTED;
         }
 
         internal static void Disconnected(DisconnectionInfo msg)
@@ -142,7 +144,9 @@ namespace OBSControl
 
                 if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
                 {
-                    _logger.LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                    if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.NO_PROCESS)
+                        _logger.LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                    Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.NO_PROCESS;
                 }
                 else
                 {
@@ -160,13 +164,23 @@ namespace OBSControl
                     }
                     else
                     {
-                        _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.NOT_MODDED)
+                            _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.NOT_MODDED;
                     }
 
                     if (FoundWebSocketDll)
-                        _logger.LogCritical($"[BS-HS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                    {
+                        if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
+                            _logger.LogCritical($"[BS-HS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
+                    }
                     else
-                        _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                    {
+                        if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
+                            _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
+                    }
                 }
             }
             catch (Exception ex)
