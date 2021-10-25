@@ -43,7 +43,6 @@ Files are saved where-ever you set your output folder to in OBS.
 
 * `README` - This really just redirects you here for help.
 <br></br>
-* `ConfigVersion` - Please don't touch <3
 * `ConsoleLogLevel` - The log level displayed in the console. I recommend leaving that alone.
 <br></br>
 * `Mod` - The mod you want to use to connect to Beat Saber. (`http-status`, `datapuller`)
