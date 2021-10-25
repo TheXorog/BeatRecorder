@@ -122,11 +122,11 @@ namespace OBSControl
                     string secret = Extensions.HashEncode(Objects.LoadedSettings.OBSPassword + required.salt);
                     string authResponse = Extensions.HashEncode(secret + required.challenge);
 
-                    Program.OBSWebSocket.Send($"{{\"request-type\":\"Authenticate\", \"message-id\":\"{AuthenticationGuid}\", \"auth\":\"{authResponse}\"}}");
+                    Program.obsWebSocket.Send($"{{\"request-type\":\"Authenticate\", \"message-id\":\"{AuthenticationGuid}\", \"auth\":\"{authResponse}\"}}");
                 }
                 else
                 {
-                    Program.OBSWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
+                    Program.obsWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
                 }
             }
             else if (msg.Text.Contains($"\"message-id\":\"{AuthenticationGuid}\""))
@@ -137,18 +137,18 @@ namespace OBSControl
                 {
                     _logger.LogInfo("[OBS] Authenticated.");
 
-                    Program.OBSWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
+                    Program.obsWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
                 }
                 else
                 {
                     _logger.LogError("[OBS] Failed to authenticate. Please check your password or wait a few seconds to try authentication again.");
-                    await Program.OBSWebSocket.Stop(WebSocketCloseStatus.NormalClosure, "Shutting down");
+                    await Program.obsWebSocket.Stop(WebSocketCloseStatus.NormalClosure, "Shutting down");
 
                     await Task.Delay(1000);
 
                     _logger.LogInfo("[OBS] Re-trying..");
-                    await Program.OBSWebSocket.Start();
-                    Program.OBSWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
+                    await Program.obsWebSocket.Start();
+                    Program.obsWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
                 }
             }
             else if (msg.Text.Contains($"\"message-id\":\"{CheckIfRecording}\""))
@@ -207,7 +207,7 @@ namespace OBSControl
             {
                 _logger.LogInfo($"[OBS] Reconnected: {msg.Type}");
 
-                Program.OBSWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
+                Program.obsWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
             }
         }
 

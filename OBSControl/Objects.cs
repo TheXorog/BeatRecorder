@@ -38,7 +38,7 @@ namespace OBSControl
 
         // Shedule-based logger
 
-        public static List<LogEntry> LogsToPost = new List<LogEntry>();
+        public static List<LogEntry> LogsToPost = new();
 
         public class LogEntry
         {

@@ -17,8 +17,9 @@ namespace OBSControl
 
 
         internal static int LastSongCombo = 0;
-
         internal static int CurrentSongCombo = 0;
+        internal static bool DataPullerInLevel = false;
+        internal static bool DataPullerPaused = false;
 
         public class DataPullerMain
         {

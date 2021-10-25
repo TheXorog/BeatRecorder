@@ -1,15 +1,202 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Websocket.Client;
+using Websocket.Client.Models;
 
 namespace OBSControl
 {
     class DataPuller
     {
+        internal static void MapDataMessageRecieved(string e)
+        {
+            DataPullerObjects.DataPullerMain _status = new DataPullerObjects.DataPullerMain();
+
+            try
+            {
+                _status = JsonConvert.DeserializeObject<DataPullerObjects.DataPullerMain>(e);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"[BS-DP1] Unable to convert BSDataPuller message into an dictionary: {ex}");
+                return;
+            }
+
+            if (DataPullerObjects.DataPullerInLevel != _status.InLevel)
+            {
+                if (!DataPullerObjects.DataPullerInLevel && _status.InLevel)
+                {
+                    DataPullerObjects.DataPullerInLevel = true;
+                    _logger.LogInfo("[BS-DP1] Song started.");
+
+                    DataPullerObjects.DataPullerCurrentBeatmap = _status;
+
+                    try
+                    {
+                        DataPullerObjects.CurrentSongCombo = 0;
+                        _ = OBSWebSocket.StartRecording();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[BS-DP1] {ex}");
+                        return;
+                    }
+                }
+                else if (DataPullerObjects.DataPullerInLevel && !_status.InLevel)
+                {
+                    DataPullerObjects.DataPullerInLevel = false;
+                    DataPullerObjects.DataPullerPaused = false;
+                    _logger.LogInfo("[BS-DP1] Menu entered.");
+
+                    try
+                    {
+                        DataPullerObjects.DataPullerCurrentBeatmap = _status;
+
+                        DataPullerObjects.DataPullerLastPerformance = DataPullerObjects.DataPullerCurrentPerformance;
+                        DataPullerObjects.DataPullerLastBeatmap = DataPullerObjects.DataPullerCurrentBeatmap;
+                        DataPullerObjects.LastSongCombo = DataPullerObjects.CurrentSongCombo;
+
+                        _ = OBSWebSocket.StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[BS-DP1] {ex}");
+                        return;
+                    }
+                }
+            }
+
+            if (_status.InLevel)
+            {
+                if (DataPullerObjects.DataPullerPaused != _status.LevelPaused)
+                {
+                    if (!DataPullerObjects.DataPullerPaused && _status.LevelPaused)
+                    {
+                        DataPullerObjects.DataPullerPaused = true;
+                        _logger.LogInfo("[BS-DP1] Song paused.");
+
+                        try
+                        {
+                            if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                                if (Program.obsWebSocket.IsStarted)
+                                    Program.obsWebSocket.Send($"{{\"request-type\":\"PauseRecording\", \"message-id\":\"PauseRecording\"}}");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError($"[BS-DP1] {ex}");
+                            return;
+                        }
+                    }
+                    else if (DataPullerObjects.DataPullerPaused && !_status.LevelPaused)
+                    {
+                        DataPullerObjects.DataPullerPaused = false;
+                        _logger.LogInfo("[BS-DP1] Song resumed.");
+
+                        try
+                        {
+                            if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                                if (Program.obsWebSocket.IsStarted)
+                                    Program.obsWebSocket.Send($"{{\"request-type\":\"ResumeRecording\", \"message-id\":\"ResumeRecording\"}}");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError($"[BS-DP1] {ex}");
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal static void LiveDataMessageRecieved(string e)
+        {
+            DataPullerObjects.DataPullerData _status = new DataPullerObjects.DataPullerData();
+
+            try
+            {
+                _status = JsonConvert.DeserializeObject<DataPullerObjects.DataPullerData>(e);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"[BS-DP2] Unable to convert BSDataPuller message into an dictionary: {ex}");
+                return;
+            }
+
+            if (DataPullerObjects.DataPullerInLevel)
+                DataPullerObjects.DataPullerCurrentPerformance = _status;
+            else
+                DataPullerObjects.DataPullerLastPerformance = _status;
+
+            if (DataPullerObjects.CurrentSongCombo < _status.Combo)
+                DataPullerObjects.CurrentSongCombo = _status.Combo;
+        }
+
+        internal static void MapDataReconnected(ReconnectionInfo msg)
+        {
+            if (msg.Type != ReconnectionType.Initial)
+                _logger.LogWarn($"[BS-DP1] Reconnected: {msg.Type}");
+        }
+
+        internal static void LiveDataReconnected(ReconnectionInfo msg)
+        {
+            if (msg.Type != ReconnectionType.Initial)
+                _logger.LogWarn($"[BS-DP2] Reconnected: {msg.Type}");
+        }
+
+        internal static void MapDataDisconnected(DisconnectionInfo msg)
+        {
+            try
+            {
+                Process[] processCollection = Process.GetProcesses();
+
+                if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
+                {
+                    _logger.LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                }
+                else
+                {
+                    bool FoundWebSocketDll = false;
+
+                    string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("beat")).MainModule.FileName;
+                    InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
+
+                    if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
+                    {
+                        if (Directory.GetFiles($"{InstallationDirectory}\\Plugins").Any(x => x.Contains("DataPuller") && x.EndsWith(".dll")))
+                        {
+                            FoundWebSocketDll = true;
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
+                    }
+
+                    if (FoundWebSocketDll)
+                        _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                    else
+                        _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"[BS-DP1] Failed to check if BSDataPuller is installed: (Disconnect Reason: {msg.Type}) {ex}");
+            }
+        }
+
+        internal static void LiveDataDisconnected(DisconnectionInfo msg)
+        {
+            if (Program.beatSaberWebSocket.IsRunning)
+                _logger.LogError($"[BS-DP2] Disconnected: {msg.Type}");
+            else
+                _logger.LogDebug($"[BS-DP2] Disconnected: {msg.Type}");
+        }
+
         internal static void HandleFile(DataPullerObjects.DataPullerMain BeatmapInfo, DataPullerObjects.DataPullerData PerformanceInfo, string OldFileName, int HighestCombo)
         {
             if (BeatmapInfo != null)

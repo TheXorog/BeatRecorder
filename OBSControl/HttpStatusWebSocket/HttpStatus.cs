@@ -1,14 +1,178 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Websocket.Client;
+using Websocket.Client.Models;
 
 namespace OBSControl
 {
     class HttpStatus
     {
+        internal static void MessageReceived(string e)
+        {
+            HttpStatusObjects.BeatSaberEvent _status = new HttpStatusObjects.BeatSaberEvent();
+
+            try
+            {
+                _status = JsonConvert.DeserializeObject<HttpStatusObjects.BeatSaberEvent>(e);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"[BS-HS] Unable to convert beatsaber-http-status message into an dictionary: {ex}");
+                return;
+            }
+
+            switch (_status.@event)
+            {
+                case "hello":
+                    _logger.LogInfo("[BS-HS] Connected.");
+                    break;
+
+                case "songStart":
+                    _logger.LogInfo("[BS-HS] Song started.");
+
+                    HttpStatusObjects.FailedCurrentSong = false;
+                    HttpStatusObjects.FinishedCurrentSong = false;
+                    HttpStatusObjects.HttpStatusCurrentBeatmap = _status.status.beatmap;
+                    HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
+
+                    try
+                    {
+                        _ = OBSWebSocket.StartRecording();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[BS-HS] {ex}");
+                        return;
+                    }
+                    break;
+
+                case "finished":
+                    _logger.LogInfo("[BS-HS] Song finished.");
+
+                    HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
+                    HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
+                    HttpStatusObjects.FinishedCurrentSong = true;
+                    break;
+
+                case "failed":
+                    _logger.LogInfo("[BS-HS] Song failed.");
+
+                    HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
+                    HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
+                    HttpStatusObjects.FailedCurrentSong = true;
+
+                    break;
+
+                case "pause":
+                    _logger.LogInfo("[BS-HS] Song paused.");
+
+                    try
+                    {
+                        if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                            if (Program.obsWebSocket.IsStarted)
+                                Program.obsWebSocket.Send($"{{\"request-type\":\"PauseRecording\", \"message-id\":\"PauseRecording\"}}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[BS-HS] {ex}");
+                        return;
+                    }
+                    break;
+
+                case "resume":
+                    _logger.LogInfo("[BS-HS] Song resumed.");
+
+                    try
+                    {
+                        if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                            if (Program.obsWebSocket.IsStarted)
+                                Program.obsWebSocket.Send($"{{\"request-type\":\"ResumeRecording\", \"message-id\":\"ResumeRecording\"}}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[BS-HS] {ex}");
+                        return;
+                    }
+                    break;
+
+                case "menu":
+                    _logger.LogInfo("[BS-HS] Menu entered.");
+
+                    try
+                    {
+                        HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
+                        HttpStatusObjects.HttpStatusLastBeatmap = HttpStatusObjects.HttpStatusCurrentBeatmap;
+
+                        HttpStatusObjects.FinishedLastSong = HttpStatusObjects.FinishedCurrentSong;
+                        HttpStatusObjects.FailedLastSong = HttpStatusObjects.FailedCurrentSong;
+                        _ = OBSWebSocket.StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"[BS-HS] {ex}");
+                        return;
+                    }
+                    break;
+
+                case "scoreChanged":
+                    HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
+                    break;
+            }
+        }
+
+        internal static void Reconnected(ReconnectionInfo msg)
+        {
+            if (msg.Type != ReconnectionType.Initial)
+                _logger.LogWarn($"[BS-HS] Reconnected: {msg.Type}");
+        }
+
+        internal static void Disconnected(DisconnectionInfo msg)
+        {
+            try
+            {
+                Process[] processCollection = Process.GetProcesses();
+
+                if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
+                {
+                    _logger.LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                }
+                else
+                {
+                    bool FoundWebSocketDll = false;
+
+                    string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("beat")).MainModule.FileName;
+                    InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
+
+                    if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
+                    {
+                        if (Directory.GetFiles($"{InstallationDirectory}\\Plugins").Any(x => x.Contains("HTTPStatus") && x.EndsWith(".dll")))
+                        {
+                            FoundWebSocketDll = true;
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                    }
+
+                    if (FoundWebSocketDll)
+                        _logger.LogCritical($"[BS-HS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                    else
+                        _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"[BS-HS] Failed to check if beatsaber-http-status is installed: (Disconnect Reason: {msg.Type}) {ex}");
+            }
+        }
+
         internal static void HandleFile(HttpStatusObjects.Beatmap BeatmapInfo, HttpStatusObjects.Performance PerformanceInfo, string OldFileName, bool FinishedLast, bool FailedLast)
         {
             if (BeatmapInfo != null)
