@@ -272,7 +272,32 @@ namespace OBSControl
 
                             GeneratedAccuracy = $"FAILED";
                         }
-                        
+                        else
+                        {
+                            if (!BeatmapInfo.LevelFailed && !BeatmapInfo.LevelQuit && !BeatmapInfo.LevelFinished)
+                            {
+                                _logger.LogDebug($"[OBSC] Level restarted");
+                                if (Objects.LoadedSettings.DeleteQuit)
+                                {
+                                    _logger.LogDebug($"[OBSC] Quit. Deletion requested.");
+                                    DeleteFile = true;
+
+                                    if (GeneratedAccuracy == "NF-")
+                                        if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
+                                        {
+                                            _logger.LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
+                                            DeleteFile = false;
+                                        }
+                                }
+
+                                GeneratedAccuracy += $"QUIT";
+                            }
+                            else
+                            {
+                                _logger.LogDebug($"[OBSC] Level finished?");
+                                GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
+                            }
+                        }
 
                         _logger.LogDebug($"[OBSC] {GeneratedAccuracy}");
                         NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
