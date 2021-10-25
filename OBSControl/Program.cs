@@ -220,30 +220,15 @@ namespace OBSControl
 
         private static void ResetSettings()
         {
-            Objects.LoadedSettings.README = "!! Please check https://github.com/XorogVEVO/OBSControl for more info and explainations for each config options !!";
-            Objects.LoadedSettings.ConfigVersion = ConfigVersion;
-            Objects.LoadedSettings.ConsoleLogLevel = 3;
-            Objects.LoadedSettings.Mod = "http-status";
-            Objects.LoadedSettings.BeatSaberUrl = "127.0.0.1";
-            Objects.LoadedSettings.BeatSaberPort = "6557";
-            Objects.LoadedSettings.OBSUrl = "127.0.0.1";
-            Objects.LoadedSettings.OBSPort = "4444";
-            Objects.LoadedSettings.OBSPassword = "";
-            Objects.LoadedSettings.AskToSaveOBSPassword = true;
-            Objects.LoadedSettings.MininumWaitUntilRecordingCanStart = 500;
-            Objects.LoadedSettings.PauseRecordingOnIngamePause = false;
-            Objects.LoadedSettings.FileFormat = "[<rank>][<accuracy>][<max-combo>x] <song-name> - <song-author> [<mapper>]";
-            Objects.LoadedSettings.StopRecordingDelay = 5;
-            Objects.LoadedSettings.DeleteIfShorterThan = 0;
-            Objects.LoadedSettings.DeleteQuit = false;
-            Objects.LoadedSettings.DeleteFailed = false;
-            Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed = false;
-            Objects.LoadedSettings.DeleteSoftFailed = false;
+            Objects.LoadedSettings = new();
 
             if (File.Exists("Settings.json"))
             {
                 try
                 {
+                    if (File.Exists("Settings.json.old"))
+                        File.Delete("Settings.json.old");
+
                     File.Copy("Settings.json", "Settings.json.old");
                 }
                 catch { }
