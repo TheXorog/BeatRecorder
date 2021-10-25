@@ -79,7 +79,7 @@ namespace OBSControl
                 try
                 {
                     var github = new GitHubClient(new ProductHeaderValue("OBSControlUpdateCheck"));
-                    var repo = await github.Repository.Release.GetLatest("XorogVEVO", "OBSControl");
+                    var repo = await github.Repository.Release.GetLatest("TheXorog", "OBSControl");
 
                     _logger.LogInfo($"[OBSC] Current latest release is \"{repo.TagName}\". You're currently running: \"{CurrentVersion}\"");
 
