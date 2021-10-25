@@ -274,6 +274,11 @@ namespace OBSControl
 
                             GeneratedAccuracy = $"FAILED";
                         }
+                        else
+                        {
+                            _logger.LogDebug($"[OBSC] Level finished");
+                            GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
+                        }
 
                         _logger.LogDebug($"[OBSC] {GeneratedAccuracy}");
                         NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
