@@ -269,7 +269,7 @@ namespace OBSControl
                         NewName = NewName.Replace("<raw-score>", $"0");
                 }
 
-                if (Objects.LoadedSettings.DeleteIfShorterThan + Objects.LoadedSettings.StopRecordingDelay > OBSWebSocketObjects.RecordingSeconds)
+                if (Objects.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
                 {
                     _logger.LogDebug($"[OBSC] The recording is too short. Deletion requested.");
                     DeleteFile = true;

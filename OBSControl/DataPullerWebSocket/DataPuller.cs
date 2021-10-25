@@ -131,8 +131,6 @@ namespace OBSControl
 
             if (DataPullerObjects.DataPullerInLevel)
                 DataPullerObjects.DataPullerCurrentPerformance = _status;
-            else
-                DataPullerObjects.DataPullerLastPerformance = _status;
 
             if (DataPullerObjects.CurrentSongCombo < _status.Combo)
                 DataPullerObjects.CurrentSongCombo = _status.Combo;
@@ -226,7 +224,7 @@ namespace OBSControl
                     {
                         string GeneratedAccuracy = "";
 
-                        if (BeatmapInfo.LevelFailed && BeatmapInfo.Modifiers.noFailOn0Energy)
+                        if ((BeatmapInfo.LevelFailed || PerformanceInfo.PlayerHealth <= 0) && BeatmapInfo.Modifiers.noFailOn0Energy)
                         {
                             _logger.LogDebug($"[OBSC] Soft-Failed.");
                             if (Objects.LoadedSettings.DeleteSoftFailed)
@@ -274,11 +272,7 @@ namespace OBSControl
 
                             GeneratedAccuracy = $"FAILED";
                         }
-                        else
-                        {
-                            _logger.LogDebug($"[OBSC] Level finished");
-                            GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
-                        }
+                        
 
                         _logger.LogDebug($"[OBSC] {GeneratedAccuracy}");
                         NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
@@ -313,7 +307,7 @@ namespace OBSControl
                         NewName = NewName.Replace("<raw-score>", $"0");
                 }
 
-                if (Objects.LoadedSettings.DeleteIfShorterThan + Objects.LoadedSettings.StopRecordingDelay > OBSWebSocketObjects.RecordingSeconds)
+                if (Objects.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
                 {
                     _logger.LogDebug($"[OBSC] The recording is too short. Deletion requested.");
                     DeleteFile = true;
