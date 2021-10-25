@@ -15,25 +15,24 @@ namespace OBSControl
 
         public class Settings
         {
-            public string README { get; set; }
-            public int ConfigVersion { get; set; }
-            public int ConsoleLogLevel { get; set; }
-            public string Mod { get; set; }
-            public string BeatSaberUrl { get; set; }
-            public string BeatSaberPort { get; set; }
-            public string OBSUrl { get; set; }
-            public string OBSPort { get; set; }
-            public string OBSPassword { get; set; }
-            public int MininumWaitUntilRecordingCanStart { get; set; }
-            public bool AskToSaveOBSPassword { get; set; }
-            public bool PauseRecordingOnIngamePause { get; set; }
-            public string FileFormat { get; set; }
-            public int StopRecordingDelay { get; set; }
-            public int DeleteIfShorterThan { get; set; }
-            public bool DeleteQuit { get; set; }
-            public bool DeleteIfQuitAfterSoftFailed { get; set; }
-            public bool DeleteFailed { get; set; }
-            public bool DeleteSoftFailed { get; set; }
+            public string README { get; set; } = "!! Please check https://github.com/XorogVEVO/OBSControl for more info and explainations for each config options !!";
+            public int ConsoleLogLevel { get; set; } = 3;
+            public string Mod { get; set; } = "http-status";
+            public string BeatSaberUrl { get; set; } = "127.0.0.1";
+            public string BeatSaberPort { get; set; } = "6557";
+            public string OBSUrl { get; set; } = "127.0.0.1";
+            public string OBSPort { get; set; } = "4444";
+            public string OBSPassword { get; set; } = "";
+            public int MininumWaitUntilRecordingCanStart { get; set; } = 500;
+            public bool AskToSaveOBSPassword { get; set; } = true;
+            public bool PauseRecordingOnIngamePause { get; set; } = false;
+            public string FileFormat { get; set; } = "[<rank>][<accuracy>][<max-combo>x] <song-name> - <song-author> [<mapper>]";
+            public int StopRecordingDelay { get; set; } = 5;
+            public int DeleteIfShorterThan { get; set; } = 0;
+            public bool DeleteQuit { get; set; } = false;
+            public bool DeleteIfQuitAfterSoftFailed { get; set; } = false;
+            public bool DeleteFailed { get; set; } = false;
+            public bool DeleteSoftFailed { get; set; } = false;
         }
 
         // Shedule-based logger
