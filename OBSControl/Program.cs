@@ -23,21 +23,7 @@ namespace OBSControl
         static WebsocketClient BeatSaberWebSocketLiveData { get; set; }
         static WebsocketClient OBSWebSocket { get; set; }
 
-        // HttpStatus
-
-        static Objects.Performance HttpStatusLastPerformance { get; set; }
-        static Objects.Beatmap HttpStatusLastBeatmap { get; set; }
-
-        static Objects.Performance HttpStatusCurrentPerformance { get; set; }
-        static Objects.Beatmap HttpStatusCurrentBeatmap { get; set; }
-
         // DataPuller
-
-        static Objects.DataPullerData DataPullerLastPerformance { get; set; }
-        static Objects.DataPullerMain DataPullerLastBeatmap { get; set; }
-
-        static Objects.DataPullerData DataPullerCurrentPerformance { get; set; }
-        static Objects.DataPullerMain DataPullerCurrentBeatmap { get; set; }
 
 
         static bool DataPullerInLevel = false;
@@ -345,7 +331,7 @@ namespace OBSControl
                 {
                     if (msg.Text.Contains($"\"message-id\":\"{RequiredAuthenticationGuid}\""))
                     {
-                        Objects.AuthenticationRequired required = JsonConvert.DeserializeObject<Objects.AuthenticationRequired>(msg.Text);
+                        OBSWebSocketObjects.AuthenticationRequired required = JsonConvert.DeserializeObject<OBSWebSocketObjects.AuthenticationRequired>(msg.Text);
 
                         if (required.authRequired)
                         {
@@ -454,7 +440,7 @@ namespace OBSControl
                     }
                     else if (msg.Text.Contains($"\"message-id\":\"{AuthenticationGuid}\""))
                     {
-                        Objects.AuthenticationRequired required = JsonConvert.DeserializeObject<Objects.AuthenticationRequired>(msg.Text);
+                        OBSWebSocketObjects.AuthenticationRequired required = JsonConvert.DeserializeObject<OBSWebSocketObjects.AuthenticationRequired>(msg.Text);
 
                         if (required.status == "ok")
                         {
@@ -476,7 +462,7 @@ namespace OBSControl
                     }
                     else if (msg.Text.Contains($"\"message-id\":\"{CheckIfRecording}\""))
                     {
-                        Objects.RecordingStatus recordingStatus = JsonConvert.DeserializeObject<Objects.RecordingStatus>(msg.Text);
+                        OBSWebSocketObjects.RecordingStatus recordingStatus = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStatus>(msg.Text);
 
                         OBSRecording = recordingStatus.isRecording;
                         OBSRecordingPaused = recordingStatus.isRecordingPaused;
@@ -487,15 +473,15 @@ namespace OBSControl
 
                     if (msg.Text.Contains("\"update-type\":\"RecordingStopped\""))
                     {
-                        Objects.RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<Objects.RecordingStopped>(msg.Text);
+                        OBSWebSocketObjects.RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStopped>(msg.Text);
 
                         _logger.LogInfo($"[OBS] Recording stopped.");
                         OBSRecording = false;
 
                         if (Objects.LoadedSettings.Mod == "http-status")
-                            HttpStatusHandleFile(HttpStatusLastBeatmap, HttpStatusLastPerformance, RecordingStopped.recordingFilename, Objects.FinishedLastSong, Objects.FailedLastSong);
+                            HttpStatusHandleFile(HttpStatusObjects.HttpStatusLastBeatmap, HttpStatusObjects.HttpStatusLastPerformance, RecordingStopped.recordingFilename, HttpStatusObjects.FinishedLastSong, HttpStatusObjects.FailedLastSong);
                         else if (Objects.LoadedSettings.Mod == "datapuller")
-                            DataPullerHandleFile(DataPullerLastBeatmap, DataPullerLastPerformance, RecordingStopped.recordingFilename, Objects.LastSongCombo);
+                            DataPullerHandleFile(DataPullerObjects.DataPullerLastBeatmap, DataPullerObjects.DataPullerLastPerformance, RecordingStopped.recordingFilename, DataPullerObjects.LastSongCombo);
                     }
                     else if (msg.Text.Contains("\"update-type\":\"RecordingStarted\""))
                     {
@@ -588,11 +574,11 @@ namespace OBSControl
 
         private static void BeatSaberDataPullerMapData_MessageRecieved(string e)
         {
-            Objects.DataPullerMain _status = new Objects.DataPullerMain();
+            DataPullerObjects.DataPullerMain _status = new DataPullerObjects.DataPullerMain();
 
             try
             {
-                _status = JsonConvert.DeserializeObject<Objects.DataPullerMain>(e);
+                _status = JsonConvert.DeserializeObject<DataPullerObjects.DataPullerMain>(e);
             }
             catch (Exception ex)
             {
@@ -607,11 +593,11 @@ namespace OBSControl
                     DataPullerInLevel = true;
                     _logger.LogInfo("[BS-DP1] Song started.");
 
-                    DataPullerCurrentBeatmap = _status;
+                    DataPullerObjects.DataPullerCurrentBeatmap = _status;
 
                     try
                     {
-                        Objects.CurrentSongCombo = 0;
+                        DataPullerObjects.CurrentSongCombo = 0;
                         _ = StartRecording();
                     }
                     catch (Exception ex)
@@ -628,11 +614,11 @@ namespace OBSControl
 
                     try
                     {
-                        DataPullerCurrentBeatmap = _status;
+                        DataPullerObjects.DataPullerCurrentBeatmap = _status;
 
-                        DataPullerLastPerformance = DataPullerCurrentPerformance;
-                        DataPullerLastBeatmap = DataPullerCurrentBeatmap;
-                        Objects.LastSongCombo = Objects.CurrentSongCombo;
+                        DataPullerObjects.DataPullerLastPerformance = DataPullerObjects.DataPullerCurrentPerformance;
+                        DataPullerObjects.DataPullerLastBeatmap = DataPullerObjects.DataPullerCurrentBeatmap;
+                        DataPullerObjects.LastSongCombo = DataPullerObjects.CurrentSongCombo;
 
                         _ = StopRecording(CancelStopRecordingDelay.Token);
                     }
@@ -688,11 +674,11 @@ namespace OBSControl
 
         private static void BeatSaberDataPullerLiveData_MessageRecieved(string e)
         {
-            Objects.DataPullerData _status = new Objects.DataPullerData();
+            DataPullerObjects.DataPullerData _status = new DataPullerObjects.DataPullerData();
 
             try
             {
-                _status = JsonConvert.DeserializeObject<Objects.DataPullerData>(e);
+                _status = JsonConvert.DeserializeObject<DataPullerObjects.DataPullerData>(e);
             }
             catch (Exception ex)
             {
@@ -701,21 +687,21 @@ namespace OBSControl
             }
 
             if (DataPullerInLevel)
-                DataPullerCurrentPerformance = _status;
+                DataPullerObjects.DataPullerCurrentPerformance = _status;
             else
-                DataPullerLastPerformance = _status;
+                DataPullerObjects.DataPullerLastPerformance = _status;
 
-            if (Objects.CurrentSongCombo < _status.Combo)
-                Objects.CurrentSongCombo = _status.Combo;
+            if (DataPullerObjects.CurrentSongCombo < _status.Combo)
+                DataPullerObjects.CurrentSongCombo = _status.Combo;
         }
 
         private static void BeatSaberHttpStatus_MessageReceived(string e)
         {
-            Objects.BeatSaberEvent _status = new Objects.BeatSaberEvent();
+            HttpStatusObjects.BeatSaberEvent _status = new HttpStatusObjects.BeatSaberEvent();
 
             try
             {
-                _status = JsonConvert.DeserializeObject<Objects.BeatSaberEvent>(e);
+                _status = JsonConvert.DeserializeObject<HttpStatusObjects.BeatSaberEvent>(e);
             }
             catch (Exception ex)
             {
@@ -732,10 +718,10 @@ namespace OBSControl
                 case "songStart":
                     _logger.LogInfo("[BS-HS] Song started.");
 
-                    Objects.FailedCurrentSong = false;
-                    Objects.FinishedCurrentSong = false;
-                    HttpStatusCurrentBeatmap = _status.status.beatmap;
-                    HttpStatusCurrentPerformance = _status.status.performance;
+                    HttpStatusObjects.FailedCurrentSong = false;
+                    HttpStatusObjects.FinishedCurrentSong = false;
+                    HttpStatusObjects.HttpStatusCurrentBeatmap = _status.status.beatmap;
+                    HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
 
                     try
                     {
@@ -751,17 +737,17 @@ namespace OBSControl
                 case "finished":
                     _logger.LogInfo("[BS-HS] Song finished.");
 
-                    HttpStatusCurrentPerformance = _status.status.performance;
-                    HttpStatusLastPerformance = HttpStatusCurrentPerformance;
-                    Objects.FinishedCurrentSong = true;
+                    HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
+                    HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
+                    HttpStatusObjects.FinishedCurrentSong = true;
                     break;
 
                 case "failed":
                     _logger.LogInfo("[BS-HS] Song failed.");
 
-                    HttpStatusCurrentPerformance = _status.status.performance;
-                    HttpStatusLastPerformance = HttpStatusCurrentPerformance;
-                    Objects.FailedCurrentSong = true;
+                    HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
+                    HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
+                    HttpStatusObjects.FailedCurrentSong = true;
 
                     break;
 
@@ -802,11 +788,11 @@ namespace OBSControl
 
                     try
                     {
-                        HttpStatusLastPerformance = HttpStatusCurrentPerformance;
-                        HttpStatusLastBeatmap = HttpStatusCurrentBeatmap;
+                        HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
+                        HttpStatusObjects.HttpStatusLastBeatmap = HttpStatusObjects.HttpStatusCurrentBeatmap;
 
-                        Objects.FinishedLastSong = Objects.FinishedCurrentSong;
-                        Objects.FailedLastSong = Objects.FailedCurrentSong;
+                        HttpStatusObjects.FinishedLastSong = HttpStatusObjects.FinishedCurrentSong;
+                        HttpStatusObjects.FailedLastSong = HttpStatusObjects.FailedCurrentSong;
                         _ = StopRecording(CancelStopRecordingDelay.Token);
                     }
                     catch (Exception ex)
@@ -817,7 +803,7 @@ namespace OBSControl
                     break;
 
                 case "scoreChanged":
-                    HttpStatusCurrentPerformance = _status.status.performance;
+                    HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
                     break;
             }
         }
@@ -888,7 +874,7 @@ namespace OBSControl
             }
         }
 
-        private static void HttpStatusHandleFile(Objects.Beatmap BeatmapInfo, Objects.Performance PerformanceInfo, string OldFileName, bool FinishedLast, bool FailedLast)
+        private static void HttpStatusHandleFile(HttpStatusObjects.Beatmap BeatmapInfo, HttpStatusObjects.Performance PerformanceInfo, string OldFileName, bool FinishedLast, bool FailedLast)
         {
             if (BeatmapInfo != null)
             {
@@ -1084,7 +1070,7 @@ namespace OBSControl
             }
         }
 
-        private static void DataPullerHandleFile(Objects.DataPullerMain BeatmapInfo, Objects.DataPullerData PerformanceInfo, string OldFileName, int HighestCombo)
+        private static void DataPullerHandleFile(DataPullerObjects.DataPullerMain BeatmapInfo, DataPullerObjects.DataPullerData PerformanceInfo, string OldFileName, int HighestCombo)
         {
             if (BeatmapInfo != null)
             {
