@@ -20,7 +20,7 @@ namespace OBSControl
 {
     class Program
     {
-        public static string CurrentVersion = "1.4.0";
+        public static string CurrentVersion = "1.5.0";
         public static int ConfigVersion = 3;
 
         internal static WebsocketClient beatSaberWebSocket { get; set; }
@@ -211,6 +211,8 @@ namespace OBSControl
 
                 SendNotification("Connected to OBS", 1000, Objects.MessageType.INFO);
             });
+
+            SendNotification("Note: Using Steam Notifications is still experimental. If you run into issues, please make sure to report them on GitHub.", 200000, Objects.MessageType.ERROR);
 
             // Don't close the application
             await Task.Delay(-1);
