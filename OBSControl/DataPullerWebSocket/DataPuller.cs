@@ -164,7 +164,10 @@ namespace OBSControl
                 if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
                 {
                     if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.NO_PROCESS)
+                    {
                         _logger.LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                        Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 2000, Objects.MessageType.ERROR);
+                    }
                     Objects.LastDP1Warning = Objects.ConnectionTypeWarning.NO_PROCESS;
                 }
                 else
@@ -184,20 +187,29 @@ namespace OBSControl
                     else
                     {
                         if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.NOT_MODDED)
+                        {
                             _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
+                            Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, Objects.MessageType.ERROR);
+                        }
                         Objects.LastDP1Warning = Objects.ConnectionTypeWarning.NOT_MODDED;
                     }
 
                     if (FoundWebSocketDll)
                     {
                         if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
+                        {
                             _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                            Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, Objects.MessageType.ERROR);
+                        }
                         Objects.LastDP1Warning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
                     }
                     else
                     {
                         if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
+                        {
                             _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                            Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, Objects.MessageType.ERROR);
+                        }
                         Objects.LastDP1Warning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
                     }
                 }
@@ -435,12 +447,14 @@ namespace OBSControl
                             _logger.LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                             File.Move(OldFileName, NewFileName);
                             _logger.LogInfo($"[OBSC] Successfully renamed.");
+                            Program.SendNotification("Recording renamed.", 1000, Objects.MessageType.INFO);
                         }
                         else
                         {
                             _logger.LogInfo($"[OBSC] Deleting \"{fileInfo.Name}\"..");
                             File.Delete(OldFileName);
                             _logger.LogInfo($"[OBSC] Successfully deleted.");
+                            Program.SendNotification("Recording deleted.", 1000, Objects.MessageType.INFO);
                         }
                     }
                     catch (Exception ex)

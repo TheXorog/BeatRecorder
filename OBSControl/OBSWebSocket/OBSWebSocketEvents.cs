@@ -135,6 +135,7 @@ namespace OBSControl
 
                 if (required.status == "ok")
                 {
+                    Program.SendNotification("Authenticated with OBS.", 1000, Objects.MessageType.INFO);
                     _logger.LogInfo("[OBS] Authenticated.");
 
                     Program.obsWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
@@ -164,6 +165,7 @@ namespace OBSControl
 
             if (msg.Text.Contains("\"update-type\":\"RecordingStopped\""))
             {
+                Program.SendNotification("Recording stopped.", 1000, Objects.MessageType.INFO);
                 OBSWebSocketObjects.RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStopped>(msg.Text);
 
                 _logger.LogInfo($"[OBS] Recording stopped.");
@@ -176,6 +178,7 @@ namespace OBSControl
             }
             else if (msg.Text.Contains("\"update-type\":\"RecordingStarted\""))
             {
+                Program.SendNotification("Recording started.", 1000, Objects.MessageType.INFO);
                 _logger.LogInfo($"[OBS] Recording started.");
                 OBSWebSocketObjects.OBSRecording = true;
                 while (OBSWebSocketObjects.OBSRecording)
@@ -191,11 +194,13 @@ namespace OBSControl
             }
             else if (msg.Text.Contains("\"update-type\":\"RecordingPaused\""))
             {
+                Program.SendNotification("Recording paused.", 1000, Objects.MessageType.INFO);
                 _logger.LogInfo($"[OBS] Recording paused.");
                 OBSWebSocketObjects.OBSRecordingPaused = true;
             }
             else if (msg.Text.Contains("\"update-type\":\"RecordingResumed\""))
             {
+                Program.SendNotification("Recording resumed.", 500, Objects.MessageType.INFO);
                 _logger.LogInfo($"[OBS] Recording resumed.");
                 OBSWebSocketObjects.OBSRecordingPaused = false;
             }
@@ -222,7 +227,10 @@ namespace OBSControl
                 if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("obs64") || x.ProcessName.ToLower().StartsWith("obs32")))
                 {
                     if (Objects.LastOBSWarning != Objects.ConnectionTypeWarning.NO_PROCESS)
+                    {
+                        Program.SendNotification("Couldn't connect to OBS, is it even running?", 10000, Objects.MessageType.ERROR);
                         _logger.LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({msg.Type})");
+                    }
                     Objects.LastOBSWarning = Objects.ConnectionTypeWarning.NO_PROCESS;
                 }
                 else
@@ -247,13 +255,19 @@ namespace OBSControl
                     if (FoundWebSocketDll)
                     {
                         if (Objects.LastOBSWarning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
+                        {
                             _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({msg.Type})");
+                            Program.SendNotification("Couldn't connect to OBS. Please make sure obs-websocket is enabled.", 10000, Objects.MessageType.ERROR);
+                        }
                         Objects.LastOBSWarning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
                     }
                     else
                     {
                         if (Objects.LastOBSWarning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
+                        {
                             _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({msg.Type})");
+                            Program.SendNotification("Couldn't connect to OBS. Please make sure obs-websocket is installed.", 10000, Objects.MessageType.ERROR);
+                        }
                         Objects.LastOBSWarning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
                     }
                 }
