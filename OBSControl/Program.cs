@@ -252,6 +252,9 @@ namespace OBSControl
         {
             _ = Task.Run(() =>
             {
+                Bitmap Info_notification_bitmap = new Bitmap("Info.png");
+                Bitmap Error_notification_bitmap = new Bitmap("Error.png");
+
                 while (true)
                 {
                     if (Objects.SteamNotificationId == 0)
@@ -277,9 +280,6 @@ namespace OBSControl
 
                     Valve.VR.NotificationBitmap_t notification_icon;
 
-                    Bitmap Info_notification_bitmap = new Bitmap("Info.png");
-                    Bitmap Error_notification_bitmap = new Bitmap("Error.png");
-
                     foreach (var b in NotificationList.ToList())
                     {
                         System.Drawing.Imaging.BitmapData TextureData = new System.Drawing.Imaging.BitmapData();
@@ -295,14 +295,18 @@ namespace OBSControl
                                     System.Drawing.Imaging.ImageLockMode.ReadOnly,
                                     System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-
-
                         notification_icon.m_pImageData = TextureData.Scan0;
                         notification_icon.m_nWidth = TextureData.Width;
                         notification_icon.m_nHeight = TextureData.Height;
                         notification_icon.m_nBytesPerPixel = 4;
 
                         var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, Valve.VR.EVRNotificationType.Persistent, b.Value.Message, Valve.VR.EVRNotificationStyle.Application, notification_icon);
+                        
+                        if (b.Value.Type == Objects.MessageType.INFO)
+                            Info_notification_bitmap.UnlockBits(TextureData);
+                        else if (b.Value.Type == Objects.MessageType.ERROR)
+                            Error_notification_bitmap.UnlockBits(TextureData);
+
                         if (NotificationId == 0)
                             return;
 
