@@ -31,7 +31,7 @@ namespace OBSControl
             public string README { get; set; } = "!! Please check https://github.com/XorogVEVO/OBSControl for more info and explainations for each config options !!";
             public int ConsoleLogLevel { get; set; } = 3;
             public string Mod { get; set; } = "http-status";
-            public bool DisplaySteamNotifications { get; set; } = true;
+            public bool DisplaySteamNotifications { get; set; } = false;
             public string BeatSaberUrl { get; set; } = "127.0.0.1";
             public string BeatSaberPort { get; set; } = "6557";
             public string OBSUrl { get; set; } = "127.0.0.1";
