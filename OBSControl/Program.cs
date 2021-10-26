@@ -36,8 +36,7 @@ namespace OBSControl
         {
             Console.Clear();
             _logger.StartLogger();
-            NotifcationLoop();
-
+            
             _logger.LogInfo($"[OBSC] Writing to file {_logger.FileName}");
 
             _logger.LogInfo("[OBSC] Loading settings..");
@@ -47,6 +46,7 @@ namespace OBSControl
                 try
                 {
                     Objects.LoadedSettings = JsonConvert.DeserializeObject<Objects.Settings>(File.ReadAllText("Settings.json"));
+                    File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
 
                     if (Objects.LoadedSettings.ConsoleLogLevel > 2)
                     {
@@ -212,7 +212,10 @@ namespace OBSControl
                 SendNotification("Connected to OBS", 1000, Objects.MessageType.INFO);
             });
 
-            SendNotification("Note: Using Steam Notifications is still experimental. If you run into issues, please make sure to report them on GitHub.", 200000, Objects.MessageType.ERROR);
+            SendNotification("Note: Using Steam Notifications is still experimental. If you run into issues, please make sure to report them on GitHub.", 20000, Objects.MessageType.ERROR);
+
+            await Task.Delay(5000);
+            NotifcationLoop();
 
             // Don't close the application
             await Task.Delay(-1);
@@ -252,9 +255,10 @@ namespace OBSControl
         {
             if (Objects.LoadedSettings.DisplaySteamNotifications)
             {
-                _logger.LogError($"Using Steam Notifications is still experimental. Issues might include:\n" +
+                _logger.LogCritical($"\n\nUsing Steam Notifications is still experimental. Issues might include:\n" +
                                 $"- notifications not dissapearing\n" +
-                                $"- notifications might interrupt your vision during gameplay if you look up while starting/resuming a song");
+                                $"- notifications might interrupt your vision during gameplay if you look up while starting/resuming a song\n\n");
+
 
                 _ = Task.Run(() =>
                 {
@@ -307,6 +311,7 @@ namespace OBSControl
                             notification_icon.m_nBytesPerPixel = 4;
 
                             var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, Valve.VR.EVRNotificationType.Persistent, b.Value.Message, Valve.VR.EVRNotificationStyle.Application, notification_icon);
+                            _logger.LogDebug($"[OBSC] Displayed Notification {NotificationId}: {b.Value.Message}");
 
                             if (b.Value.Type == Objects.MessageType.INFO)
                                 Info_notification_bitmap.UnlockBits(TextureData);
@@ -323,6 +328,8 @@ namespace OBSControl
                             {
                                 _logger.LogError($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
                             }
+
+                            _logger.LogDebug($"[OBSC] Dismissed Notification {NotificationId}");
 
                             NotificationList.Remove(b.Key);
                         }
