@@ -166,7 +166,7 @@ namespace OBSControl
                     if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.NO_PROCESS)
                     {
                         _logger.LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
-                        Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 2000, Objects.MessageType.ERROR);
+                        Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, Objects.MessageType.ERROR);
                     }
                     Objects.LastDP1Warning = Objects.ConnectionTypeWarning.NO_PROCESS;
                 }
