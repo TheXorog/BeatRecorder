@@ -11,12 +11,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Websocket.Client;
+using BOLL7708;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace OBSControl
 {
     class Program
     {
-        public static string CurrentVersion = "1.4.0";
+        public static string CurrentVersion = "1.5.0";
         public static int ConfigVersion = 3;
 
         internal static WebsocketClient beatSaberWebSocket { get; set; }
@@ -32,6 +36,7 @@ namespace OBSControl
         {
             Console.Clear();
             _logger.StartLogger();
+            NotifcationLoop();
 
             _logger.LogInfo($"[OBSC] Writing to file {_logger.FileName}");
 
@@ -203,9 +208,13 @@ namespace OBSControl
                 obsWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{OBSWebSocketEvents.RequiredAuthenticationGuid}\"}}");
 
                 _logger.LogInfo($"[OBS] Connected.");
+
+                SendNotification("Connected to OBS", 1000, Objects.MessageType.INFO);
             });
 
-            // Leave this thread running to not disconnect from the websocket
+            SendNotification("Note: Using Steam Notifications is still experimental. If you run into issues, please make sure to report them on GitHub.", 200000, Objects.MessageType.ERROR);
+
+            // Don't close the application
             await Task.Delay(-1);
         }
 
@@ -227,6 +236,7 @@ namespace OBSControl
 
             File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
 
+            SendNotification("Your settings were reset due to an error. Please check your desktop.", 10000, Objects.MessageType.ERROR);
             _logger.LogInfo($"Please configure OBSControl using the config file that was just opened. If you're done, save and quit notepad and OBSControl will restart for you.");
 
             var _Process = Process.Start("notepad", "Settings.json");
@@ -234,6 +244,101 @@ namespace OBSControl
 
             Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
             Environment.Exit(0);
+        }
+
+        public static Dictionary<int, Objects.NotificationEntry> NotificationList = new();
+
+        public static void NotifcationLoop()
+        {
+            if (Objects.LoadedSettings.DisplaySteamNotifications)
+            {
+                _logger.LogError($"Using Steam Notifications is still experimental. Issues might include:\n" +
+                                $"- notifications not dissapearing\n" +
+                                $"- notifications might interrupt your vision during gameplay if you look up while starting/resuming a song");
+
+                _ = Task.Run(() =>
+                {
+                    Bitmap Info_notification_bitmap = new Bitmap("Info.png");
+                    Bitmap Error_notification_bitmap = new Bitmap("Error.png");
+
+                    while (true)
+                    {
+                        if (Objects.SteamNotificationId == 0)
+                        {
+                            _logger.LogDebug($"[OBSC] Initializing OpenVR..");
+                            bool Initialized = false;
+
+                            while (!Initialized)
+                            {
+                                Initialized = EasyOpenVRSingleton.Instance.Init();
+                                Thread.Sleep(500);
+                            }
+
+                            _logger.LogDebug($"[OBSC] Initialized OpenVR.");
+
+                            _logger.LogDebug($"[OBSC] Initializing NotificationOverlay..");
+                            Objects.SteamNotificationId = EasyOpenVRSingleton.Instance.InitNotificationOverlay("OBSControl");
+                            _logger.LogDebug($"[OBSC] Initialized NotificationOverlay: {Objects.SteamNotificationId}");
+                        }
+
+                        while (NotificationList.Count == 0)
+                            Thread.Sleep(500);
+
+                        Valve.VR.NotificationBitmap_t notification_icon;
+
+                        foreach (var b in NotificationList.ToList())
+                        {
+                            System.Drawing.Imaging.BitmapData TextureData = new System.Drawing.Imaging.BitmapData();
+
+                            if (b.Value.Type == Objects.MessageType.INFO)
+                                TextureData = Info_notification_bitmap.LockBits(
+                                        new Rectangle(0, 0, Info_notification_bitmap.Width, Info_notification_bitmap.Height),
+                                        System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                                        System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                            else if (b.Value.Type == Objects.MessageType.ERROR)
+                                TextureData = Error_notification_bitmap.LockBits(
+                                        new Rectangle(0, 0, Error_notification_bitmap.Width, Error_notification_bitmap.Height),
+                                        System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                                        System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                            notification_icon.m_pImageData = TextureData.Scan0;
+                            notification_icon.m_nWidth = TextureData.Width;
+                            notification_icon.m_nHeight = TextureData.Height;
+                            notification_icon.m_nBytesPerPixel = 4;
+
+                            var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, Valve.VR.EVRNotificationType.Persistent, b.Value.Message, Valve.VR.EVRNotificationStyle.Application, notification_icon);
+
+                            if (b.Value.Type == Objects.MessageType.INFO)
+                                Info_notification_bitmap.UnlockBits(TextureData);
+                            else if (b.Value.Type == Objects.MessageType.ERROR)
+                                Error_notification_bitmap.UnlockBits(TextureData);
+
+                            if (NotificationId == 0)
+                                return;
+
+                            Thread.Sleep(b.Value.Delay);
+                            EasyOpenVRSingleton.Instance.DismissNotification(NotificationId, out var error);
+
+                            if (error != Valve.VR.EVRNotificationError.OK)
+                            {
+                                _logger.LogError($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
+                            }
+
+                            NotificationList.Remove(b.Key);
+                        }
+                    }
+                });
+            }
+        }
+
+        public static void SendNotification(string Text, int DisplayTime = 2000, Objects.MessageType messageType = Objects.MessageType.INFO)
+        {
+            int A = 0;
+
+            while (NotificationList.ContainsKey(A))
+                A = new Random().Next();
+
+            NotificationList.Add(A, new Objects.NotificationEntry { Message = Text, Delay = DisplayTime, Type = messageType });
         }
     }
 }
