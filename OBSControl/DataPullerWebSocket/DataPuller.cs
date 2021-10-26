@@ -140,6 +140,7 @@ namespace OBSControl
 
         internal static void MapDataReconnected(ReconnectionInfo msg)
         {
+            Program.SendNotification("Connected to Beat Saber", 1000, Objects.MessageType.INFO);
             if (msg.Type != ReconnectionType.Initial)
             {
                 _logger.LogWarn($"[BS-DP1] Reconnected: {msg.Type}");

@@ -134,6 +134,7 @@ namespace OBSControl
                 _logger.LogWarn($"[BS-HS] Reconnected: {msg.Type}");
 
             Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.CONNECTED;
+            Program.SendNotification("Connected to Beat Saber", 1000, Objects.MessageType.INFO);
         }
 
         internal static void Disconnected(DisconnectionInfo msg)
@@ -147,7 +148,7 @@ namespace OBSControl
                     if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.NO_PROCESS)
                     {
                         _logger.LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
-                        Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 2000, Objects.MessageType.ERROR);
+                        Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, Objects.MessageType.ERROR);
                     }
                     Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.NO_PROCESS;
                 }
