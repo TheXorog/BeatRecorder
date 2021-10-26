@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OBSControl;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -821,7 +822,16 @@ namespace BOLL7708
             uint id = 0;
             while (id == 0 || _notifications.Contains(id)) id = (uint)_rnd.Next(); // Not sure why we do this
             var error = OpenVR.Notifications.CreateNotification(overlayHandle, 0, type, message, style, ref bitmap, ref id);
-            DebugLog(error);
+
+            if (error == EVRNotificationError.InvalidOverlayHandle)
+                Objects.SteamNotificationId = 0;
+
+            if (error != EVRNotificationError.OK)
+            {
+                _logger.LogError($"Failed to send notification: {error}");
+                return 0;
+            }
+
             _notifications.Add(id);
             return id;
         }

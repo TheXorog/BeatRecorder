@@ -16,4 +16,16 @@
     <PackageReference Include="Websocket.Client" Version="4.3.32" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Error.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Info.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="openvr_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

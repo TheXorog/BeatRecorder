@@ -9,6 +9,8 @@ namespace OBSControl
 {
     class Objects
     {
+        public static ulong SteamNotificationId = 0;
+
         public static ConnectionTypeWarning LastDP1Warning { get; set; }
         public static ConnectionTypeWarning LastHttpStatusWarning { get; set; }
         public static ConnectionTypeWarning LastOBSWarning { get; set; }
@@ -29,6 +31,7 @@ namespace OBSControl
             public string README { get; set; } = "!! Please check https://github.com/XorogVEVO/OBSControl for more info and explainations for each config options !!";
             public int ConsoleLogLevel { get; set; } = 3;
             public string Mod { get; set; } = "http-status";
+            public bool DisplaySteamNotifications { get; set; } = true;
             public string BeatSaberUrl { get; set; } = "127.0.0.1";
             public string BeatSaberPort { get; set; } = "6557";
             public string OBSUrl { get; set; } = "127.0.0.1";
@@ -58,5 +61,17 @@ namespace OBSControl
             public string Message { get; set; }
         }
 
+        public enum MessageType
+        {
+            ERROR,
+            INFO
+        }
+
+        public class NotificationEntry
+        {
+            public string Message { get; set; }
+            public int Delay { get; set; } = 2000;
+            public MessageType Type { get; set; } = MessageType.INFO;
+        }
     }
 }
