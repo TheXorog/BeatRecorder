@@ -76,6 +76,8 @@ namespace OBSControl
             }
 
             _logger.LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented)}\n");
+            _logger.LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
+            _logger.LogDebug($"{Environment.CurrentDirectory}");
 
             OBSWebSocketObjects.CancelStopRecordingDelay = new CancellationTokenSource();
 
@@ -262,76 +264,85 @@ namespace OBSControl
 
                 _ = Task.Run(() =>
                 {
-                    Bitmap Info_notification_bitmap = new Bitmap("Info.png");
-                    Bitmap Error_notification_bitmap = new Bitmap("Error.png");
+                    Bitmap Info_notification_bitmap = new Bitmap($"{AppDomain.CurrentDomain.BaseDirectory}Info.png");
+                    Bitmap Error_notification_bitmap = new Bitmap($"{AppDomain.CurrentDomain.BaseDirectory}Error.png");
 
                     while (true)
                     {
-                        if (Objects.SteamNotificationId == 0)
+                        try
                         {
-                            _logger.LogDebug($"[OBSC] Initializing OpenVR..");
-                            bool Initialized = false;
-
-                            while (!Initialized)
+                            if (Objects.SteamNotificationId == 0)
                             {
-                                Initialized = EasyOpenVRSingleton.Instance.Init();
+                                _logger.LogDebug($"[OBSC] Initializing OpenVR..");
+                                bool Initialized = false;
+
+                                while (!Initialized)
+                                {
+                                    Initialized = EasyOpenVRSingleton.Instance.Init();
+                                    Thread.Sleep(500);
+                                }
+
+                                _logger.LogDebug($"[OBSC] Initialized OpenVR.");
+
+                                _logger.LogDebug($"[OBSC] Initializing NotificationOverlay..");
+                                Objects.SteamNotificationId = EasyOpenVRSingleton.Instance.InitNotificationOverlay("OBSControl");
+                                _logger.LogDebug($"[OBSC] Initialized NotificationOverlay: {Objects.SteamNotificationId}");
+                            }
+
+                            while (NotificationList.Count == 0)
                                 Thread.Sleep(500);
-                            }
 
-                            _logger.LogDebug($"[OBSC] Initialized OpenVR.");
+                            Valve.VR.NotificationBitmap_t notification_icon;
 
-                            _logger.LogDebug($"[OBSC] Initializing NotificationOverlay..");
-                            Objects.SteamNotificationId = EasyOpenVRSingleton.Instance.InitNotificationOverlay("OBSControl");
-                            _logger.LogDebug($"[OBSC] Initialized NotificationOverlay: {Objects.SteamNotificationId}");
-                        }
-
-                        while (NotificationList.Count == 0)
-                            Thread.Sleep(500);
-
-                        Valve.VR.NotificationBitmap_t notification_icon;
-
-                        foreach (var b in NotificationList.ToList())
-                        {
-                            System.Drawing.Imaging.BitmapData TextureData = new System.Drawing.Imaging.BitmapData();
-
-                            if (b.Value.Type == Objects.MessageType.INFO)
-                                TextureData = Info_notification_bitmap.LockBits(
-                                        new Rectangle(0, 0, Info_notification_bitmap.Width, Info_notification_bitmap.Height),
-                                        System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                                        System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                            else if (b.Value.Type == Objects.MessageType.ERROR)
-                                TextureData = Error_notification_bitmap.LockBits(
-                                        new Rectangle(0, 0, Error_notification_bitmap.Width, Error_notification_bitmap.Height),
-                                        System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                                        System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-                            notification_icon.m_pImageData = TextureData.Scan0;
-                            notification_icon.m_nWidth = TextureData.Width;
-                            notification_icon.m_nHeight = TextureData.Height;
-                            notification_icon.m_nBytesPerPixel = 4;
-
-                            var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, Valve.VR.EVRNotificationType.Persistent, b.Value.Message, Valve.VR.EVRNotificationStyle.Application, notification_icon);
-                            _logger.LogDebug($"[OBSC] Displayed Notification {NotificationId}: {b.Value.Message}");
-
-                            if (b.Value.Type == Objects.MessageType.INFO)
-                                Info_notification_bitmap.UnlockBits(TextureData);
-                            else if (b.Value.Type == Objects.MessageType.ERROR)
-                                Error_notification_bitmap.UnlockBits(TextureData);
-
-                            if (NotificationId == 0)
-                                return;
-
-                            Thread.Sleep(b.Value.Delay);
-                            EasyOpenVRSingleton.Instance.DismissNotification(NotificationId, out var error);
-
-                            if (error != Valve.VR.EVRNotificationError.OK)
+                            foreach (var b in NotificationList.ToList())
                             {
-                                _logger.LogError($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
+                                System.Drawing.Imaging.BitmapData TextureData = new System.Drawing.Imaging.BitmapData();
+
+                                if (b.Value.Type == Objects.MessageType.INFO)
+                                    TextureData = Info_notification_bitmap.LockBits(
+                                            new Rectangle(0, 0, Info_notification_bitmap.Width, Info_notification_bitmap.Height),
+                                            System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                                            System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                                else if (b.Value.Type == Objects.MessageType.ERROR)
+                                    TextureData = Error_notification_bitmap.LockBits(
+                                            new Rectangle(0, 0, Error_notification_bitmap.Width, Error_notification_bitmap.Height),
+                                            System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                                            System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                                notification_icon.m_pImageData = TextureData.Scan0;
+                                notification_icon.m_nWidth = TextureData.Width;
+                                notification_icon.m_nHeight = TextureData.Height;
+                                notification_icon.m_nBytesPerPixel = 4;
+
+                                var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, Valve.VR.EVRNotificationType.Persistent, b.Value.Message, Valve.VR.EVRNotificationStyle.Application, notification_icon);
+                                _logger.LogDebug($"[OBSC] Displayed Notification {NotificationId}: {b.Value.Message}");
+
+                                if (b.Value.Type == Objects.MessageType.INFO)
+                                    Info_notification_bitmap.UnlockBits(TextureData);
+                                else if (b.Value.Type == Objects.MessageType.ERROR)
+                                    Error_notification_bitmap.UnlockBits(TextureData);
+
+                                if (NotificationId == 0)
+                                    return;
+
+                                Thread.Sleep(b.Value.Delay);
+                                EasyOpenVRSingleton.Instance.DismissNotification(NotificationId, out var error);
+
+                                if (error != Valve.VR.EVRNotificationError.OK)
+                                {
+                                    _logger.LogError($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
+                                }
+
+                                _logger.LogDebug($"[OBSC] Dismissed Notification {NotificationId}");
+
+                                NotificationList.Remove(b.Key);
                             }
-
-                            _logger.LogDebug($"[OBSC] Dismissed Notification {NotificationId}");
-
-                            NotificationList.Remove(b.Key);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex.ToString());
+                            Thread.Sleep(5000);
+                            continue;
                         }
                     }
                 });
