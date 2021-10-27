@@ -53,6 +53,7 @@ Files are saved where-ever you set your output folder to in OBS.
 * `OBSPort` - The IP/URL you use to connect to the OBS-WebSocket. Leave at default if you don't know any better.
 * `OBSPassword` - The password you use to connect to the OBS-Websocket. OBSControl will ask for the password if you haven't put one in.
 * `AskToSaveOBSPassword` - This specifies if you want OBSControl to ask for a password. 
+* `DisplaySteamNotifications` - Toggles sending of steam notifications when starting/stopping recordings, and other events. (EXPERIMENTAL!)
 <br></br>
 * `MininumWaitUntilRecordingCanStart` - The amount of milliseconds a new recording is gonna be delayed when forcing to restart a recording. Increase this if you find that your recordings don't restart after restarting a song. (min: `200`ms, max: `2000`ms)
 <br></br>
