@@ -20,7 +20,7 @@ namespace OBSControl
 {
     class Program
     {
-        public static string CurrentVersion = "1.5.0";
+        public static string CurrentVersion = "1.5.1";
         public static int ConfigVersion = 3;
 
         internal static WebsocketClient beatSaberWebSocket { get; set; }
