@@ -14,15 +14,20 @@
 * **[Notable differences between beatsaber-http-status and BSDataPuller](#notable-differences-between-beatsaber-http-status-and-bsdatapuller)**
 * **[Contributing or modifying the code](#Contributing-or-modifying-the-code)**
 
+## Important info regarding OBS Websocket 5.x.x
+
+**OBS Websocket 5.X.X is currently not supported. Please download and use [4.9.1](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1) for now.** 5.x.x support will be added soon, so stay tuned for that.
+
 ## What is this?
 
-This application is for people who record their BeatSaber gameplay using OBS. It connects to **[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** or **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** to detect the current game-state and **[obs-websocket](https://obsproject.com/forum/resources/obs-websocket-remote-control-obs-studio-from-websockets.466/)** to automatically start and stop the recording.
+This application is for people who record their BeatSaber gameplay using OBS. It connects to **[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** or **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** to detect the current game-state and **[obs-websocket](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)** to automatically start and stop the recording.
 
 Files are saved where-ever you set your output folder to in OBS.
 
 **If you have encountered any bugs or issues with this application, feel free to create an issue with your problem.**
 
 **If you want to get it fixed faster or it's something urgent, you can join [my Discord](https://discord.gg/gzEjZE9Mre) and hit me (`Fab#5555`) with a ping.**
+
 
 ## Requirements
 
