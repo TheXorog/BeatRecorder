@@ -19,6 +19,7 @@ using System.Drawing.Imaging;
 using Xorog.Logger;
 using static Xorog.Logger.Logger;
 using static Xorog.Logger.LoggerObjects;
+using System.Runtime.InteropServices;
 
 namespace BeatRecorder
 {
@@ -40,6 +41,13 @@ namespace BeatRecorder
         private async Task MainAsync(string[] args)
         {
             Console.Clear();
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                Console.SetWindowSize(160, 40);
+
+            if (!Directory.Exists("logs"))
+                Directory.CreateDirectory("logs");
+
             StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.DEBUG, DateTime.UtcNow.AddDays(-3), false);
 
             LogInfo("[BR] Loading settings..");
@@ -270,8 +278,8 @@ namespace BeatRecorder
 
                 _ = Task.Run(() =>
                 {
-                    Bitmap Info_notification_bitmap = new($"{AppDomain.CurrentDomain.BaseDirectory}Info.png");
-                    Bitmap Error_notification_bitmap = new($"{AppDomain.CurrentDomain.BaseDirectory}Error.png");
+                    Bitmap Info_notification_bitmap = new($"{AppDomain.CurrentDomain.BaseDirectory}Resources\\Info.png");
+                    Bitmap Error_notification_bitmap = new($"{AppDomain.CurrentDomain.BaseDirectory}Resources\\Error.png");
 
                     while (true)
                     {
