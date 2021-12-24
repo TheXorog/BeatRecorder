@@ -147,7 +147,7 @@ namespace BeatRecorder
             {
                 Process[] processCollection = Process.GetProcesses();
 
-                if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("beat")))
+                if (!processCollection.Any(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")))
                 {
                     if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.NO_PROCESS)
                     {
@@ -160,7 +160,7 @@ namespace BeatRecorder
                 {
                     bool FoundWebSocketDll = false;
 
-                    string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("beat")).MainModule.FileName;
+                    string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")).MainModule.FileName;
                     InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
 
                     if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
