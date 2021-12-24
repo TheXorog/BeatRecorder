@@ -25,7 +25,7 @@ namespace BeatRecorder
 {
     class Program
     {
-        public static string CurrentVersion = "1.5.1";
+        public static string CurrentVersion = "1.5.2";
 
         internal static WebsocketClient beatSaberWebSocket { get; set; }
         internal static WebsocketClient beatSaberWebSocketLiveData { get; set; }
