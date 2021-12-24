@@ -96,35 +96,44 @@ namespace Xorog.Logger
                                 _ => ConsoleColor.Gray
                             };
 
-                            if (b.LogLevel == LoggerObjects.LogLevel.DEBUG && maxLogLevel >= LoggerObjects.LogLevel.DEBUG)
+                            if (b.LogLevel == LoggerObjects.LogLevel.DEBUG)
+                            {
+                                if (maxLogLevel == LoggerObjects.LogLevel.DEBUG)
+                                {
+                                    Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
+                                    Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
+                                    Console.ResetColor(); Console.WriteLine(b.Message);
+                                    _loggerObjects.LogsToPost.Remove(b); 
+                                }
+                            }
+                            else if (b.LogLevel == LoggerObjects.LogLevel.INFO)
+                            {
+                                if (maxLogLevel == LoggerObjects.LogLevel.DEBUG || maxLogLevel == LoggerObjects.LogLevel.INFO)
+                                {
+                                    Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
+                                    Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
+                                    Console.ResetColor(); Console.WriteLine(b.Message);
+                                    _loggerObjects.LogsToPost.Remove(b); 
+                                }
+                            }
+                            else if (b.LogLevel == LoggerObjects.LogLevel.WARN)
+                            {
+                                if (maxLogLevel == LoggerObjects.LogLevel.DEBUG || maxLogLevel == LoggerObjects.LogLevel.INFO || maxLogLevel == LoggerObjects.LogLevel.WARN)
+                                {
+                                    Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
+                                    Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
+                                    Console.ResetColor(); Console.WriteLine(b.Message);
+                                    _loggerObjects.LogsToPost.Remove(b); 
+                                }
+                            }
+                            else if (b.LogLevel == LoggerObjects.LogLevel.ERROR)
                             {
                                 Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
                                 Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
                                 Console.ResetColor(); Console.WriteLine(b.Message);
                                 _loggerObjects.LogsToPost.Remove(b);
                             }
-                            else if (b.LogLevel == LoggerObjects.LogLevel.INFO && maxLogLevel >= LoggerObjects.LogLevel.INFO)
-                            {
-                                Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
-                                Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
-                                Console.ResetColor(); Console.WriteLine(b.Message);
-                                _loggerObjects.LogsToPost.Remove(b);
-                            }
-                            else if (b.LogLevel == LoggerObjects.LogLevel.WARN && maxLogLevel >= LoggerObjects.LogLevel.WARN)
-                            {
-                                Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
-                                Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
-                                Console.ResetColor(); Console.WriteLine(b.Message);
-                                _loggerObjects.LogsToPost.Remove(b);
-                            }
-                            else if (b.LogLevel == LoggerObjects.LogLevel.ERROR && maxLogLevel >= LoggerObjects.LogLevel.ERROR)
-                            {
-                                Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
-                                Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
-                                Console.ResetColor(); Console.WriteLine(b.Message);
-                                _loggerObjects.LogsToPost.Remove(b);
-                            }
-                            else if (b.LogLevel == LoggerObjects.LogLevel.FATAL && maxLogLevel >= LoggerObjects.LogLevel.FATAL)
+                            else if (b.LogLevel == LoggerObjects.LogLevel.FATAL)
                             {
                                 Console.ResetColor();
                                 Console.ForegroundColor = ConsoleColor.Black; Console.BackgroundColor = LogLevelColor; Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
