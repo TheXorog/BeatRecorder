@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeatRecorder", "OBSControl\BeatRecorder.csproj", "{09326400-48AA-4B49-9589-A29CDA47C742}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeatRecorder", "BeatRecorder\BeatRecorder.csproj", "{BA868827-924B-41AE-BC79-03BCF671F1BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{09326400-48AA-4B49-9589-A29CDA47C742}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09326400-48AA-4B49-9589-A29CDA47C742}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09326400-48AA-4B49-9589-A29CDA47C742}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09326400-48AA-4B49-9589-A29CDA47C742}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA868827-924B-41AE-BC79-03BCF671F1BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA868827-924B-41AE-BC79-03BCF671F1BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA868827-924B-41AE-BC79-03BCF671F1BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA868827-924B-41AE-BC79-03BCF671F1BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {AA5038B4-8496-4494-A6BB-9A8EB9FD4092}
+		SolutionGuid = {413E950E-A1E2-41F3-91DE-AC5FBE722D49}
 	EndGlobalSection
 EndGlobal
