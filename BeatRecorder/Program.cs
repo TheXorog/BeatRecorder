@@ -117,9 +117,11 @@ namespace BeatRecorder
                             }
                     });
 
-                    beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/BSDataPuller/MapData"), factory);
-                    beatSaberWebSocket.ReconnectTimeout = null;
-                    beatSaberWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(3);
+                    beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/BSDataPuller/MapData"), factory)
+                    {
+                        ReconnectTimeout = null,
+                        ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
+                    };
 
                     beatSaberWebSocket.MessageReceived.Subscribe(msg => { DataPuller.MapDataMessageRecieved(msg.Text); });
                     beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { DataPuller.MapDataReconnected(type); });
@@ -144,9 +146,11 @@ namespace BeatRecorder
                                     }
                         });
 
-                        beatSaberWebSocketLiveData = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/BSDataPuller/LiveData"), factory);
-                        beatSaberWebSocketLiveData.ReconnectTimeout = null;
-                        beatSaberWebSocketLiveData.ErrorReconnectTimeout = TimeSpan.FromSeconds(3);
+                        beatSaberWebSocketLiveData = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/BSDataPuller/LiveData"), factory)
+                        {
+                            ReconnectTimeout = null,
+                            ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
+                        };
 
                         beatSaberWebSocketLiveData.MessageReceived.Subscribe(msg => { DataPuller.LiveDataMessageRecieved(msg.Text); });
                         beatSaberWebSocketLiveData.ReconnectionHappened.Subscribe(type => { DataPuller.LiveDataReconnected(type); });
@@ -172,9 +176,11 @@ namespace BeatRecorder
                             }
                     });
 
-                    beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/socket"), factory); beatSaberWebSocket.ReconnectTimeout = null;
-                    beatSaberWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(3);
-
+                    beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/socket"), factory)
+                    {
+                        ReconnectTimeout = null,
+                        ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
+                    };
                     beatSaberWebSocket.MessageReceived.Subscribe(msg => { HttpStatus.MessageReceived(msg.Text); });
                     beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { HttpStatus.Reconnected(type); });
                     beatSaberWebSocket.DisconnectionHappened.Subscribe(type => { HttpStatus.Disconnected(type); });
@@ -196,9 +202,11 @@ namespace BeatRecorder
                             }
                 });
 
-                obsWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.OBSUrl}:{Objects.LoadedSettings.OBSPort}"), factory);
-                obsWebSocket.ReconnectTimeout = null;
-                obsWebSocket.ErrorReconnectTimeout = TimeSpan.FromSeconds(3);
+                obsWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.OBSUrl}:{Objects.LoadedSettings.OBSPort}"), factory)
+                {
+                    ReconnectTimeout = null,
+                    ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
+                };
 
                 obsWebSocket.MessageReceived.Subscribe(msg => { _ = OBSWebSocketEvents.MessageReceived(msg); });
                 obsWebSocket.ReconnectionHappened.Subscribe(type => { OBSWebSocketEvents.Reconnected(type); });
@@ -264,8 +272,8 @@ namespace BeatRecorder
 
                 _ = Task.Run(() =>
                 {
-                    Bitmap Info_notification_bitmap = new Bitmap($"{AppDomain.CurrentDomain.BaseDirectory}Info.png");
-                    Bitmap Error_notification_bitmap = new Bitmap($"{AppDomain.CurrentDomain.BaseDirectory}Error.png");
+                    Bitmap Info_notification_bitmap = new($"{AppDomain.CurrentDomain.BaseDirectory}Info.png");
+                    Bitmap Error_notification_bitmap = new($"{AppDomain.CurrentDomain.BaseDirectory}Error.png");
 
                     while (true)
                     {
@@ -296,7 +304,7 @@ namespace BeatRecorder
 
                             foreach (var b in NotificationList.ToList())
                             {
-                                System.Drawing.Imaging.BitmapData TextureData = new System.Drawing.Imaging.BitmapData();
+                                BitmapData TextureData = new();
 
                                 if (b.Value.Type == Objects.MessageType.INFO)
                                     TextureData = Info_notification_bitmap.LockBits(

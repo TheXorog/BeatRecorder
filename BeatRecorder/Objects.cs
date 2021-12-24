@@ -24,7 +24,7 @@ namespace BeatRecorder
             NO_PROCESS
         }
 
-        public static Settings LoadedSettings = new Settings();
+        public static Settings LoadedSettings = new();
 
         public class Settings
         {
