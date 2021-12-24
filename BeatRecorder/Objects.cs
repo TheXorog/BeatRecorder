@@ -28,7 +28,7 @@ namespace BeatRecorder
 
         public class Settings
         {
-            public string README { get; set; } = "!! Please check https://github.com/XorogVEVO/OBSControl for more info and explainations for each config options !!";
+            public string README { get; set; } = "!! Please check https://github.com/TheXorog/BeatRecorder for more info and explainations for each config options !!";
             public int ConsoleLogLevel { get; set; } = 3;
             public string Mod { get; set; } = "http-status";
             public bool DisplaySteamNotifications { get; set; } = false;

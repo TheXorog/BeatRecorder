@@ -92,7 +92,7 @@ namespace BeatRecorder
 
                     if (repo.TagName != CurrentVersion)
                     {
-                        _logger.LogCritical($"[BR] You're running an outdated version of BeatRecorder, please update at https://github.com/XorogVEVO/BeatRecorder/releases/latest." +
+                        _logger.LogCritical($"[BR] You're running an outdated version of BeatRecorder, please update at https://github.com/TheXorog/BeatRecorder/releases/latest." +
                                             $"\n\nWhat changed in the new version:\n\n" +
                                             $"{repo.Body}\n");
                     }

@@ -23,7 +23,7 @@
     <None Update="Info.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="openvr_api.dll">
+    <None Update="Util\openvr_api.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

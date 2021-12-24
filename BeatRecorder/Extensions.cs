@@ -9,7 +9,11 @@ namespace BeatRecorder
 {
     class Extensions
     {
-        // Used for authentication with OBS Websocket if authentication is required ("Borrowed" from https://github.com/BarRaider/obs-websocket-dotnet/blob/268b7f6c52d8daf8e8d08cf517812009c6f9cc26/obs-websocket-dotnet/OBSWebsocket.cs#L797)
+        /// <summary>
+        /// Used for authentication with OBS Websocket if authentication is required ("Borrowed" from https://github.com/BarRaider/obs-websocket-dotnet/blob/268b7f6c52d8daf8e8d08cf517812009c6f9cc26/obs-websocket-dotnet/OBSWebsocket.cs#L797)
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         internal protected static string HashEncode(string input)
         {
             using var sha256 = new SHA256Managed();
