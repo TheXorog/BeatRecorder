@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Websocket.Client;
 using Websocket.Client.Models;
 
-namespace OBSControl
+namespace BeatRecorder
 {
     class OBSWebSocketEvents
     {

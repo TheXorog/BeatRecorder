@@ -1,4 +1,4 @@
-﻿using OBSControl;
+﻿using BeatRecorder;
 using System;
 using System.Collections;
 using System.Collections.Generic;

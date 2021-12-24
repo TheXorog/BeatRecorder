@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
 
-namespace OBSControl
+namespace BeatRecorder
 {
     class _logger
     {

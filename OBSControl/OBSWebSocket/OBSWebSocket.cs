@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OBSControl
+namespace BeatRecorder
 {
     class OBSWebSocket
     {

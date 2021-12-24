@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace OBSControl
+namespace BeatRecorder
 {
     class Program
     {
@@ -37,9 +37,9 @@ namespace OBSControl
             Console.Clear();
             _logger.StartLogger();
             
-            _logger.LogInfo($"[OBSC] Writing to file {_logger.FileName}");
+            _logger.LogInfo($"[BR] Writing to file {_logger.FileName}");
 
-            _logger.LogInfo("[OBSC] Loading settings..");
+            _logger.LogInfo("[BR] Loading settings..");
 
             if (File.Exists("Settings.json"))
             {
@@ -62,12 +62,12 @@ namespace OBSControl
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[OBSC] Exception occured while loading config: {ex}");
+                    _logger.LogError($"[BR] Exception occured while loading config: {ex}");
                     ResetSettings();
                     return;
                 }
 
-                _logger.LogInfo("[OBSC] Settings loaded.");
+                _logger.LogInfo("[BR] Settings loaded.");
             }
             else
             {
@@ -85,21 +85,21 @@ namespace OBSControl
             {
                 try
                 {
-                    var github = new GitHubClient(new ProductHeaderValue("OBSControlUpdateCheck"));
-                    var repo = await github.Repository.Release.GetLatest("TheXorog", "OBSControl");
+                    var github = new GitHubClient(new ProductHeaderValue("BeatRecorderUpdateCheck"));
+                    var repo = await github.Repository.Release.GetLatest("TheXorog", "BeatRecorder");
 
-                    _logger.LogInfo($"[OBSC] Current latest release is \"{repo.TagName}\". You're currently running: \"{CurrentVersion}\"");
+                    _logger.LogInfo($"[BR] Current latest release is \"{repo.TagName}\". You're currently running: \"{CurrentVersion}\"");
 
                     if (repo.TagName != CurrentVersion)
                     {
-                        _logger.LogCritical($"[OBSC] You're running an outdated version of OBSControl, please update at https://github.com/XorogVEVO/OBSControl/releases/latest." +
+                        _logger.LogCritical($"[BR] You're running an outdated version of BeatRecorder, please update at https://github.com/XorogVEVO/BeatRecorder/releases/latest." +
                                             $"\n\nWhat changed in the new version:\n\n" +
                                             $"{repo.Body}\n");
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[OBSC] Unable to get latest version: {ex}");
+                    _logger.LogError($"[BR] Unable to get latest version: {ex}");
                 }
             });
 
@@ -242,7 +242,7 @@ namespace OBSControl
             File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
 
             SendNotification("Your settings were reset due to an error. Please check your desktop.", 10000, Objects.MessageType.ERROR);
-            _logger.LogInfo($"Please configure OBSControl using the config file that was just opened. If you're done, save and quit notepad and OBSControl will restart for you.");
+            _logger.LogInfo($"Please configure BeatRecorder using the config file that was just opened. If you're done, save and quit notepad and BeatRecorder will restart for you.");
 
             var _Process = Process.Start("notepad", "Settings.json");
             _Process.WaitForExit();
@@ -273,7 +273,7 @@ namespace OBSControl
                         {
                             if (Objects.SteamNotificationId == 0)
                             {
-                                _logger.LogDebug($"[OBSC] Initializing OpenVR..");
+                                _logger.LogDebug($"[BR] Initializing OpenVR..");
                                 bool Initialized = false;
 
                                 while (!Initialized)
@@ -282,11 +282,11 @@ namespace OBSControl
                                     Thread.Sleep(500);
                                 }
 
-                                _logger.LogDebug($"[OBSC] Initialized OpenVR.");
+                                _logger.LogDebug($"[BR] Initialized OpenVR.");
 
-                                _logger.LogDebug($"[OBSC] Initializing NotificationOverlay..");
-                                Objects.SteamNotificationId = EasyOpenVRSingleton.Instance.InitNotificationOverlay("OBSControl");
-                                _logger.LogDebug($"[OBSC] Initialized NotificationOverlay: {Objects.SteamNotificationId}");
+                                _logger.LogDebug($"[BR] Initializing NotificationOverlay..");
+                                Objects.SteamNotificationId = EasyOpenVRSingleton.Instance.InitNotificationOverlay("BeatRecorder");
+                                _logger.LogDebug($"[BR] Initialized NotificationOverlay: {Objects.SteamNotificationId}");
                             }
 
                             while (NotificationList.Count == 0)
@@ -315,7 +315,7 @@ namespace OBSControl
                                 notification_icon.m_nBytesPerPixel = 4;
 
                                 var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, Valve.VR.EVRNotificationType.Persistent, b.Value.Message, Valve.VR.EVRNotificationStyle.Application, notification_icon);
-                                _logger.LogDebug($"[OBSC] Displayed Notification {NotificationId}: {b.Value.Message}");
+                                _logger.LogDebug($"[BR] Displayed Notification {NotificationId}: {b.Value.Message}");
 
                                 if (b.Value.Type == Objects.MessageType.INFO)
                                     Info_notification_bitmap.UnlockBits(TextureData);
@@ -333,7 +333,7 @@ namespace OBSControl
                                     _logger.LogError($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
                                 }
 
-                                _logger.LogDebug($"[OBSC] Dismissed Notification {NotificationId}");
+                                _logger.LogDebug($"[BR] Dismissed Notification {NotificationId}");
 
                                 NotificationList.Remove(b.Key);
                             }
