@@ -21,7 +21,6 @@ namespace BeatRecorder
     class Program
     {
         public static string CurrentVersion = "1.5.1";
-        public static int ConfigVersion = 3;
 
         internal static WebsocketClient beatSaberWebSocket { get; set; }
         internal static WebsocketClient beatSaberWebSocketLiveData { get; set; }
@@ -29,10 +28,12 @@ namespace BeatRecorder
 
         static void Main(string[] args)
         {
-            MainAsync(args).ConfigureAwait(true).GetAwaiter().GetResult();
+            Program program = new Program();
+
+            program.MainAsync(args).ConfigureAwait(true).GetAwaiter().GetResult();
         }
 
-        private static async Task MainAsync(string[] args)
+        private async Task MainAsync(string[] args)
         {
             Console.Clear();
             _logger.StartLogger();
