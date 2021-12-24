@@ -16,6 +16,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 
+using Xorog.Logger;
+using static Xorog.Logger.Logger;
+using static Xorog.Logger.LoggerObjects;
+
 namespace BeatRecorder
 {
     class Program
@@ -36,11 +40,9 @@ namespace BeatRecorder
         private async Task MainAsync(string[] args)
         {
             Console.Clear();
-            _logger.StartLogger();
-            
-            _logger.LogInfo($"[BR] Writing to file {_logger.FileName}");
+            StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.DEBUG, DateTime.UtcNow.AddDays(-3), false);
 
-            _logger.LogInfo("[BR] Loading settings..");
+            LogInfo("[BR] Loading settings..");
 
             if (File.Exists("Settings.json"))
             {
@@ -49,12 +51,7 @@ namespace BeatRecorder
                     Objects.LoadedSettings = JsonConvert.DeserializeObject<Objects.Settings>(File.ReadAllText("Settings.json"));
                     File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
 
-                    if (Objects.LoadedSettings.ConsoleLogLevel > 2)
-                    {
-                        _logger.LogLevel = Objects.LoadedSettings.ConsoleLogLevel;
-                    }
-                    else
-                        throw new Exception("Invalid Console Log Level.");
+                    ChangeLogLevel(Objects.LoadedSettings.ConsoleLogLevelEnum);
 
                     if (Objects.LoadedSettings.Mod != "http-status" && Objects.LoadedSettings.Mod != "datapuller")
                     {
@@ -63,12 +60,12 @@ namespace BeatRecorder
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BR] Exception occured while loading config: {ex}");
+                    LogError($"[BR] Exception occured while loading config: {ex}");
                     ResetSettings();
                     return;
                 }
 
-                _logger.LogInfo("[BR] Settings loaded.");
+                LogInfo("[BR] Settings loaded.");
             }
             else
             {
@@ -76,9 +73,9 @@ namespace BeatRecorder
                 return;
             }
 
-            _logger.LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented)}\n");
-            _logger.LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
-            _logger.LogDebug($"{Environment.CurrentDirectory}");
+            LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented)}\n");
+            LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
+            LogDebug($"{Environment.CurrentDirectory}");
 
             OBSWebSocketObjects.CancelStopRecordingDelay = new CancellationTokenSource();
 
@@ -89,18 +86,18 @@ namespace BeatRecorder
                     var github = new GitHubClient(new ProductHeaderValue("BeatRecorderUpdateCheck"));
                     var repo = await github.Repository.Release.GetLatest("TheXorog", "BeatRecorder");
 
-                    _logger.LogInfo($"[BR] Current latest release is \"{repo.TagName}\". You're currently running: \"{CurrentVersion}\"");
+                    LogInfo($"[BR] Current latest release is \"{repo.TagName}\". You're currently running: \"{CurrentVersion}\"");
 
                     if (repo.TagName != CurrentVersion)
                     {
-                        _logger.LogCritical($"[BR] You're running an outdated version of BeatRecorder, please update at https://github.com/TheXorog/BeatRecorder/releases/latest." +
+                        LogFatal($"[BR] You're running an outdated version of BeatRecorder, please update at https://github.com/TheXorog/BeatRecorder/releases/latest." +
                                             $"\n\nWhat changed in the new version:\n\n" +
                                             $"{repo.Body}\n");
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BR] Unable to get latest version: {ex}");
+                    LogError($"[BR] Unable to get latest version: {ex}");
                 }
             });
 
@@ -128,9 +125,9 @@ namespace BeatRecorder
                     beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { DataPuller.MapDataReconnected(type); });
                     beatSaberWebSocket.DisconnectionHappened.Subscribe(type => { DataPuller.MapDataDisconnected(type); });
 
-                    _logger.LogInfo($"[BS-DP1] Connecting..");
+                    LogInfo($"[BS-DP1] Connecting..");
                     beatSaberWebSocket.Start().Wait();
-                    _logger.LogInfo("[BS-DP1] Connected.");
+                    LogInfo("[BS-DP1] Connected.");
                 });
 
                 // Connect to LiveData Endpoint of DataPuller's WebSocket or HttpStatus' Endpoint
@@ -157,9 +154,9 @@ namespace BeatRecorder
                         beatSaberWebSocketLiveData.ReconnectionHappened.Subscribe(type => { DataPuller.LiveDataReconnected(type); });
                         beatSaberWebSocketLiveData.DisconnectionHappened.Subscribe(type => { DataPuller.LiveDataDisconnected(type); });
 
-                        _logger.LogDebug($"[BS-DP2] Connecting..");
+                        LogDebug($"[BS-DP2] Connecting..");
                         beatSaberWebSocketLiveData.Start().Wait();
-                        _logger.LogDebug("[BS-DP2] Connected.");
+                        LogDebug("[BS-DP2] Connected.");
                     });
             }
             else if (Objects.LoadedSettings.Mod == "http-status")
@@ -186,7 +183,7 @@ namespace BeatRecorder
                     beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { HttpStatus.Reconnected(type); });
                     beatSaberWebSocket.DisconnectionHappened.Subscribe(type => { HttpStatus.Disconnected(type); });
 
-                    _logger.LogInfo($"[BS-HS] Connecting..");
+                    LogInfo($"[BS-HS] Connecting..");
                     beatSaberWebSocket.Start().Wait();
                 });
             }
@@ -213,12 +210,12 @@ namespace BeatRecorder
                 obsWebSocket.ReconnectionHappened.Subscribe(type => { OBSWebSocketEvents.Reconnected(type); });
                 obsWebSocket.DisconnectionHappened.Subscribe(type => { OBSWebSocketEvents.Disconnected(type); });
 
-                _logger.LogInfo($"[OBS] Connecting..");
+                LogInfo($"[OBS] Connecting..");
                 obsWebSocket.Start().Wait();
 
                 obsWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{OBSWebSocketEvents.RequiredAuthenticationGuid}\"}}");
 
-                _logger.LogInfo($"[OBS] Connected.");
+                LogInfo($"[OBS] Connected.");
 
                 SendNotification("Connected to OBS", 1000, Objects.MessageType.INFO);
             });
@@ -251,7 +248,7 @@ namespace BeatRecorder
             File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
 
             SendNotification("Your settings were reset due to an error. Please check your desktop.", 10000, Objects.MessageType.ERROR);
-            _logger.LogInfo($"Please configure BeatRecorder using the config file that was just opened. If you're done, save and quit notepad and BeatRecorder will restart for you.");
+            LogInfo($"Please configure BeatRecorder using the config file that was just opened. If you're done, save and quit notepad and BeatRecorder will restart for you.");
 
             var _Process = Process.Start("notepad", "Settings.json");
             _Process.WaitForExit();
@@ -266,7 +263,7 @@ namespace BeatRecorder
         {
             if (Objects.LoadedSettings.DisplaySteamNotifications)
             {
-                _logger.LogCritical($"\n\nUsing Steam Notifications is still experimental. Issues might include:\n" +
+                LogFatal($"\n\nUsing Steam Notifications is still experimental. Issues might include:\n" +
                                 $"- notifications not dissapearing\n" +
                                 $"- notifications might interrupt your vision during gameplay if you look up while starting/resuming a song\n\n");
 
@@ -282,7 +279,7 @@ namespace BeatRecorder
                         {
                             if (Objects.SteamNotificationId == 0)
                             {
-                                _logger.LogDebug($"[BR] Initializing OpenVR..");
+                                LogDebug($"[BR] Initializing OpenVR..");
                                 bool Initialized = false;
 
                                 while (!Initialized)
@@ -291,11 +288,11 @@ namespace BeatRecorder
                                     Thread.Sleep(500);
                                 }
 
-                                _logger.LogDebug($"[BR] Initialized OpenVR.");
+                                LogDebug($"[BR] Initialized OpenVR.");
 
-                                _logger.LogDebug($"[BR] Initializing NotificationOverlay..");
+                                LogDebug($"[BR] Initializing NotificationOverlay..");
                                 Objects.SteamNotificationId = EasyOpenVRSingleton.Instance.InitNotificationOverlay("BeatRecorder");
-                                _logger.LogDebug($"[BR] Initialized NotificationOverlay: {Objects.SteamNotificationId}");
+                                LogDebug($"[BR] Initialized NotificationOverlay: {Objects.SteamNotificationId}");
                             }
 
                             while (NotificationList.Count == 0)
@@ -324,7 +321,7 @@ namespace BeatRecorder
                                 notification_icon.m_nBytesPerPixel = 4;
 
                                 var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, Valve.VR.EVRNotificationType.Persistent, b.Value.Message, Valve.VR.EVRNotificationStyle.Application, notification_icon);
-                                _logger.LogDebug($"[BR] Displayed Notification {NotificationId}: {b.Value.Message}");
+                                LogDebug($"[BR] Displayed Notification {NotificationId}: {b.Value.Message}");
 
                                 if (b.Value.Type == Objects.MessageType.INFO)
                                     Info_notification_bitmap.UnlockBits(TextureData);
@@ -339,17 +336,17 @@ namespace BeatRecorder
 
                                 if (error != Valve.VR.EVRNotificationError.OK)
                                 {
-                                    _logger.LogError($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
+                                    LogError($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
                                 }
 
-                                _logger.LogDebug($"[BR] Dismissed Notification {NotificationId}");
+                                LogDebug($"[BR] Dismissed Notification {NotificationId}");
 
                                 NotificationList.Remove(b.Key);
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex.ToString());
+                            LogError(ex.ToString());
                             Thread.Sleep(5000);
                             continue;
                         }

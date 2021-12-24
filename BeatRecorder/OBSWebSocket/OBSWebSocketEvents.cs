@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 using Websocket.Client;
 using Websocket.Client.Models;
 
+using Xorog.Logger;
+using static Xorog.Logger.Logger;
+using static Xorog.Logger.LoggerObjects;
+
 namespace BeatRecorder
 {
     class OBSWebSocketEvents
@@ -26,12 +30,12 @@ namespace BeatRecorder
 
                 if (required.authRequired)
                 {
-                    _logger.LogInfo("[OBS] Authenticating..");
+                    LogInfo("[OBS] Authenticating..");
 
                     if (Objects.LoadedSettings.OBSPassword == "")
                     {
                         await Task.Delay(1000);
-                        _logger.LogInfo("[OBS] A password is required to log into your obs websocket.");
+                        LogInfo("[OBS] A password is required to log into your obs websocket.");
                         await Task.Delay(1000);
                         Console.Write("> ");
 
@@ -58,7 +62,7 @@ namespace BeatRecorder
                             }
                             else if (key == ConsoleKey.Escape)
                             {
-                                _logger.LogInfo("[OBS] Cancelled. Press any key to exit.");
+                                LogInfo("[OBS] Cancelled. Press any key to exit.");
                                 Console.ReadKey();
                                 Environment.Exit(0);
                                 return;
@@ -76,7 +80,7 @@ namespace BeatRecorder
                             {
                                 key = ConsoleKey.A;
 
-                                _logger.LogWarn("[OBS] Do you want to save this password in the config? (THIS WILL STORE THE PASSWORD IN PLAIN-TEXT, THIS CAN BE ACCESSED BY ANYONE WITH ACCESS TO YOUR FILES. THIS IS NOT RECOMMENDED!)");
+                                LogWarn("[OBS] Do you want to save this password in the config? (THIS WILL STORE THE PASSWORD IN PLAIN-TEXT, THIS CAN BE ACCESSED BY ANYONE WITH ACCESS TO YOUR FILES. THIS IS NOT RECOMMENDED!)");
                                 while (key != ConsoleKey.Enter || key != ConsoleKey.Escape || key != ConsoleKey.Y || key != ConsoleKey.N)
                                 {
                                     await Task.Delay(1000);
@@ -88,14 +92,14 @@ namespace BeatRecorder
 
                                     if (key == ConsoleKey.Escape)
                                     {
-                                        _logger.LogWarn("[OBS] Cancelled. Press any key to exit.");
+                                        LogWarn("[OBS] Cancelled. Press any key to exit.");
                                         Console.ReadKey();
                                         Environment.Exit(0);
                                         return;
                                     }
                                     else if (key == ConsoleKey.Y)
                                     {
-                                        _logger.LogInfo("[OBS] Your password is now saved in the Settings.json.");
+                                        LogInfo("[OBS] Your password is now saved in the Settings.json.");
                                         Objects.LoadedSettings.OBSPassword = Password;
                                         Objects.LoadedSettings.AskToSaveOBSPassword = true;
 
@@ -104,8 +108,8 @@ namespace BeatRecorder
                                     }
                                     else if (key == ConsoleKey.N || key == ConsoleKey.Enter)
                                     {
-                                        _logger.LogInfo("[OBS] Your password will not be saved. This wont be asked in the feature.");
-                                        _logger.LogInfo("[OBS] To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
+                                        LogInfo("[OBS] Your password will not be saved. This wont be asked in the feature.");
+                                        LogInfo("[OBS] To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
                                         Objects.LoadedSettings.OBSPassword = "";
                                         Objects.LoadedSettings.AskToSaveOBSPassword = false;
 
@@ -136,18 +140,18 @@ namespace BeatRecorder
                 if (required.status == "ok")
                 {
                     Program.SendNotification("Authenticated with OBS.", 1000, Objects.MessageType.INFO);
-                    _logger.LogInfo("[OBS] Authenticated.");
+                    LogInfo("[OBS] Authenticated.");
 
                     Program.obsWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
                 }
                 else
                 {
-                    _logger.LogError("[OBS] Failed to authenticate. Please check your password or wait a few seconds to try authentication again.");
+                    LogError("[OBS] Failed to authenticate. Please check your password or wait a few seconds to try authentication again.");
                     await Program.obsWebSocket.Stop(WebSocketCloseStatus.NormalClosure, "Shutting down");
 
                     await Task.Delay(1000);
 
-                    _logger.LogInfo("[OBS] Re-trying..");
+                    LogInfo("[OBS] Re-trying..");
                     await Program.obsWebSocket.Start();
                     Program.obsWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
                 }
@@ -160,7 +164,7 @@ namespace BeatRecorder
                 OBSWebSocketObjects.OBSRecordingPaused = recordingStatus.isRecordingPaused;
 
                 if (recordingStatus.isRecording)
-                    _logger.LogWarn($"[OBS] A recording is already running.");
+                    LogWarn($"[OBS] A recording is already running.");
             }
 
             if (msg.Text.Contains("\"update-type\":\"RecordingStopped\""))
@@ -168,7 +172,7 @@ namespace BeatRecorder
                 Program.SendNotification("Recording stopped.", 1000, Objects.MessageType.INFO);
                 OBSWebSocketObjects.RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStopped>(msg.Text);
 
-                _logger.LogInfo($"[OBS] Recording stopped.");
+                LogInfo($"[OBS] Recording stopped.");
                 OBSWebSocketObjects.OBSRecording = false;
 
                 if (Objects.LoadedSettings.Mod == "http-status")
@@ -179,7 +183,7 @@ namespace BeatRecorder
             else if (msg.Text.Contains("\"update-type\":\"RecordingStarted\""))
             {
                 Program.SendNotification("Recording started.", 1000, Objects.MessageType.INFO);
-                _logger.LogInfo($"[OBS] Recording started.");
+                LogInfo($"[OBS] Recording started.");
                 OBSWebSocketObjects.OBSRecording = true;
                 while (OBSWebSocketObjects.OBSRecording)
                 {
@@ -195,13 +199,13 @@ namespace BeatRecorder
             else if (msg.Text.Contains("\"update-type\":\"RecordingPaused\""))
             {
                 Program.SendNotification("Recording paused.", 1000, Objects.MessageType.INFO);
-                _logger.LogInfo($"[OBS] Recording paused.");
+                LogInfo($"[OBS] Recording paused.");
                 OBSWebSocketObjects.OBSRecordingPaused = true;
             }
             else if (msg.Text.Contains("\"update-type\":\"RecordingResumed\""))
             {
                 Program.SendNotification("Recording resumed.", 500, Objects.MessageType.INFO);
-                _logger.LogInfo($"[OBS] Recording resumed.");
+                LogInfo($"[OBS] Recording resumed.");
                 OBSWebSocketObjects.OBSRecordingPaused = false;
             }
         }
@@ -210,7 +214,7 @@ namespace BeatRecorder
         {
             if (msg.Type != ReconnectionType.Initial)
             {
-                _logger.LogInfo($"[OBS] Reconnected: {msg.Type}");
+                LogInfo($"[OBS] Reconnected: {msg.Type}");
 
                 Objects.LastOBSWarning = Objects.ConnectionTypeWarning.CONNECTED;
 
@@ -229,7 +233,7 @@ namespace BeatRecorder
                     if (Objects.LastOBSWarning != Objects.ConnectionTypeWarning.NO_PROCESS)
                     {
                         Program.SendNotification("Couldn't connect to OBS, is it even running?", 10000, Objects.MessageType.ERROR);
-                        _logger.LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({msg.Type})");
+                        LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({msg.Type})");
                     }
                     Objects.LastOBSWarning = Objects.ConnectionTypeWarning.NO_PROCESS;
                 }
@@ -256,7 +260,7 @@ namespace BeatRecorder
                     {
                         if (Objects.LastOBSWarning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
                         {
-                            _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({msg.Type})");
+                            LogFatal($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({msg.Type})");
                             Program.SendNotification("Couldn't connect to OBS. Please make sure obs-websocket is enabled.", 10000, Objects.MessageType.ERROR);
                         }
                         Objects.LastOBSWarning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
@@ -265,7 +269,7 @@ namespace BeatRecorder
                     {
                         if (Objects.LastOBSWarning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
                         {
-                            _logger.LogCritical($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({msg.Type})");
+                            LogFatal($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({msg.Type})");
                             Program.SendNotification("Couldn't connect to OBS. Please make sure obs-websocket is installed.", 10000, Objects.MessageType.ERROR);
                         }
                         Objects.LastOBSWarning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
@@ -274,7 +278,7 @@ namespace BeatRecorder
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to check if obs-websocket is installed: (Disconnect Reason: {msg.Type}) {ex}");
+                LogError($"Failed to check if obs-websocket is installed: (Disconnect Reason: {msg.Type}) {ex}");
             }
         }
     }

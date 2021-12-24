@@ -11,6 +11,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Valve.VR;
 
+using Xorog.Logger;
+using static Xorog.Logger.Logger;
+using static Xorog.Logger.LoggerObjects;
+
 namespace BOLL7708
 {
     public sealed class EasyOpenVRSingleton
@@ -828,7 +832,7 @@ namespace BOLL7708
 
             if (error != EVRNotificationError.OK)
             {
-                _logger.LogError($"Failed to send notification: {error}");
+                LogError($"Failed to send notification: {error}");
                 return 0;
             }
 

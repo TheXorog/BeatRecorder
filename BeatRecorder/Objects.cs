@@ -5,6 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Xorog.Logger;
+using static Xorog.Logger.Logger;
+using static Xorog.Logger.LoggerObjects;
+
 namespace BeatRecorder
 {
     class Objects
@@ -29,7 +33,7 @@ namespace BeatRecorder
         public class Settings
         {
             public string README { get; set; } = "!! Please check https://github.com/TheXorog/BeatRecorder for more info and explainations for each config options !!";
-            public int ConsoleLogLevel { get; set; } = 3;
+            public LogLevel ConsoleLogLevelEnum { get; set; } = LogLevel.INFO;
             public string Mod { get; set; } = "http-status";
             public bool DisplaySteamNotifications { get; set; } = false;
             public string BeatSaberUrl { get; set; } = "127.0.0.1";
@@ -47,6 +51,11 @@ namespace BeatRecorder
             public bool DeleteIfQuitAfterSoftFailed { get; set; } = false;
             public bool DeleteFailed { get; set; } = false;
             public bool DeleteSoftFailed { get; set; } = false;
+
+
+            // Ignore old Console Log Level
+            [JsonProperty("ConsoleLogLevel")]
+            private int MigrationConsoleLogLevel { set { } }
         }
 
         // Shedule-based logger

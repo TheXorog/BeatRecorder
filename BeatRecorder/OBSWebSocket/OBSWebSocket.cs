@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Xorog.Logger;
+using static Xorog.Logger.Logger;
+using static Xorog.Logger.LoggerObjects;
+
 namespace BeatRecorder
 {
     class OBSWebSocket
@@ -30,7 +34,7 @@ namespace BeatRecorder
                     Thread.Sleep(Objects.LoadedSettings.MininumWaitUntilRecordingCanStart);
                 else
                 {
-                    _logger.LogError("The MininumWaitUntilRecordingCanStart has to be between 200ms and 2000ms. Defaulting to a wait time of 800ms.");
+                    LogError("The MininumWaitUntilRecordingCanStart has to be between 200ms and 2000ms. Defaulting to a wait time of 800ms.");
                     Thread.Sleep(800);
                 }
 
@@ -38,7 +42,7 @@ namespace BeatRecorder
             }
             else
             {
-                _logger.LogError("[OBS] The WebSocket isn't connected, no recording can be started.");
+                LogError("[OBS] The WebSocket isn't connected, no recording can be started.");
             }
         }
 
@@ -62,7 +66,7 @@ namespace BeatRecorder
                             }
                         }
                         else
-                            _logger.LogError("[OBS] The specified delay is not in between 1 and 20 seconds. The delay will be skipped.");
+                            LogError("[OBS] The specified delay is not in between 1 and 20 seconds. The delay will be skipped.");
                     }
 
                     Program.obsWebSocket.Send($"{{\"request-type\":\"StopRecording\", \"message-id\":\"StopRecording\"}}");
@@ -71,7 +75,7 @@ namespace BeatRecorder
             }
             else
             {
-                _logger.LogError("[OBS] The WebSocket isn't connected, no recording can be stopped.");
+                LogError("[OBS] The WebSocket isn't connected, no recording can be stopped.");
             }
         }
     }

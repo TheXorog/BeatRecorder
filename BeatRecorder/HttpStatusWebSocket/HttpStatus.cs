@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 using Websocket.Client;
 using Websocket.Client.Models;
 
+using Xorog.Logger;
+using static Xorog.Logger.Logger;
+using static Xorog.Logger.LoggerObjects;
+
 namespace BeatRecorder
 {
     class HttpStatus
@@ -23,19 +27,19 @@ namespace BeatRecorder
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"[BS-HS] Unable to convert beatsaber-http-status message into an dictionary: {ex}");
+                LogFatal($"[BS-HS] Unable to convert beatsaber-http-status message into an dictionary: {ex}");
                 return;
             }
 
             switch (_status.@event)
             {
                 case "hello":
-                    _logger.LogInfo("[BS-HS] Connected.");
+                    LogInfo("[BS-HS] Connected.");
                     break;
 
                 case "songStart":
-                    _logger.LogDebug("[BS-HS] Song started.");
-                    _logger.LogInfo($"[BS-HS] Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
+                    LogDebug("[BS-HS] Song started.");
+                    LogInfo($"[BS-HS] Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
 
                     HttpStatusObjects.FailedCurrentSong = false;
                     HttpStatusObjects.FinishedCurrentSong = false;
@@ -48,13 +52,13 @@ namespace BeatRecorder
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS-HS] {ex}");
+                        LogError($"[BS-HS] {ex}");
                         return;
                     }
                     break;
 
                 case "finished":
-                    _logger.LogInfo("[BS-HS] Song finished.");
+                    LogInfo("[BS-HS] Song finished.");
 
                     HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
                     HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
@@ -62,7 +66,7 @@ namespace BeatRecorder
                     break;
 
                 case "failed":
-                    _logger.LogInfo("[BS-HS] Song failed.");
+                    LogInfo("[BS-HS] Song failed.");
 
                     HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
                     HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
@@ -71,7 +75,7 @@ namespace BeatRecorder
                     break;
 
                 case "pause":
-                    _logger.LogInfo("[BS-HS] Song paused.");
+                    LogInfo("[BS-HS] Song paused.");
 
                     try
                     {
@@ -81,13 +85,13 @@ namespace BeatRecorder
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS-HS] {ex}");
+                        LogError($"[BS-HS] {ex}");
                         return;
                     }
                     break;
 
                 case "resume":
-                    _logger.LogInfo("[BS-HS] Song resumed.");
+                    LogInfo("[BS-HS] Song resumed.");
 
                     try
                     {
@@ -97,14 +101,14 @@ namespace BeatRecorder
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS-HS] {ex}");
+                        LogError($"[BS-HS] {ex}");
                         return;
                     }
                     break;
 
                 case "menu":
-                    _logger.LogDebug("[BS-HS] Menu entered.");
-                    _logger.LogInfo($"[BS-HS] Stopped playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
+                    LogDebug("[BS-HS] Menu entered.");
+                    LogInfo($"[BS-HS] Stopped playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
 
                     try
                     {
@@ -117,7 +121,7 @@ namespace BeatRecorder
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS-HS] {ex}");
+                        LogError($"[BS-HS] {ex}");
                         return;
                     }
                     break;
@@ -131,7 +135,7 @@ namespace BeatRecorder
         internal static void Reconnected(ReconnectionInfo msg)
         {
             if (msg.Type != ReconnectionType.Initial)
-                _logger.LogWarn($"[BS-HS] Reconnected: {msg.Type}");
+                LogWarn($"[BS-HS] Reconnected: {msg.Type}");
 
             Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.CONNECTED;
             Program.SendNotification("Connected to Beat Saber", 1000, Objects.MessageType.INFO);
@@ -147,7 +151,7 @@ namespace BeatRecorder
                 {
                     if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.NO_PROCESS)
                     {
-                        _logger.LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                        LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
                         Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, Objects.MessageType.ERROR);
                     }
                     Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.NO_PROCESS;
@@ -170,7 +174,7 @@ namespace BeatRecorder
                     {
                         if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.NOT_MODDED)
                         {
-                            _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                            LogFatal($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
                             Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, Objects.MessageType.ERROR);
                         }
                         Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.NOT_MODDED;
@@ -180,7 +184,7 @@ namespace BeatRecorder
                     {
                         if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
                         {
-                            _logger.LogCritical($"[BS-HS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                            LogFatal($"[BS-HS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
                             Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, Objects.MessageType.ERROR);
                         }
                         Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
@@ -189,7 +193,7 @@ namespace BeatRecorder
                     {
                         if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
                         {
-                            _logger.LogCritical($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                            LogFatal($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
                             Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, Objects.MessageType.ERROR);
                         }
                         Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
@@ -198,7 +202,7 @@ namespace BeatRecorder
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[BS-HS] Failed to check if beatsaber-http-status is installed: (Disconnect Reason: {msg.Type}) {ex}");
+                LogError($"[BS-HS] Failed to check if beatsaber-http-status is installed: (Disconnect Reason: {msg.Type}) {ex}");
             }
         }
 
@@ -224,7 +228,7 @@ namespace BeatRecorder
                         {
                             if (Objects.LoadedSettings.DeleteSoftFailed)
                             {
-                                _logger.LogDebug($"[OBSC] Soft-Failed. Deletion requested.");
+                                LogDebug($"[OBSC] Soft-Failed. Deletion requested.");
                                 DeleteFile = true;
                             }
 
@@ -237,13 +241,13 @@ namespace BeatRecorder
                         {
                             if (Objects.LoadedSettings.DeleteQuit)
                             {
-                                _logger.LogDebug($"[OBSC] Quit. Deletion requested.");
+                                LogDebug($"[OBSC] Quit. Deletion requested.");
                                 DeleteFile = true;
 
                                 if (GeneratedAccuracy == "NF-")
                                     if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                     {
-                                        _logger.LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
+                                        LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
                                         DeleteFile = false;
                                     }
                             }
@@ -255,7 +259,7 @@ namespace BeatRecorder
                         {
                             if (Objects.LoadedSettings.DeleteFailed)
                             {
-                                _logger.LogDebug($"[OBSC] Failed. Deletion requested.");
+                                LogDebug($"[OBSC] Failed. Deletion requested.");
                                 DeleteFile = true;
                             }
                             else
@@ -304,7 +308,7 @@ namespace BeatRecorder
 
                 if (Objects.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
                 {
-                    _logger.LogDebug($"[OBSC] The recording is too short. Deletion requested.");
+                    LogDebug($"[OBSC] The recording is too short. Deletion requested.");
                     DeleteFile = true;
                 }
 
@@ -377,32 +381,32 @@ namespace BeatRecorder
                     {
                         if (!DeleteFile)
                         {
-                            _logger.LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
+                            LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                             File.Move(OldFileName, NewFileName);
-                            _logger.LogInfo($"[OBSC] Successfully renamed.");
+                            LogInfo($"[OBSC] Successfully renamed.");
                             Program.SendNotification("Recording renamed.", 1000, Objects.MessageType.INFO);
                         }
                         else
                         {
-                            _logger.LogInfo($"[OBSC] Deleting \"{fileInfo.Name}\"..");
+                            LogInfo($"[OBSC] Deleting \"{fileInfo.Name}\"..");
                             File.Delete(OldFileName);
-                            _logger.LogInfo($"[OBSC] Successfully deleted.");
+                            LogInfo($"[OBSC] Successfully deleted.");
                             Program.SendNotification("Recording deleted.", 1000, Objects.MessageType.INFO);
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[OBSC] {ex}.");
+                        LogError($"[OBSC] {ex}.");
                     }
                 }
                 else
                 {
-                    _logger.LogError($"[OBSC] {OldFileName} doesn't exist.");
+                    LogError($"[OBSC] {OldFileName} doesn't exist.");
                 }
             }
             else
             {
-                _logger.LogError($"[OBSC] Last recorded file can't be renamed.");
+                LogError($"[OBSC] Last recorded file can't be renamed.");
             }
         }
     }

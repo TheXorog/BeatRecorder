@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 using Websocket.Client;
 using Websocket.Client.Models;
 
+using Xorog.Logger;
+using static Xorog.Logger.Logger;
+using static Xorog.Logger.LoggerObjects;
+
 namespace BeatRecorder
 {
     class DataPuller
@@ -24,7 +28,7 @@ namespace BeatRecorder
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"[BS-DP1] Unable to convert BSDataPuller message into an dictionary: {ex}");
+                LogFatal($"[BS-DP1] Unable to convert BSDataPuller message into an dictionary: {ex}");
                 return;
             }
 
@@ -33,8 +37,8 @@ namespace BeatRecorder
                 if (!DataPullerObjects.DataPullerInLevel && _status.InLevel)
                 {
                     DataPullerObjects.DataPullerInLevel = true;
-                    _logger.LogDebug("[BS-DP1] Song started.");
-                    _logger.LogInfo($"[BS-DP1] Started playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
+                    LogDebug("[BS-DP1] Song started.");
+                    LogInfo($"[BS-DP1] Started playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
                     DataPullerObjects.DataPullerCurrentBeatmap = _status;
 
@@ -45,7 +49,7 @@ namespace BeatRecorder
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS-DP1] {ex}");
+                        LogError($"[BS-DP1] {ex}");
                         return;
                     }
                 }
@@ -54,8 +58,8 @@ namespace BeatRecorder
                     Thread.Sleep(500);
                     DataPullerObjects.DataPullerInLevel = false;
                     DataPullerObjects.DataPullerPaused = false;
-                    _logger.LogDebug("[BS-DP1] Menu entered.");
-                    _logger.LogInfo($"[BS-DP1] Stopped playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
+                    LogDebug("[BS-DP1] Menu entered.");
+                    LogInfo($"[BS-DP1] Stopped playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
                     try
                     {
@@ -69,7 +73,7 @@ namespace BeatRecorder
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[BS-DP1] {ex}");
+                        LogError($"[BS-DP1] {ex}");
                         return;
                     }
                 }
@@ -82,7 +86,7 @@ namespace BeatRecorder
                     if (!DataPullerObjects.DataPullerPaused && _status.LevelPaused)
                     {
                         DataPullerObjects.DataPullerPaused = true;
-                        _logger.LogInfo("[BS-DP1] Song paused.");
+                        LogInfo("[BS-DP1] Song paused.");
 
                         try
                         {
@@ -92,14 +96,14 @@ namespace BeatRecorder
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError($"[BS-DP1] {ex}");
+                            LogError($"[BS-DP1] {ex}");
                             return;
                         }
                     }
                     else if (DataPullerObjects.DataPullerPaused && !_status.LevelPaused)
                     {
                         DataPullerObjects.DataPullerPaused = false;
-                        _logger.LogInfo("[BS-DP1] Song resumed.");
+                        LogInfo("[BS-DP1] Song resumed.");
 
                         try
                         {
@@ -109,7 +113,7 @@ namespace BeatRecorder
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError($"[BS-DP1] {ex}");
+                            LogError($"[BS-DP1] {ex}");
                             return;
                         }
                     }
@@ -127,7 +131,7 @@ namespace BeatRecorder
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"[BS-DP2] Unable to convert BSDataPuller message into an dictionary: {ex}");
+                LogFatal($"[BS-DP2] Unable to convert BSDataPuller message into an dictionary: {ex}");
                 return;
             }
 
@@ -143,7 +147,7 @@ namespace BeatRecorder
             Program.SendNotification("Connected to Beat Saber", 1000, Objects.MessageType.INFO);
             if (msg.Type != ReconnectionType.Initial)
             {
-                _logger.LogWarn($"[BS-DP1] Reconnected: {msg.Type}");
+                LogWarn($"[BS-DP1] Reconnected: {msg.Type}");
                 Objects.LastDP1Warning = Objects.ConnectionTypeWarning.CONNECTED;
             }
         }
@@ -152,7 +156,7 @@ namespace BeatRecorder
         {
             if (msg.Type != ReconnectionType.Initial)
             {
-                _logger.LogWarn($"[BS-DP2] Reconnected: {msg.Type}");
+                LogWarn($"[BS-DP2] Reconnected: {msg.Type}");
             }
         }
 
@@ -166,7 +170,7 @@ namespace BeatRecorder
                 {
                     if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.NO_PROCESS)
                     {
-                        _logger.LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                        LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
                         Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, Objects.MessageType.ERROR);
                     }
                     Objects.LastDP1Warning = Objects.ConnectionTypeWarning.NO_PROCESS;
@@ -189,7 +193,7 @@ namespace BeatRecorder
                     {
                         if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.NOT_MODDED)
                         {
-                            _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
+                            LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
                             Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, Objects.MessageType.ERROR);
                         }
                         Objects.LastDP1Warning = Objects.ConnectionTypeWarning.NOT_MODDED;
@@ -199,7 +203,7 @@ namespace BeatRecorder
                     {
                         if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
                         {
-                            _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                            LogFatal($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
                             Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, Objects.MessageType.ERROR);
                         }
                         Objects.LastDP1Warning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
@@ -208,7 +212,7 @@ namespace BeatRecorder
                     {
                         if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
                         {
-                            _logger.LogCritical($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                            LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
                             Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, Objects.MessageType.ERROR);
                         }
                         Objects.LastDP1Warning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
@@ -217,26 +221,26 @@ namespace BeatRecorder
             }
             catch (Exception ex)
             {
-                _logger.LogError($"[BS-DP1] Failed to check if BSDataPuller is installed: (Disconnect Reason: {msg.Type}) {ex}");
+                LogError($"[BS-DP1] Failed to check if BSDataPuller is installed: (Disconnect Reason: {msg.Type}) {ex}");
             }
         }
 
         internal static void LiveDataDisconnected(DisconnectionInfo msg)
         {
             if (Program.beatSaberWebSocket.IsRunning)
-                _logger.LogError($"[BS-DP2] Disconnected: {msg.Type}");
+                LogError($"[BS-DP2] Disconnected: {msg.Type}");
             else
-                _logger.LogDebug($"[BS-DP2] Disconnected: {msg.Type}");
+                LogDebug($"[BS-DP2] Disconnected: {msg.Type}");
         }
 
         internal static void HandleFile(DataPullerObjects.DataPullerMain BeatmapInfo, DataPullerObjects.DataPullerData PerformanceInfo, string OldFileName, int HighestCombo)
         {
             if (BeatmapInfo != null)
             {
-                _logger.LogDebug($"[OBSC] BeatmapInfo: {JsonConvert.SerializeObject(BeatmapInfo)}");
-                _logger.LogDebug($"[OBSC] PerformanceInfo: {JsonConvert.SerializeObject(PerformanceInfo)}");
-                _logger.LogDebug($"[OBSC] OldFileName: {OldFileName}");
-                _logger.LogDebug($"[OBSC] HighestCombo: {HighestCombo}");
+                LogDebug($"[OBSC] BeatmapInfo: {JsonConvert.SerializeObject(BeatmapInfo)}");
+                LogDebug($"[OBSC] PerformanceInfo: {JsonConvert.SerializeObject(PerformanceInfo)}");
+                LogDebug($"[OBSC] OldFileName: {OldFileName}");
+                LogDebug($"[OBSC] HighestCombo: {HighestCombo}");
                 bool DeleteFile = false;
                 string NewName = Objects.LoadedSettings.FileFormat;
 
@@ -258,10 +262,10 @@ namespace BeatRecorder
 
                         if ((BeatmapInfo.LevelFailed || PerformanceInfo.PlayerHealth <= 0) && BeatmapInfo.Modifiers.noFailOn0Energy)
                         {
-                            _logger.LogDebug($"[OBSC] Soft-Failed.");
+                            LogDebug($"[OBSC] Soft-Failed.");
                             if (Objects.LoadedSettings.DeleteSoftFailed)
                             {
-                                _logger.LogDebug($"[OBSC] Soft-Failed. Deletion requested.");
+                                LogDebug($"[OBSC] Soft-Failed. Deletion requested.");
                                 DeleteFile = true;
                             }
 
@@ -270,21 +274,21 @@ namespace BeatRecorder
 
                         if (BeatmapInfo.LevelFinished)
                         {
-                            _logger.LogDebug($"[OBSC] Level finished");
+                            LogDebug($"[OBSC] Level finished");
                             GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
                         }
                         else if (BeatmapInfo.LevelQuit)
                         {
-                            _logger.LogDebug($"[OBSC] Level quit");
+                            LogDebug($"[OBSC] Level quit");
                             if (Objects.LoadedSettings.DeleteQuit)
                             {
-                                _logger.LogDebug($"[OBSC] Quit. Deletion requested.");
+                                LogDebug($"[OBSC] Quit. Deletion requested.");
                                 DeleteFile = true;
 
                                 if (GeneratedAccuracy == "NF-")
                                     if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                     {
-                                        _logger.LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
+                                        LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
                                         DeleteFile = false;
                                     }
                             }
@@ -293,10 +297,10 @@ namespace BeatRecorder
                         }
                         else if (BeatmapInfo.LevelFailed && !BeatmapInfo.Modifiers.noFailOn0Energy)
                         {
-                            _logger.LogDebug($"[OBSC] Level failed.");
+                            LogDebug($"[OBSC] Level failed.");
                             if (Objects.LoadedSettings.DeleteFailed)
                             {
-                                _logger.LogDebug($"[OBSC] Failed. Deletion requested.");
+                                LogDebug($"[OBSC] Failed. Deletion requested.");
                                 DeleteFile = true;
                             }
                             else
@@ -308,16 +312,16 @@ namespace BeatRecorder
                         {
                             if (!BeatmapInfo.LevelQuit && !BeatmapInfo.LevelFinished)
                             {
-                                _logger.LogDebug($"[OBSC] Level restarted");
+                                LogDebug($"[OBSC] Level restarted");
                                 if (Objects.LoadedSettings.DeleteQuit)
                                 {
-                                    _logger.LogDebug($"[OBSC] Quit. Deletion requested.");
+                                    LogDebug($"[OBSC] Quit. Deletion requested.");
                                     DeleteFile = true;
 
                                     if (GeneratedAccuracy == "NF-")
                                         if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                         {
-                                            _logger.LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
+                                            LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
                                             DeleteFile = false;
                                         }
                                 }
@@ -326,12 +330,12 @@ namespace BeatRecorder
                             }
                             else
                             {
-                                _logger.LogDebug($"[OBSC] Level finished?");
+                                LogDebug($"[OBSC] Level finished?");
                                 GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
                             }
                         }
 
-                        _logger.LogDebug($"[OBSC] {GeneratedAccuracy}");
+                        LogDebug($"[OBSC] {GeneratedAccuracy}");
                         NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
                     }
 
@@ -372,7 +376,7 @@ namespace BeatRecorder
 
                 if (Objects.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
                 {
-                    _logger.LogDebug($"[OBSC] The recording is too short. Deletion requested.");
+                    LogDebug($"[OBSC] The recording is too short. Deletion requested.");
                     DeleteFile = true;
                 }
 
@@ -445,32 +449,32 @@ namespace BeatRecorder
                     {
                         if (!DeleteFile)
                         {
-                            _logger.LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
+                            LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                             File.Move(OldFileName, NewFileName);
-                            _logger.LogInfo($"[OBSC] Successfully renamed.");
+                            LogInfo($"[OBSC] Successfully renamed.");
                             Program.SendNotification("Recording renamed.", 1000, Objects.MessageType.INFO);
                         }
                         else
                         {
-                            _logger.LogInfo($"[OBSC] Deleting \"{fileInfo.Name}\"..");
+                            LogInfo($"[OBSC] Deleting \"{fileInfo.Name}\"..");
                             File.Delete(OldFileName);
-                            _logger.LogInfo($"[OBSC] Successfully deleted.");
+                            LogInfo($"[OBSC] Successfully deleted.");
                             Program.SendNotification("Recording deleted.", 1000, Objects.MessageType.INFO);
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"[OBSC] {ex}.");
+                        LogError($"[OBSC] {ex}.");
                     }
                 }
                 else
                 {
-                    _logger.LogError($"[OBSC] {OldFileName} doesn't exist.");
+                    LogError($"[OBSC] {OldFileName} doesn't exist.");
                 }
             }
             else
             {
-                _logger.LogError($"[OBSC] Last recorded file can't be renamed.");
+                LogError($"[OBSC] Last recorded file can't be renamed.");
             }
         }
     }
