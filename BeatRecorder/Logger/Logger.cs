@@ -103,7 +103,6 @@ namespace Xorog.Logger
                                     Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
                                     Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
                                     Console.ResetColor(); Console.WriteLine(b.Message);
-                                    _loggerObjects.LogsToPost.Remove(b); 
                                 }
                             }
                             else if (b.LogLevel == LoggerObjects.LogLevel.INFO)
@@ -113,7 +112,6 @@ namespace Xorog.Logger
                                     Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
                                     Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
                                     Console.ResetColor(); Console.WriteLine(b.Message);
-                                    _loggerObjects.LogsToPost.Remove(b); 
                                 }
                             }
                             else if (b.LogLevel == LoggerObjects.LogLevel.WARN)
@@ -123,7 +121,6 @@ namespace Xorog.Logger
                                     Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
                                     Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
                                     Console.ResetColor(); Console.WriteLine(b.Message);
-                                    _loggerObjects.LogsToPost.Remove(b); 
                                 }
                             }
                             else if (b.LogLevel == LoggerObjects.LogLevel.ERROR)
@@ -131,7 +128,6 @@ namespace Xorog.Logger
                                 Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
                                 Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
                                 Console.ResetColor(); Console.WriteLine(b.Message);
-                                _loggerObjects.LogsToPost.Remove(b);
                             }
                             else if (b.LogLevel == LoggerObjects.LogLevel.FATAL)
                             {
@@ -139,15 +135,15 @@ namespace Xorog.Logger
                                 Console.ForegroundColor = ConsoleColor.Black; Console.BackgroundColor = LogLevelColor; Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
                                 Console.Write($"[{LogLevelText}]");
                                 Console.ResetColor(); Console.WriteLine($" {b.Message}");
-                                _loggerObjects.LogsToPost.Remove(b);
                             }
                             else
                             {
                                 Console.ResetColor(); Console.Write($"[{b.TimeOfEvent:dd.MM.yyyy HH:mm:ss}] ");
                                 Console.ForegroundColor = LogLevelColor; Console.Write($"[{LogLevelText}] ");
                                 Console.ResetColor(); Console.WriteLine(b.Message);
-                                _loggerObjects.LogsToPost.Remove(b);
                             }
+
+                            _loggerObjects.LogsToPost.Remove(b);
 
                             try
                             {
