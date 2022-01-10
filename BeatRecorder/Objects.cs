@@ -24,7 +24,7 @@ class Objects
         public string README { get; set; } = "!! Please check https://github.com/TheXorog/BeatRecorder for more info and explainations for each config options !!";
         public LogLevel ConsoleLogLevelEnum { get; set; } = LogLevel.INFO;
         public string Mod { get; set; } = "http-status";
-        public bool DisplayUI { get; set; } = false;
+        public bool DisplayUI { get; set; } = true;
         public bool DisplaySteamNotifications { get; set; } = false;
         public string BeatSaberUrl { get; set; } = "127.0.0.1";
         public string BeatSaberPort { get; set; } = "6557";
