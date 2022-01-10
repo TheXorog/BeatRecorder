@@ -2,7 +2,7 @@
 
 class Program
 {
-    public static string CurrentVersion = "1.5.3";
+    public static string CurrentVersion = "1.6";
 
     internal static WebsocketClient beatSaberWebSocket { get; set; }
     internal static WebsocketClient beatSaberWebSocketLiveData { get; set; }
