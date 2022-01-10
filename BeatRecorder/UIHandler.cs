@@ -22,105 +22,121 @@ internal class UIHandler
 
             Action UpdateUI = new Action(() =>
             {
-            try
-            {
-                    if (Program.obsWebSocket.IsRunning)
-                    {
-                        if (infoUI.OBSConnectionLabel.BackColor != Color.DarkGreen && infoUI.OBSConnectionLabel.BackColor != Color.Orange)
-                            infoUI.OBSConnectionLabel.BackColor = Color.DarkGreen;
-                    }
-                    else
-                    {
-                        if (infoUI.OBSConnectionLabel.BackColor != Color.DarkRed)
-                            infoUI.OBSConnectionLabel.BackColor = Color.DarkRed;
-                    }
-
-                    if (Program.beatSaberWebSocket.IsRunning)
-                    {
-                        if (infoUI.BeatSaberConnectionLabel.BackColor != Color.DarkGreen)
-                            infoUI.BeatSaberConnectionLabel.BackColor = Color.DarkGreen;
-                    }
-                    else
-                    {
-                        if (infoUI.BeatSaberConnectionLabel.BackColor != Color.DarkRed)
-                            infoUI.BeatSaberConnectionLabel.BackColor = Color.DarkRed;
-                    }
-
-                    if (OBSWebSocketObjects.OBSRecording)
-                    {
-                        infoUI.OBSConnectionLabel.Text = "(REC) OBS";
-
-                        if (infoUI.OBSConnectionLabel.BackColor != Color.Orange)
-                            infoUI.OBSConnectionLabel.BackColor = Color.Orange;
-                    }
-                    else
-                    {
-                        infoUI.OBSConnectionLabel.Text = "OBS";
-
-                        if (infoUI.OBSConnectionLabel.BackColor != Color.DarkGreen)
-                            infoUI.OBSConnectionLabel.BackColor = Color.DarkGreen;
-                    }
-
-                    if (!Program.beatSaberWebSocket.IsRunning)
-                        return;
-
-                    if (HttpStatusObjects.HttpStatusCurrentPerformance is null && DataPullerObjects.DataPullerCurrentBeatmap is null)
-                        return;
-
-                    if (DataPullerObjects.DataPullerCurrentBeatmap?.coverImage != null)
-                    {
-                        if (lastCover != DataPullerObjects.DataPullerCurrentBeatmap?.coverImage?.ToString())
+                try
+                {
+                        if (Program.obsWebSocket.IsRunning)
                         {
-                            Stopwatch sc = new Stopwatch();
-                            sc.Start();
-
-                            LogDebug($"Downloading cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()}'..");
-
-                            lastCover = DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString();
-
-                            new HttpClient().GetStreamAsync(DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()).ContinueWith(t =>
-                            {
-                                coverArt = Bitmap.FromStream(t.Result);
-                                LogDebug($"Downloaded cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()}' in {sc.ElapsedMilliseconds}ms");
-
-                                sc.Stop();
-                            });
+                            if (infoUI.OBSConnectionLabel.BackColor != Color.DarkGreen && infoUI.OBSConnectionLabel.BackColor != Color.Orange)
+                                infoUI.OBSConnectionLabel.BackColor = Color.DarkGreen;
                         }
-                    }
-                    else
-                    {
-                        // TODO: BeatSaver Details sometimes dont load which causes the cover fall back to default
-
-                        if (lastCover != "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg")
+                        else
                         {
-                            Stopwatch sc = new Stopwatch();
-                            sc.Start();
-
-                            LogWarn($"Failed to get cover art from song.");
-                            LogDebug($"Downloading default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg'..");
-
-                            lastCover = "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg";
-
-                            new HttpClient().GetStreamAsync("https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg").ContinueWith(t =>
-                            {
-                                coverArt = Bitmap.FromStream(t.Result);
-
-                                LogDebug($"Downloaded default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
-
-                                sc.Stop();
-                            });
+                            if (infoUI.OBSConnectionLabel.BackColor != Color.DarkRed)
+                                infoUI.OBSConnectionLabel.BackColor = Color.DarkRed;
                         }
-                    }
 
-                    switch (Objects.LoadedSettings.Mod)
-                    {
-                        case "http-status":
+                        if (Program.beatSaberWebSocket.IsRunning)
+                        {
+                            if (infoUI.BeatSaberConnectionLabel.BackColor != Color.DarkGreen)
+                                infoUI.BeatSaberConnectionLabel.BackColor = Color.DarkGreen;
+                        }
+                        else
+                        {
+                            if (infoUI.BeatSaberConnectionLabel.BackColor != Color.DarkRed)
+                                infoUI.BeatSaberConnectionLabel.BackColor = Color.DarkRed;
+                        }
 
-                            infoUI.SongNameLabel.Text = $"{HttpStatusObjects.HttpStatusCurrentBeatmap.songName}{(HttpStatusObjects.HttpStatusCurrentBeatmap.songSubName != "" ? $" {HttpStatusObjects.HttpStatusCurrentBeatmap.songName}" : "")}";
-                            infoUI.SongAuthorLabel.Text = HttpStatusObjects.HttpStatusCurrentBeatmap.levelAuthorName;
+                        if (OBSWebSocketObjects.OBSRecording)
+                        {
+                            infoUI.OBSConnectionLabel.Text = "(REC) OBS";
+
+                            if (infoUI.OBSConnectionLabel.BackColor != Color.Orange)
+                                infoUI.OBSConnectionLabel.BackColor = Color.Orange;
+                        }
+                        else
+                        {
+                            infoUI.OBSConnectionLabel.Text = "OBS";
+
+                            if (infoUI.OBSConnectionLabel.BackColor != Color.DarkGreen)
+                                infoUI.OBSConnectionLabel.BackColor = Color.DarkGreen;
+                        }
+
+                        if (!Program.beatSaberWebSocket.IsRunning)
+                            return;
+
+                        if (HttpStatusObjects.HttpStatusCurrentPerformance is null && DataPullerObjects.DataPullerCurrentBeatmap is null)
+                            return;
+
+                        switch (Objects.LoadedSettings.Mod)
+                        {
+                            case "http-status":
+
+                            if (HttpStatusObjects.HttpStatusCurrentBeatmap != null)
+                            {
+                                infoUI.SongNameLabel.Text = $"{HttpStatusObjects.HttpStatusCurrentBeatmap.songName}{(HttpStatusObjects.HttpStatusCurrentBeatmap.songSubName != "" ? $" {HttpStatusObjects.HttpStatusCurrentBeatmap.songSubName}" : "")}";
+                                infoUI.SongAuthorLabel.Text = HttpStatusObjects.HttpStatusCurrentBeatmap.songAuthorName;
+                                infoUI.SongAuthorLabel.Location = new Point(infoUI.SongNameLabel.Location.X, infoUI.SongNameLabel.Location.Y + infoUI.SongNameLabel.Height);
+                                infoUI.BSRLabel.Text = $"";
+                                infoUI.MapperLabel.Text = $"";
+
+                                infoUI.ProgressLabel.Text = $"{TimeSpan.FromSeconds(OBSWebSocketObjects.RecordingSeconds).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}/{TimeSpan.FromSeconds(HttpStatusObjects.HttpStatusCurrentBeatmap.length / 1000).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}";
+
+                                if (HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover != null)
+                                {
+                                    if (lastCover != HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover)
+                                    {
+                                        LogDebug($"Generating cover art from base64 string..");
+
+                                        lastCover = HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover;
+
+                                        byte[] byteBuffer = Convert.FromBase64String(HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover);
+                                        MemoryStream memoryStream = new MemoryStream(byteBuffer);
+                                        memoryStream.Position = 0;
+
+                                        Bitmap bmpReturn = (Bitmap)Bitmap.FromStream(memoryStream);
+                                        coverArt = bmpReturn;
+                                    }
+                                }
+                                else
+                                {
+                                    if (lastCover != "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg")
+                                    {
+                                        Stopwatch sc = new Stopwatch();
+                                        sc.Start();
+
+                                        LogWarn($"Failed to get cover art from song.");
+                                        LogDebug($"Downloading default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg'..");
+
+                                        lastCover = "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg";
+
+                                        new HttpClient().GetStreamAsync("https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg").ContinueWith(t =>
+                                        {
+                                            coverArt = Bitmap.FromStream(t.Result);
+
+                                            LogDebug($"Downloaded default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
+
+                                            sc.Stop();
+                                        });
+                                    }
+                                }
+                            }
+
+                            if (HttpStatusObjects.HttpStatusCurrentPerformance != null)
+                            {
+                                infoUI.ScoreLabel.Text = String.Format("{0:n0}", HttpStatusObjects.HttpStatusCurrentPerformance.score);
+                                infoUI.ComboLabel.Text = $"{HttpStatusObjects.HttpStatusCurrentPerformance?.combo}x";
+                                infoUI.AccuracyLabel.Text = $"{Math.Round((decimal)((decimal)((decimal)HttpStatusObjects.HttpStatusCurrentPerformance.score / (decimal)HttpStatusObjects.HttpStatusCurrentPerformance.currentMaxScore) * 100), 2)}%";
+                                infoUI.MissesLabel.Text = $"{HttpStatusObjects.HttpStatusCurrentPerformance.missedNotes} Misses";
+
+                                if (coverArt != null && infoUI.pictureBox1.Image != coverArt)
+                                {
+                                    infoUI.pictureBox1.Image = coverArt;
+                                }
+                            }
 
                             break;
-                        case "datapuller":
+
+                            case "datapuller":
 
                             if (DataPullerObjects.DataPullerCurrentBeatmap != null)
                             {
@@ -129,6 +145,51 @@ internal class UIHandler
                                 infoUI.SongAuthorLabel.Location = new Point(infoUI.SongNameLabel.Location.X, infoUI.SongNameLabel.Location.Y + infoUI.SongNameLabel.Height);
                                 infoUI.BSRLabel.Text = $"BSR: {DataPullerObjects.DataPullerCurrentBeatmap.BSRKey?.ToString().TrimEnd()}";
                                 infoUI.MapperLabel.Text = $"Mapper: {DataPullerObjects.DataPullerCurrentBeatmap.Mapper}";
+
+                                if (DataPullerObjects.DataPullerCurrentBeatmap?.coverImage != null)
+                                {
+                                    if (lastCover != DataPullerObjects.DataPullerCurrentBeatmap?.coverImage?.ToString())
+                                    {
+                                        Stopwatch sc = new Stopwatch();
+                                        sc.Start();
+
+                                        LogDebug($"Downloading cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()}'..");
+
+                                        lastCover = DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString();
+
+                                        new HttpClient().GetStreamAsync(DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()).ContinueWith(t =>
+                                        {
+                                            coverArt = Bitmap.FromStream(t.Result);
+                                            LogDebug($"Downloaded cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()}' in {sc.ElapsedMilliseconds}ms");
+
+                                            sc.Stop();
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    // TODO: BeatSaver Details sometimes dont load which causes the cover fall back to default
+
+                                    if (lastCover != "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg")
+                                    {
+                                        Stopwatch sc = new Stopwatch();
+                                        sc.Start();
+
+                                        LogWarn($"Failed to get cover art from song.");
+                                        LogDebug($"Downloading default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg'..");
+
+                                        lastCover = "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg";
+
+                                        new HttpClient().GetStreamAsync("https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg").ContinueWith(t =>
+                                        {
+                                            coverArt = Bitmap.FromStream(t.Result);
+
+                                            LogDebug($"Downloaded default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
+
+                                            sc.Stop();
+                                        });
+                                    }
+                                }
                             }
 
                             if (DataPullerObjects.DataPullerCurrentPerformance != null)
@@ -146,12 +207,12 @@ internal class UIHandler
                                 }
                             }
 
-                            break;
-                        default:
-                            return;
+                                break;
+                            default:
+                                return;
+                        }
                     }
-                }
-                catch { }
+                    catch { }
             });
 
             await Task.Delay(500);

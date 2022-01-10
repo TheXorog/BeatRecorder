@@ -93,7 +93,7 @@ class HttpStatus
 
             case "menu":
                 LogDebug("[BS-HS] Menu entered.");
-                LogInfo($"[BS-HS] Stopped playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
+                LogInfo($"[BS-HS] Stopped playing \"{_status?.status?.beatmap?.songName}\" by \"{_status?.status?.beatmap?.songAuthorName}\"");
 
                 try
                 {
