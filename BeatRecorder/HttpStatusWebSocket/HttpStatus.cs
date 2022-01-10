@@ -19,6 +19,10 @@ class HttpStatus
         switch (_status.@event)
         {
             case "hello":
+
+                try { HttpStatusObjects.HttpStatusCurrentBeatmap = _status.status.beatmap; } catch { }
+                try { HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance; } catch { }
+
                 LogInfo("[BS-HS] Connected.");
                 break;
 
