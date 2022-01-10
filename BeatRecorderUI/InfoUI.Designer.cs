@@ -106,6 +106,7 @@ partial class InfoUI
             this.OpenSettings.TabIndex = 5;
             this.OpenSettings.Text = "Settings..";
             this.OpenSettings.UseVisualStyleBackColor = false;
+            this.OpenSettings.Click += new System.EventHandler(this.OpenSettings_Click);
             // 
             // ScoreLabel
             // 
