@@ -7,11 +7,14 @@ public partial class SettingsUI : Form
 
     internal bool SettingsUpdated = false;
 
-    public SettingsUI(bool topMost)
+    internal bool SettingsRequired = false;
+
+    public SettingsUI(bool topMost, bool settingsRequired = false)
     {
         InitializeComponent();
 
         beTopMost = topMost;
+        SettingsRequired = settingsRequired;
     }
 
     BeatRecorder.Objects.Settings? _loadedSettings = null;
@@ -44,7 +47,6 @@ public partial class SettingsUI : Form
 
         ModSelectionBox.SelectedIndex = ModSelectionBox.Items.IndexOf(_loadedSettings.Mod);
         OBSPasswordBox.Text = _loadedSettings.OBSPassword;
-        AskForPassOBSPasswordCheck.Checked = _loadedSettings.AskToSaveOBSPassword;
         FileFormatBox.Text = _loadedSettings.FileFormat;
         StopRecordingDelay.Value = _loadedSettings.StopRecordingDelay;
 
@@ -171,7 +173,6 @@ public partial class SettingsUI : Form
 
         _loadedSettings.Mod = ModSelectionBox.Text;
         _loadedSettings.OBSPassword = OBSPasswordBox.Text;
-        _loadedSettings.AskToSaveOBSPassword = AskForPassOBSPasswordCheck.Checked;
         _loadedSettings.FileFormat = FileFormatBox.Text;
         _loadedSettings.StopRecordingDelay = Convert.ToInt32(StopRecordingDelay.Value);
 
@@ -326,5 +327,15 @@ public partial class SettingsUI : Form
         FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<raw-score>");
 
         FileFormatBox.SelectionStart = preEdit + "<raw-score>".Length;
+    }
+
+    private void SettingsUI_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        if (SettingsRequired)
+        {
+            e.Cancel = true;
+            SettingsRequired = false;
+            Save.PerformClick();
+        }
     }
 }

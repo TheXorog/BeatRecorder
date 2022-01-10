@@ -43,7 +43,6 @@ partial class SettingsUI
             this.ModSelectionBox = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.OBSPasswordBox = new System.Windows.Forms.TextBox();
-            this.AskForPassOBSPasswordCheck = new System.Windows.Forms.CheckBox();
             this.DisplaySteamNotificationsCheck = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.FileFormatBox = new System.Windows.Forms.TextBox();
@@ -255,27 +254,13 @@ partial class SettingsUI
             this.toolTip1.SetToolTip(this.OBSPasswordBox, "The password BeatRecorder should use, if required, to connect to OBS Websocket");
             this.OBSPasswordBox.UseSystemPasswordChar = true;
             // 
-            // AskForPassOBSPasswordCheck
-            // 
-            this.AskForPassOBSPasswordCheck.AutoSize = true;
-            this.AskForPassOBSPasswordCheck.FlatAppearance.BorderSize = 0;
-            this.AskForPassOBSPasswordCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.AskForPassOBSPasswordCheck.ForeColor = System.Drawing.Color.White;
-            this.AskForPassOBSPasswordCheck.Location = new System.Drawing.Point(12, 107);
-            this.AskForPassOBSPasswordCheck.Name = "AskForPassOBSPasswordCheck";
-            this.AskForPassOBSPasswordCheck.Size = new System.Drawing.Size(287, 19);
-            this.AskForPassOBSPasswordCheck.TabIndex = 15;
-            this.AskForPassOBSPasswordCheck.Text = "Ask for OBS Websocket Password on every startup";
-            this.toolTip1.SetToolTip(this.AskForPassOBSPasswordCheck, "Ask, if required, for the OBS Websocket");
-            this.AskForPassOBSPasswordCheck.UseVisualStyleBackColor = true;
-            // 
             // DisplaySteamNotificationsCheck
             // 
             this.DisplaySteamNotificationsCheck.AutoSize = true;
             this.DisplaySteamNotificationsCheck.FlatAppearance.BorderSize = 0;
             this.DisplaySteamNotificationsCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DisplaySteamNotificationsCheck.ForeColor = System.Drawing.Color.White;
-            this.DisplaySteamNotificationsCheck.Location = new System.Drawing.Point(12, 444);
+            this.DisplaySteamNotificationsCheck.Location = new System.Drawing.Point(12, 419);
             this.DisplaySteamNotificationsCheck.Name = "DisplaySteamNotificationsCheck";
             this.DisplaySteamNotificationsCheck.Size = new System.Drawing.Size(248, 19);
             this.DisplaySteamNotificationsCheck.TabIndex = 16;
@@ -288,7 +273,7 @@ partial class SettingsUI
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label8.ForeColor = System.Drawing.Color.White;
-            this.label8.Location = new System.Drawing.Point(12, 129);
+            this.label8.Location = new System.Drawing.Point(12, 104);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(78, 17);
             this.label8.TabIndex = 18;
@@ -300,7 +285,7 @@ partial class SettingsUI
             this.FileFormatBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.FileFormatBox.ContextMenuStrip = this.contextMenuStrip1;
             this.FileFormatBox.ForeColor = System.Drawing.Color.White;
-            this.FileFormatBox.Location = new System.Drawing.Point(12, 151);
+            this.FileFormatBox.Location = new System.Drawing.Point(12, 126);
             this.FileFormatBox.Name = "FileFormatBox";
             this.FileFormatBox.Size = new System.Drawing.Size(360, 23);
             this.FileFormatBox.TabIndex = 17;
@@ -428,7 +413,7 @@ partial class SettingsUI
             // 
             this.StopRecordingDelay.BackColor = System.Drawing.Color.Black;
             this.StopRecordingDelay.ForeColor = System.Drawing.Color.White;
-            this.StopRecordingDelay.Location = new System.Drawing.Point(12, 197);
+            this.StopRecordingDelay.Location = new System.Drawing.Point(12, 172);
             this.StopRecordingDelay.Maximum = new decimal(new int[] {
             20,
             0,
@@ -449,7 +434,7 @@ partial class SettingsUI
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label9.ForeColor = System.Drawing.Color.White;
-            this.label9.Location = new System.Drawing.Point(12, 177);
+            this.label9.Location = new System.Drawing.Point(12, 152);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(141, 17);
             this.label9.TabIndex = 19;
@@ -460,7 +445,7 @@ partial class SettingsUI
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label10.ForeColor = System.Drawing.Color.White;
-            this.label10.Location = new System.Drawing.Point(315, 199);
+            this.label10.Location = new System.Drawing.Point(315, 174);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(57, 17);
             this.label10.TabIndex = 21;
@@ -471,7 +456,7 @@ partial class SettingsUI
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label11.ForeColor = System.Drawing.Color.White;
-            this.label11.Location = new System.Drawing.Point(315, 245);
+            this.label11.Location = new System.Drawing.Point(315, 220);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(57, 17);
             this.label11.TabIndex = 24;
@@ -481,7 +466,7 @@ partial class SettingsUI
             // 
             this.DeleteIfShorterThan.BackColor = System.Drawing.Color.Black;
             this.DeleteIfShorterThan.ForeColor = System.Drawing.Color.White;
-            this.DeleteIfShorterThan.Location = new System.Drawing.Point(12, 243);
+            this.DeleteIfShorterThan.Location = new System.Drawing.Point(12, 218);
             this.DeleteIfShorterThan.Maximum = new decimal(new int[] {
             60,
             0,
@@ -497,7 +482,7 @@ partial class SettingsUI
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label12.ForeColor = System.Drawing.Color.White;
-            this.label12.Location = new System.Drawing.Point(12, 223);
+            this.label12.Location = new System.Drawing.Point(12, 198);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(204, 17);
             this.label12.TabIndex = 22;
@@ -509,7 +494,7 @@ partial class SettingsUI
             this.DeleteIfQuit.FlatAppearance.BorderSize = 0;
             this.DeleteIfQuit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DeleteIfQuit.ForeColor = System.Drawing.Color.White;
-            this.DeleteIfQuit.Location = new System.Drawing.Point(12, 272);
+            this.DeleteIfQuit.Location = new System.Drawing.Point(12, 247);
             this.DeleteIfQuit.Name = "DeleteIfQuit";
             this.DeleteIfQuit.Size = new System.Drawing.Size(196, 19);
             this.DeleteIfQuit.TabIndex = 25;
@@ -522,7 +507,7 @@ partial class SettingsUI
             this.DeleteIfQuitAfterSoftFailCheck.FlatAppearance.BorderSize = 0;
             this.DeleteIfQuitAfterSoftFailCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DeleteIfQuitAfterSoftFailCheck.ForeColor = System.Drawing.Color.White;
-            this.DeleteIfQuitAfterSoftFailCheck.Location = new System.Drawing.Point(12, 297);
+            this.DeleteIfQuitAfterSoftFailCheck.Location = new System.Drawing.Point(12, 272);
             this.DeleteIfQuitAfterSoftFailCheck.Name = "DeleteIfQuitAfterSoftFailCheck";
             this.DeleteIfQuitAfterSoftFailCheck.Size = new System.Drawing.Size(284, 19);
             this.DeleteIfQuitAfterSoftFailCheck.TabIndex = 26;
@@ -535,7 +520,7 @@ partial class SettingsUI
             this.DeleteIfFailedCheck.FlatAppearance.BorderSize = 0;
             this.DeleteIfFailedCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DeleteIfFailedCheck.ForeColor = System.Drawing.Color.White;
-            this.DeleteIfFailedCheck.Location = new System.Drawing.Point(12, 347);
+            this.DeleteIfFailedCheck.Location = new System.Drawing.Point(12, 322);
             this.DeleteIfFailedCheck.Name = "DeleteIfFailedCheck";
             this.DeleteIfFailedCheck.Size = new System.Drawing.Size(204, 19);
             this.DeleteIfFailedCheck.TabIndex = 27;
@@ -548,7 +533,7 @@ partial class SettingsUI
             this.DeleteIfSoftFailedCheck.FlatAppearance.BorderSize = 0;
             this.DeleteIfSoftFailedCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DeleteIfSoftFailedCheck.ForeColor = System.Drawing.Color.White;
-            this.DeleteIfSoftFailedCheck.Location = new System.Drawing.Point(12, 322);
+            this.DeleteIfSoftFailedCheck.Location = new System.Drawing.Point(12, 297);
             this.DeleteIfSoftFailedCheck.Name = "DeleteIfSoftFailedCheck";
             this.DeleteIfSoftFailedCheck.Size = new System.Drawing.Size(177, 19);
             this.DeleteIfSoftFailedCheck.TabIndex = 28;
@@ -589,7 +574,7 @@ partial class SettingsUI
             this.AlwaysTopMostCheck.FlatAppearance.BorderSize = 0;
             this.AlwaysTopMostCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AlwaysTopMostCheck.ForeColor = System.Drawing.Color.White;
-            this.AlwaysTopMostCheck.Location = new System.Drawing.Point(12, 419);
+            this.AlwaysTopMostCheck.Location = new System.Drawing.Point(12, 394);
             this.AlwaysTopMostCheck.Name = "AlwaysTopMostCheck";
             this.AlwaysTopMostCheck.Size = new System.Drawing.Size(211, 19);
             this.AlwaysTopMostCheck.TabIndex = 31;
@@ -646,7 +631,7 @@ partial class SettingsUI
             this.PauseOnIngamePauseCheck.FlatAppearance.BorderSize = 0;
             this.PauseOnIngamePauseCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.PauseOnIngamePauseCheck.ForeColor = System.Drawing.Color.White;
-            this.PauseOnIngamePauseCheck.Location = new System.Drawing.Point(12, 384);
+            this.PauseOnIngamePauseCheck.Location = new System.Drawing.Point(12, 359);
             this.PauseOnIngamePauseCheck.Name = "PauseOnIngamePauseCheck";
             this.PauseOnIngamePauseCheck.Size = new System.Drawing.Size(203, 19);
             this.PauseOnIngamePauseCheck.TabIndex = 35;
@@ -660,7 +645,7 @@ partial class SettingsUI
             this.MenuSceneBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.MenuSceneBox.ContextMenuStrip = this.contextMenuStrip1;
             this.MenuSceneBox.ForeColor = System.Drawing.Color.White;
-            this.MenuSceneBox.Location = new System.Drawing.Point(12, 495);
+            this.MenuSceneBox.Location = new System.Drawing.Point(12, 470);
             this.MenuSceneBox.Name = "MenuSceneBox";
             this.MenuSceneBox.PlaceholderText = "Don\'t switch scene when going into the menu";
             this.MenuSceneBox.Size = new System.Drawing.Size(360, 23);
@@ -673,7 +658,7 @@ partial class SettingsUI
             this.IngameSceneBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.IngameSceneBox.ContextMenuStrip = this.contextMenuStrip1;
             this.IngameSceneBox.ForeColor = System.Drawing.Color.White;
-            this.IngameSceneBox.Location = new System.Drawing.Point(12, 543);
+            this.IngameSceneBox.Location = new System.Drawing.Point(12, 518);
             this.IngameSceneBox.Name = "IngameSceneBox";
             this.IngameSceneBox.PlaceholderText = "Don\'t switch scene when going ingame";
             this.IngameSceneBox.Size = new System.Drawing.Size(360, 23);
@@ -686,7 +671,7 @@ partial class SettingsUI
             this.PauseSceneBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.PauseSceneBox.ContextMenuStrip = this.contextMenuStrip1;
             this.PauseSceneBox.ForeColor = System.Drawing.Color.White;
-            this.PauseSceneBox.Location = new System.Drawing.Point(12, 591);
+            this.PauseSceneBox.Location = new System.Drawing.Point(12, 566);
             this.PauseSceneBox.Name = "PauseSceneBox";
             this.PauseSceneBox.PlaceholderText = "Don\'t switch scene when pausing the game";
             this.PauseSceneBox.Size = new System.Drawing.Size(360, 23);
@@ -712,7 +697,7 @@ partial class SettingsUI
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label13.ForeColor = System.Drawing.Color.White;
-            this.label13.Location = new System.Drawing.Point(12, 473);
+            this.label13.Location = new System.Drawing.Point(12, 448);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(166, 17);
             this.label13.TabIndex = 38;
@@ -723,7 +708,7 @@ partial class SettingsUI
             this.label14.AutoSize = true;
             this.label14.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label14.ForeColor = System.Drawing.Color.White;
-            this.label14.Location = new System.Drawing.Point(12, 521);
+            this.label14.Location = new System.Drawing.Point(12, 496);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(177, 17);
             this.label14.TabIndex = 40;
@@ -734,7 +719,7 @@ partial class SettingsUI
             this.label15.AutoSize = true;
             this.label15.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label15.ForeColor = System.Drawing.Color.White;
-            this.label15.Location = new System.Drawing.Point(12, 569);
+            this.label15.Location = new System.Drawing.Point(12, 544);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(167, 17);
             this.label15.TabIndex = 42;
@@ -785,7 +770,6 @@ partial class SettingsUI
             this.Controls.Add(this.label8);
             this.Controls.Add(this.FileFormatBox);
             this.Controls.Add(this.DisplaySteamNotificationsCheck);
-            this.Controls.Add(this.AskForPassOBSPasswordCheck);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.OBSPasswordBox);
             this.Controls.Add(this.ModSelectionBox);
@@ -804,6 +788,7 @@ partial class SettingsUI
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "BeatRecorder Setttings";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsUI_FormClosing);
             this.Shown += new System.EventHandler(this.SettingsUI_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.BeatSaberPortBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OBSPortBox)).EndInit();
@@ -830,7 +815,6 @@ partial class SettingsUI
     private ComboBox ModSelectionBox;
     private Label label7;
     private TextBox OBSPasswordBox;
-    private CheckBox AskForPassOBSPasswordCheck;
     private CheckBox DisplaySteamNotificationsCheck;
     private Label label8;
     private TextBox FileFormatBox;

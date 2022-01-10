@@ -4,6 +4,8 @@ namespace BeatRecorder;
 
 class Objects
 {
+    public static bool SettingsRequired = false;
+
     public static ulong SteamNotificationId = 0;
 
     public static ConnectionTypeWarning LastDP1Warning { get; set; }

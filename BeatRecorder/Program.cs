@@ -240,11 +240,14 @@ class Program
         SendNotification("Your settings were reset due to an error. Please check your desktop.", 10000, Objects.MessageType.ERROR);
         LogInfo($"Please configure BeatRecorder using the config file that was just opened. If you're done, save and quit notepad and BeatRecorder will restart for you.");
 
-        var _Process = Process.Start("notepad", "Settings.json");
-        _Process.WaitForExit();
-
+        Objects.SettingsRequired = true;
+        var infoUI = new InfoUI(Objects.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
+        infoUI.ShowDialog();
+        LogDebug("Settings updated via UI");
         Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+        Thread.Sleep(2000);
         Environment.Exit(0);
+        return;
     }
 
     public static Dictionary<int, Objects.NotificationEntry> NotificationList = new();

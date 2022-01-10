@@ -18,6 +18,8 @@ class OBSWebSocketEvents
 
                 if (Objects.LoadedSettings.OBSPassword == "")
                 {
+                    UIHandler.OBSPasswordRequired = true;
+
                     await Task.Delay(1000);
                     LogInfo("[OBS] A password is required to log into your obs websocket.");
                     await Task.Delay(1000);

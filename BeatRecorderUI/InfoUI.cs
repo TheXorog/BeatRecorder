@@ -7,16 +7,28 @@ public partial class InfoUI : Form
 
     bool loadedTopmost = false;
 
-    public InfoUI(bool alwaysTopMost = false, double Transparency = 1.0)
+    bool SettingsRequired = false;
+
+    public InfoUI(bool alwaysTopMost = false, bool settingsRequired = false)
     {
         InitializeComponent();
 
         loadedTopmost = alwaysTopMost;
+
+        SettingsRequired = settingsRequired;
     }
 
     private void InfoUI_Shown(object sender, EventArgs e)
     {
         this.TopMost = loadedTopmost;
+
+        if (SettingsRequired)
+        {
+            SettingsUI settingsUI = new SettingsUI(this.TopMost);
+            this.Hide();
+            settingsUI.ShowDialog();
+            this.Close();
+        }
     }
 
     private void OpenSettings_Click(object sender, EventArgs e)
