@@ -5,11 +5,18 @@ public partial class InfoUI : Form
     public bool SettingsUpdated = false;
     public bool ShowConsoleAgain = false;
 
-    public InfoUI(bool alwaysTopMost = false)
+    bool loadedTopmost = false;
+
+    public InfoUI(bool alwaysTopMost = false, double Transparency = 1.0)
     {
         InitializeComponent();
 
-        this.TopMost = alwaysTopMost;
+        loadedTopmost = alwaysTopMost;
+    }
+
+    private void InfoUI_Shown(object sender, EventArgs e)
+    {
+        this.TopMost = loadedTopmost;
     }
 
     private void OpenSettings_Click(object sender, EventArgs e)

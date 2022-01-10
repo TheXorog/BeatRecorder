@@ -46,6 +46,21 @@ partial class SettingsUI
             this.DisplaySteamNotificationsCheck = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.FileFormatBox = new System.Windows.Forms.TextBox();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.difficultyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.shortDifficultyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.songNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.songAuthorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.songSubNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mapperToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.levelIdHashToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bPMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rankToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.accuracyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.missesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.maxComboToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scoreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rawScoreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StopRecordingDelay = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -67,6 +82,7 @@ partial class SettingsUI
             this.EntirelyHideConsoleCheck = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.BeatSaberPortBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OBSPortBox)).BeginInit();
+            this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.StopRecordingDelay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DeleteIfShorterThan)).BeginInit();
             this.SuspendLayout();
@@ -275,12 +291,131 @@ partial class SettingsUI
             // 
             this.FileFormatBox.BackColor = System.Drawing.Color.Black;
             this.FileFormatBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.FileFormatBox.ContextMenuStrip = this.contextMenuStrip1;
             this.FileFormatBox.ForeColor = System.Drawing.Color.White;
             this.FileFormatBox.Location = new System.Drawing.Point(12, 151);
             this.FileFormatBox.Name = "FileFormatBox";
             this.FileFormatBox.Size = new System.Drawing.Size(360, 23);
             this.FileFormatBox.TabIndex = 17;
             this.toolTip1.SetToolTip(this.FileFormatBox, "How your saved file should be formatted. Right-Click for fill-in options");
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.difficultyToolStripMenuItem,
+            this.shortDifficultyToolStripMenuItem,
+            this.songNameToolStripMenuItem,
+            this.songAuthorToolStripMenuItem,
+            this.songSubNameToolStripMenuItem,
+            this.mapperToolStripMenuItem,
+            this.levelIdHashToolStripMenuItem,
+            this.bPMToolStripMenuItem,
+            this.rankToolStripMenuItem,
+            this.accuracyToolStripMenuItem,
+            this.missesToolStripMenuItem,
+            this.maxComboToolStripMenuItem,
+            this.scoreToolStripMenuItem,
+            this.rawScoreToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(160, 312);
+            // 
+            // difficultyToolStripMenuItem
+            // 
+            this.difficultyToolStripMenuItem.Name = "difficultyToolStripMenuItem";
+            this.difficultyToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.difficultyToolStripMenuItem.Text = "Difficulty";
+            this.difficultyToolStripMenuItem.Click += new System.EventHandler(this.difficultyToolStripMenuItem_Click);
+            // 
+            // shortDifficultyToolStripMenuItem
+            // 
+            this.shortDifficultyToolStripMenuItem.Name = "shortDifficultyToolStripMenuItem";
+            this.shortDifficultyToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.shortDifficultyToolStripMenuItem.Text = "Short Difficulty";
+            this.shortDifficultyToolStripMenuItem.Click += new System.EventHandler(this.shortDifficultyToolStripMenuItem_Click);
+            // 
+            // songNameToolStripMenuItem
+            // 
+            this.songNameToolStripMenuItem.Name = "songNameToolStripMenuItem";
+            this.songNameToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.songNameToolStripMenuItem.Text = "Song Name";
+            this.songNameToolStripMenuItem.Click += new System.EventHandler(this.songNameToolStripMenuItem_Click);
+            // 
+            // songAuthorToolStripMenuItem
+            // 
+            this.songAuthorToolStripMenuItem.Name = "songAuthorToolStripMenuItem";
+            this.songAuthorToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.songAuthorToolStripMenuItem.Text = "Song Author";
+            this.songAuthorToolStripMenuItem.Click += new System.EventHandler(this.songAuthorToolStripMenuItem_Click);
+            // 
+            // songSubNameToolStripMenuItem
+            // 
+            this.songSubNameToolStripMenuItem.Name = "songSubNameToolStripMenuItem";
+            this.songSubNameToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.songSubNameToolStripMenuItem.Text = "Song Sub Name";
+            this.songSubNameToolStripMenuItem.Click += new System.EventHandler(this.songSubNameToolStripMenuItem_Click);
+            // 
+            // mapperToolStripMenuItem
+            // 
+            this.mapperToolStripMenuItem.Name = "mapperToolStripMenuItem";
+            this.mapperToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.mapperToolStripMenuItem.Text = "Mapper";
+            this.mapperToolStripMenuItem.Click += new System.EventHandler(this.mapperToolStripMenuItem_Click);
+            // 
+            // levelIdHashToolStripMenuItem
+            // 
+            this.levelIdHashToolStripMenuItem.Name = "levelIdHashToolStripMenuItem";
+            this.levelIdHashToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.levelIdHashToolStripMenuItem.Text = "Level Id/Hash";
+            this.levelIdHashToolStripMenuItem.Click += new System.EventHandler(this.levelIdHashToolStripMenuItem_Click);
+            // 
+            // bPMToolStripMenuItem
+            // 
+            this.bPMToolStripMenuItem.Name = "bPMToolStripMenuItem";
+            this.bPMToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.bPMToolStripMenuItem.Text = "BPM";
+            this.bPMToolStripMenuItem.Click += new System.EventHandler(this.bPMToolStripMenuItem_Click);
+            // 
+            // rankToolStripMenuItem
+            // 
+            this.rankToolStripMenuItem.Name = "rankToolStripMenuItem";
+            this.rankToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.rankToolStripMenuItem.Text = "Rank";
+            this.rankToolStripMenuItem.Click += new System.EventHandler(this.rankToolStripMenuItem_Click);
+            // 
+            // accuracyToolStripMenuItem
+            // 
+            this.accuracyToolStripMenuItem.Name = "accuracyToolStripMenuItem";
+            this.accuracyToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.accuracyToolStripMenuItem.Text = "Accuracy";
+            this.accuracyToolStripMenuItem.Click += new System.EventHandler(this.accuracyToolStripMenuItem_Click);
+            // 
+            // missesToolStripMenuItem
+            // 
+            this.missesToolStripMenuItem.Name = "missesToolStripMenuItem";
+            this.missesToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.missesToolStripMenuItem.Text = "Misses";
+            this.missesToolStripMenuItem.Click += new System.EventHandler(this.missesToolStripMenuItem_Click);
+            // 
+            // maxComboToolStripMenuItem
+            // 
+            this.maxComboToolStripMenuItem.Name = "maxComboToolStripMenuItem";
+            this.maxComboToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.maxComboToolStripMenuItem.Text = "Max-Combo";
+            this.maxComboToolStripMenuItem.Click += new System.EventHandler(this.maxComboToolStripMenuItem_Click);
+            // 
+            // scoreToolStripMenuItem
+            // 
+            this.scoreToolStripMenuItem.Name = "scoreToolStripMenuItem";
+            this.scoreToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.scoreToolStripMenuItem.Text = "Score";
+            this.scoreToolStripMenuItem.Click += new System.EventHandler(this.scoreToolStripMenuItem_Click);
+            // 
+            // rawScoreToolStripMenuItem
+            // 
+            this.rawScoreToolStripMenuItem.Name = "rawScoreToolStripMenuItem";
+            this.rawScoreToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.rawScoreToolStripMenuItem.Text = "Raw Score";
+            this.rawScoreToolStripMenuItem.Click += new System.EventHandler(this.rawScoreToolStripMenuItem_Click);
             // 
             // StopRecordingDelay
             // 
@@ -419,7 +554,7 @@ partial class SettingsUI
             this.ShowAdvancedSettings.FlatAppearance.BorderSize = 0;
             this.ShowAdvancedSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ShowAdvancedSettings.ForeColor = System.Drawing.Color.White;
-            this.ShowAdvancedSettings.Location = new System.Drawing.Point(296, 530);
+            this.ShowAdvancedSettings.Location = new System.Drawing.Point(296, 580);
             this.ShowAdvancedSettings.Name = "ShowAdvancedSettings";
             this.ShowAdvancedSettings.Size = new System.Drawing.Size(76, 19);
             this.ShowAdvancedSettings.TabIndex = 29;
@@ -476,7 +611,7 @@ partial class SettingsUI
             this.Save.FlatAppearance.BorderSize = 0;
             this.Save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Save.ForeColor = System.Drawing.Color.White;
-            this.Save.Location = new System.Drawing.Point(12, 522);
+            this.Save.Location = new System.Drawing.Point(12, 572);
             this.Save.Name = "Save";
             this.Save.Size = new System.Drawing.Size(83, 27);
             this.Save.TabIndex = 33;
@@ -490,7 +625,7 @@ partial class SettingsUI
             this.Cancel.FlatAppearance.BorderSize = 0;
             this.Cancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Cancel.ForeColor = System.Drawing.Color.White;
-            this.Cancel.Location = new System.Drawing.Point(101, 522);
+            this.Cancel.Location = new System.Drawing.Point(101, 572);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(83, 27);
             this.Cancel.TabIndex = 34;
@@ -531,7 +666,7 @@ partial class SettingsUI
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(23)))), ((int)(((byte)(23)))));
-            this.ClientSize = new System.Drawing.Size(784, 561);
+            this.ClientSize = new System.Drawing.Size(784, 611);
             this.Controls.Add(this.EntirelyHideConsoleCheck);
             this.Controls.Add(this.PauseOnIngamePauseCheck);
             this.Controls.Add(this.Cancel);
@@ -575,6 +710,7 @@ partial class SettingsUI
             this.Shown += new System.EventHandler(this.SettingsUI_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.BeatSaberPortBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OBSPortBox)).EndInit();
+            this.contextMenuStrip1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.StopRecordingDelay)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DeleteIfShorterThan)).EndInit();
             this.ResumeLayout(false);
@@ -620,4 +756,19 @@ partial class SettingsUI
     private ToolTip toolTip1;
     private CheckBox PauseOnIngamePauseCheck;
     private CheckBox EntirelyHideConsoleCheck;
+    private ContextMenuStrip contextMenuStrip1;
+    private ToolStripMenuItem difficultyToolStripMenuItem;
+    private ToolStripMenuItem shortDifficultyToolStripMenuItem;
+    private ToolStripMenuItem songNameToolStripMenuItem;
+    private ToolStripMenuItem songAuthorToolStripMenuItem;
+    private ToolStripMenuItem songSubNameToolStripMenuItem;
+    private ToolStripMenuItem mapperToolStripMenuItem;
+    private ToolStripMenuItem levelIdHashToolStripMenuItem;
+    private ToolStripMenuItem bPMToolStripMenuItem;
+    private ToolStripMenuItem rankToolStripMenuItem;
+    private ToolStripMenuItem accuracyToolStripMenuItem;
+    private ToolStripMenuItem missesToolStripMenuItem;
+    private ToolStripMenuItem maxComboToolStripMenuItem;
+    private ToolStripMenuItem scoreToolStripMenuItem;
+    private ToolStripMenuItem rawScoreToolStripMenuItem;
 }

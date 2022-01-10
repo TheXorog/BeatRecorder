@@ -20,7 +20,7 @@ public partial class SettingsUI : Form
     {
         this.TopMost = beTopMost;
 
-        this.Size = new Size(400, 600);
+        this.Size = new Size(400, 650);
 
         BeatSaberIpBox.Enabled = false;
         BeatSaberPortBox.Enabled = false;
@@ -56,6 +56,7 @@ public partial class SettingsUI : Form
 
         DisplaySteamNotificationsCheck.Checked = _loadedSettings.DisplaySteamNotifications;
         AlwaysTopMostCheck.Checked = _loadedSettings.DisplayUITopmost;
+        UITransparencyTrackbar.Value = Convert.ToInt32(_loadedSettings.UITransparency * 100);
 
         BeatSaberIpBox.Text = _loadedSettings.BeatSaberUrl;
         BeatSaberPortBox.Text = _loadedSettings.BeatSaberPort;
@@ -65,6 +66,8 @@ public partial class SettingsUI : Form
         AutomaticRecordingCheck.Checked = _loadedSettings.AutomaticRecording;
         PauseOnIngamePauseCheck.Checked = _loadedSettings.PauseRecordingOnIngamePause;
         EntirelyHideConsoleCheck.Checked = _loadedSettings.HideConsole;
+
+        UITransparencyPercentage.Text = $"{UITransparencyTrackbar.Value}%";
     }
 
     private void ShowAdvancedSettings_Click(object sender, EventArgs e)
@@ -79,7 +82,7 @@ public partial class SettingsUI : Form
 
         if (ShowAdvancedSettings.Checked)
         {
-            this.Size = new Size(800, 600);
+            this.Size = new Size(800, 650);
 
             BeatSaberIpBox.Enabled = true;
             BeatSaberPortBox.Enabled = true;
@@ -92,7 +95,7 @@ public partial class SettingsUI : Form
         }
         else
         {
-            this.Size = new Size(400, 600);
+            this.Size = new Size(400, 650);
 
             BeatSaberIpBox.Enabled = false;
             BeatSaberPortBox.Enabled = false;
@@ -114,6 +117,11 @@ public partial class SettingsUI : Form
                 AutomaticRecordingCheck.Checked = true;
             }
         }
+    }
+
+    private void UITransparencyTrackbar_Scroll(object sender, EventArgs e)
+    {
+        UITransparencyPercentage.Text = $"{UITransparencyTrackbar.Value}%";
     }
 
     private void ModSelectionBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -182,9 +190,136 @@ public partial class SettingsUI : Form
         _loadedSettings.AutomaticRecording = AutomaticRecordingCheck.Checked;
         _loadedSettings.PauseRecordingOnIngamePause = PauseOnIngamePauseCheck.Checked;
         _loadedSettings.HideConsole = EntirelyHideConsoleCheck.Checked;
+        _loadedSettings.UITransparency = (double)((double)UITransparencyTrackbar.Value / 100);
 
         File.WriteAllText("Settings.json", JsonConvert.SerializeObject(_loadedSettings, Formatting.Indented));
         SettingsUpdated = true;
         this.Close();
+    }
+
+    private void difficultyToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(preEdit, "<difficulty>");
+
+        FileFormatBox.SelectionStart = preEdit + "<difficulty>".Length;
+    }
+
+    private void shortDifficultyToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<short-difficulty>");
+
+        FileFormatBox.SelectionStart = preEdit + "<short-difficulty>".Length;
+    }
+
+    private void songNameToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<song-name>");
+
+        FileFormatBox.SelectionStart = preEdit + "<song-name>".Length;
+    }
+
+    private void songAuthorToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<song-author>");
+
+        FileFormatBox.SelectionStart = preEdit + "<song-author>".Length;
+    }
+
+    private void songSubNameToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<song-sub-name>");
+
+        FileFormatBox.SelectionStart = preEdit + "<song-sub-name>".Length;
+    }
+
+    private void mapperToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<mapper>");
+
+        FileFormatBox.SelectionStart = preEdit + "<mapper>".Length;
+    }
+
+    private void levelIdHashToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<levelid>");
+
+        FileFormatBox.SelectionStart = preEdit + "<levelid>".Length;
+    }
+
+    private void bPMToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<bpm>");
+
+        FileFormatBox.SelectionStart = preEdit + "<bpm>".Length;
+    }
+
+    private void rankToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<rank>");
+
+        FileFormatBox.SelectionStart = preEdit + "<rank>".Length;
+    }
+
+    private void accuracyToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<accuracy>");
+
+        FileFormatBox.SelectionStart = preEdit + "<accuracy>".Length;
+    }
+
+    private void missesToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<misses>");
+
+        FileFormatBox.SelectionStart = preEdit + "<misses>".Length;
+    }
+
+    private void maxComboToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<max-combo>");
+
+        FileFormatBox.SelectionStart = preEdit + "<max-combo>".Length;
+    }
+
+    private void scoreToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<score>");
+
+        FileFormatBox.SelectionStart = preEdit + "<score>".Length;
+    }
+
+    private void rawScoreToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<raw-score>");
+
+        FileFormatBox.SelectionStart = preEdit + "<raw-score>".Length;
     }
 }

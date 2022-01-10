@@ -178,6 +178,8 @@ internal class UIHandler
             infoUI.ShowDialog();
         }
 
+        Program.ShowWindow(Program.GetConsoleWindow(), 5);
+
         if (infoUI.SettingsUpdated)
         {
             LogDebug("Settings updated via UI");
@@ -186,7 +188,6 @@ internal class UIHandler
             Environment.Exit(0);
             return;
         }
-
         LogDebug("InfoUI closed");
         Environment.Exit(0);
     }
