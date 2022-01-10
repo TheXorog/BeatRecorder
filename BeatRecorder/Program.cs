@@ -28,6 +28,18 @@ class Program
 
         LogInfo("[BR] Loading settings..");
 
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(30000);
+
+            if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
+            {
+                LogError("Only one instance of this application is allowed");
+                Environment.Exit(0);
+                return;
+            }
+        });
+        
         if (File.Exists("Settings.json"))
         {
             try
