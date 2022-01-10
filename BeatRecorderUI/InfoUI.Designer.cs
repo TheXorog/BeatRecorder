@@ -49,14 +49,17 @@ partial class InfoUI
             this.pictureBox1.Location = new System.Drawing.Point(12, 12);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(237, 237);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
             // SongNameLabel
             // 
+            this.SongNameLabel.AutoEllipsis = true;
             this.SongNameLabel.AutoSize = true;
             this.SongNameLabel.Font = new System.Drawing.Font("Segoe UI", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.SongNameLabel.Location = new System.Drawing.Point(255, 12);
+            this.SongNameLabel.MaximumSize = new System.Drawing.Size(515, 0);
             this.SongNameLabel.Name = "SongNameLabel";
             this.SongNameLabel.Size = new System.Drawing.Size(118, 30);
             this.SongNameLabel.TabIndex = 1;
@@ -76,7 +79,7 @@ partial class InfoUI
             // 
             this.MapperLabel.AutoSize = true;
             this.MapperLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.MapperLabel.Location = new System.Drawing.Point(255, 234);
+            this.MapperLabel.Location = new System.Drawing.Point(257, 234);
             this.MapperLabel.Name = "MapperLabel";
             this.MapperLabel.Size = new System.Drawing.Size(48, 15);
             this.MapperLabel.TabIndex = 3;
@@ -86,7 +89,7 @@ partial class InfoUI
             // 
             this.BSRLabel.AutoSize = true;
             this.BSRLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.BSRLabel.Location = new System.Drawing.Point(255, 219);
+            this.BSRLabel.Location = new System.Drawing.Point(257, 217);
             this.BSRLabel.Name = "BSRLabel";
             this.BSRLabel.Size = new System.Drawing.Size(27, 15);
             this.BSRLabel.TabIndex = 4;
@@ -97,7 +100,7 @@ partial class InfoUI
             this.OpenSettings.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(0)))), ((int)(((byte)(84)))));
             this.OpenSettings.FlatAppearance.BorderSize = 0;
             this.OpenSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.OpenSettings.Location = new System.Drawing.Point(689, 253);
+            this.OpenSettings.Location = new System.Drawing.Point(689, 283);
             this.OpenSettings.Name = "OpenSettings";
             this.OpenSettings.Size = new System.Drawing.Size(83, 27);
             this.OpenSettings.TabIndex = 5;
@@ -146,18 +149,18 @@ partial class InfoUI
             // 
             // ProgressLabel
             // 
-            this.ProgressLabel.AutoSize = true;
             this.ProgressLabel.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.ProgressLabel.Location = new System.Drawing.Point(15, 221);
+            this.ProgressLabel.Location = new System.Drawing.Point(12, 251);
             this.ProgressLabel.Name = "ProgressLabel";
-            this.ProgressLabel.Size = new System.Drawing.Size(118, 25);
+            this.ProgressLabel.Size = new System.Drawing.Size(237, 25);
             this.ProgressLabel.TabIndex = 10;
             this.ProgressLabel.Text = "00:00/00:00";
+            this.ProgressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // BeatSaberConnectionLabel
             // 
             this.BeatSaberConnectionLabel.BackColor = System.Drawing.Color.DarkRed;
-            this.BeatSaberConnectionLabel.Location = new System.Drawing.Point(12, 250);
+            this.BeatSaberConnectionLabel.Location = new System.Drawing.Point(12, 280);
             this.BeatSaberConnectionLabel.Name = "BeatSaberConnectionLabel";
             this.BeatSaberConnectionLabel.Size = new System.Drawing.Size(118, 30);
             this.BeatSaberConnectionLabel.TabIndex = 11;
@@ -167,7 +170,7 @@ partial class InfoUI
             // OBSConnectionLabel
             // 
             this.OBSConnectionLabel.BackColor = System.Drawing.Color.DarkRed;
-            this.OBSConnectionLabel.Location = new System.Drawing.Point(130, 250);
+            this.OBSConnectionLabel.Location = new System.Drawing.Point(130, 280);
             this.OBSConnectionLabel.Name = "OBSConnectionLabel";
             this.OBSConnectionLabel.Size = new System.Drawing.Size(119, 30);
             this.OBSConnectionLabel.TabIndex = 12;
@@ -179,7 +182,7 @@ partial class InfoUI
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(23)))), ((int)(((byte)(23)))));
-            this.ClientSize = new System.Drawing.Size(784, 291);
+            this.ClientSize = new System.Drawing.Size(784, 321);
             this.Controls.Add(this.OBSConnectionLabel);
             this.Controls.Add(this.BeatSaberConnectionLabel);
             this.Controls.Add(this.ProgressLabel);
@@ -194,12 +197,12 @@ partial class InfoUI
             this.Controls.Add(this.SongNameLabel);
             this.Controls.Add(this.pictureBox1);
             this.ForeColor = System.Drawing.Color.White;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "InfoUI";
             this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "BeatRecorder";
+            this.TopMost = true;
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -207,18 +210,17 @@ partial class InfoUI
     }
 
     #endregion
-
-    private PictureBox pictureBox1;
-    private Label SongNameLabel;
-    private Label SongAuthorLabel;
-    private Label MapperLabel;
-    private Label BSRLabel;
     private Button OpenSettings;
-    private Label ScoreLabel;
-    private Label ComboLabel;
-    private Label AccuracyLabel;
-    private Label MissesLabel;
-    private Label ProgressLabel;
-    private Label BeatSaberConnectionLabel;
-    private Label OBSConnectionLabel;
+    public Label ProgressLabel;
+    public Label BeatSaberConnectionLabel;
+    public PictureBox pictureBox1;
+    public Label SongNameLabel;
+    public Label SongAuthorLabel;
+    public Label MapperLabel;
+    public Label BSRLabel;
+    public Label ScoreLabel;
+    public Label ComboLabel;
+    public Label MissesLabel;
+    public Label OBSConnectionLabel;
+    public Label AccuracyLabel;
 }
