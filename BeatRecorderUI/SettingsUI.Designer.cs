@@ -28,6 +28,7 @@ partial class SettingsUI
     /// </summary>
     private void InitializeComponent()
     {
+            this.components = new System.ComponentModel.Container();
             this.BeatSaberIpBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -61,6 +62,9 @@ partial class SettingsUI
             this.AutomaticRecordingCheck = new System.Windows.Forms.CheckBox();
             this.Save = new System.Windows.Forms.Button();
             this.Cancel = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.PauseOnIngamePauseCheck = new System.Windows.Forms.CheckBox();
+            this.EntirelyHideConsoleCheck = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.BeatSaberPortBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OBSPortBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.StopRecordingDelay)).BeginInit();
@@ -198,6 +202,7 @@ partial class SettingsUI
             this.ModSelectionBox.Name = "ModSelectionBox";
             this.ModSelectionBox.Size = new System.Drawing.Size(360, 23);
             this.ModSelectionBox.TabIndex = 12;
+            this.toolTip1.SetToolTip(this.ModSelectionBox, "What mod should BeatRecorder connect to?");
             this.ModSelectionBox.SelectedIndexChanged += new System.EventHandler(this.ModSelectionBox_SelectedIndexChanged);
             this.ModSelectionBox.TextUpdate += new System.EventHandler(this.ModSelectionBox_TextUpdate);
             this.ModSelectionBox.TextChanged += new System.EventHandler(this.ModSelectionBox_TextChanged);
@@ -223,6 +228,7 @@ partial class SettingsUI
             this.OBSPasswordBox.PasswordChar = '*';
             this.OBSPasswordBox.Size = new System.Drawing.Size(360, 23);
             this.OBSPasswordBox.TabIndex = 13;
+            this.toolTip1.SetToolTip(this.OBSPasswordBox, "The password BeatRecorder should use, if required, to connect to OBS Websocket");
             this.OBSPasswordBox.UseSystemPasswordChar = true;
             // 
             // AskForPassOBSPasswordCheck
@@ -236,6 +242,7 @@ partial class SettingsUI
             this.AskForPassOBSPasswordCheck.Size = new System.Drawing.Size(287, 19);
             this.AskForPassOBSPasswordCheck.TabIndex = 15;
             this.AskForPassOBSPasswordCheck.Text = "Ask for OBS Websocket Password on every startup";
+            this.toolTip1.SetToolTip(this.AskForPassOBSPasswordCheck, "Ask, if required, for the OBS Websocket");
             this.AskForPassOBSPasswordCheck.UseVisualStyleBackColor = true;
             // 
             // DisplaySteamNotificationsCheck
@@ -244,11 +251,13 @@ partial class SettingsUI
             this.DisplaySteamNotificationsCheck.FlatAppearance.BorderSize = 0;
             this.DisplaySteamNotificationsCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DisplaySteamNotificationsCheck.ForeColor = System.Drawing.Color.White;
-            this.DisplaySteamNotificationsCheck.Location = new System.Drawing.Point(12, 408);
+            this.DisplaySteamNotificationsCheck.Location = new System.Drawing.Point(12, 444);
             this.DisplaySteamNotificationsCheck.Name = "DisplaySteamNotificationsCheck";
             this.DisplaySteamNotificationsCheck.Size = new System.Drawing.Size(248, 19);
             this.DisplaySteamNotificationsCheck.TabIndex = 16;
             this.DisplaySteamNotificationsCheck.Text = "Display Steam Notifications (Experimental)";
+            this.toolTip1.SetToolTip(this.DisplaySteamNotificationsCheck, "Show in-headset Notifications via Steam. Requires Notifactions to be enabled in S" +
+        "teamVR Settings");
             this.DisplaySteamNotificationsCheck.UseVisualStyleBackColor = true;
             // 
             // label8
@@ -271,6 +280,7 @@ partial class SettingsUI
             this.FileFormatBox.Name = "FileFormatBox";
             this.FileFormatBox.Size = new System.Drawing.Size(360, 23);
             this.FileFormatBox.TabIndex = 17;
+            this.toolTip1.SetToolTip(this.FileFormatBox, "How your saved file should be formatted. Right-Click for fill-in options");
             // 
             // StopRecordingDelay
             // 
@@ -285,6 +295,7 @@ partial class SettingsUI
             this.StopRecordingDelay.Name = "StopRecordingDelay";
             this.StopRecordingDelay.Size = new System.Drawing.Size(297, 23);
             this.StopRecordingDelay.TabIndex = 20;
+            this.toolTip1.SetToolTip(this.StopRecordingDelay, "How long BeatRecorder should wait after a song to stop the recording");
             this.StopRecordingDelay.Value = new decimal(new int[] {
             1,
             0,
@@ -337,6 +348,7 @@ partial class SettingsUI
             this.DeleteIfShorterThan.Name = "DeleteIfShorterThan";
             this.DeleteIfShorterThan.Size = new System.Drawing.Size(297, 23);
             this.DeleteIfShorterThan.TabIndex = 23;
+            this.toolTip1.SetToolTip(this.DeleteIfShorterThan, "How long a recording needs to be for BeatRecorder to keep it");
             // 
             // label12
             // 
@@ -435,11 +447,12 @@ partial class SettingsUI
             this.AlwaysTopMostCheck.FlatAppearance.BorderSize = 0;
             this.AlwaysTopMostCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AlwaysTopMostCheck.ForeColor = System.Drawing.Color.White;
-            this.AlwaysTopMostCheck.Location = new System.Drawing.Point(12, 383);
+            this.AlwaysTopMostCheck.Location = new System.Drawing.Point(12, 419);
             this.AlwaysTopMostCheck.Name = "AlwaysTopMostCheck";
             this.AlwaysTopMostCheck.Size = new System.Drawing.Size(211, 19);
             this.AlwaysTopMostCheck.TabIndex = 31;
             this.AlwaysTopMostCheck.Text = "Always display BeatRecorder on top";
+            this.toolTip1.SetToolTip(this.AlwaysTopMostCheck, "Always display BeatRecorder in front of everything else");
             this.AlwaysTopMostCheck.UseVisualStyleBackColor = true;
             // 
             // AutomaticRecordingCheck
@@ -485,12 +498,42 @@ partial class SettingsUI
             this.Cancel.UseVisualStyleBackColor = false;
             this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
             // 
+            // PauseOnIngamePauseCheck
+            // 
+            this.PauseOnIngamePauseCheck.AutoSize = true;
+            this.PauseOnIngamePauseCheck.FlatAppearance.BorderSize = 0;
+            this.PauseOnIngamePauseCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.PauseOnIngamePauseCheck.ForeColor = System.Drawing.Color.White;
+            this.PauseOnIngamePauseCheck.Location = new System.Drawing.Point(12, 384);
+            this.PauseOnIngamePauseCheck.Name = "PauseOnIngamePauseCheck";
+            this.PauseOnIngamePauseCheck.Size = new System.Drawing.Size(203, 19);
+            this.PauseOnIngamePauseCheck.TabIndex = 35;
+            this.PauseOnIngamePauseCheck.Text = "Pause recording if game is paused";
+            this.toolTip1.SetToolTip(this.PauseOnIngamePauseCheck, "Always display BeatRecorder in front of everything else");
+            this.PauseOnIngamePauseCheck.UseVisualStyleBackColor = true;
+            // 
+            // EntirelyHideConsoleCheck
+            // 
+            this.EntirelyHideConsoleCheck.AutoSize = true;
+            this.EntirelyHideConsoleCheck.Enabled = false;
+            this.EntirelyHideConsoleCheck.FlatAppearance.BorderSize = 0;
+            this.EntirelyHideConsoleCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.EntirelyHideConsoleCheck.ForeColor = System.Drawing.Color.White;
+            this.EntirelyHideConsoleCheck.Location = new System.Drawing.Point(412, 251);
+            this.EntirelyHideConsoleCheck.Name = "EntirelyHideConsoleCheck";
+            this.EntirelyHideConsoleCheck.Size = new System.Drawing.Size(136, 19);
+            this.EntirelyHideConsoleCheck.TabIndex = 36;
+            this.EntirelyHideConsoleCheck.Text = "Entirely Hide Console";
+            this.EntirelyHideConsoleCheck.UseVisualStyleBackColor = true;
+            // 
             // SettingsUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(23)))), ((int)(((byte)(23)))));
             this.ClientSize = new System.Drawing.Size(784, 561);
+            this.Controls.Add(this.EntirelyHideConsoleCheck);
+            this.Controls.Add(this.PauseOnIngamePauseCheck);
             this.Controls.Add(this.Cancel);
             this.Controls.Add(this.Save);
             this.Controls.Add(this.AutomaticRecordingCheck);
@@ -574,4 +617,7 @@ partial class SettingsUI
     private CheckBox AutomaticRecordingCheck;
     private Button Save;
     private Button Cancel;
+    private ToolTip toolTip1;
+    private CheckBox PauseOnIngamePauseCheck;
+    private CheckBox EntirelyHideConsoleCheck;
 }

@@ -6,7 +6,11 @@ internal class UIHandler
     {
         await Task.Delay(500);
 
-        Program.ShowWindow(Program.GetConsoleWindow(), 2);
+        if (!Objects.LoadedSettings.HideConsole)
+            Program.ShowWindow(Program.GetConsoleWindow(), 2);
+        else
+            Program.ShowWindow(Program.GetConsoleWindow(), 0);
+
         LogDebug($"Displaying InfoUI");
 
         var infoUI = new InfoUI(Objects.LoadedSettings.DisplayUITopmost);
@@ -164,6 +168,15 @@ internal class UIHandler
         });
 
         infoUI.ShowDialog();
+
+        if (infoUI.ShowConsoleAgain)
+        {
+            infoUI.ShowConsoleAgain = false;
+            infoUI.ShowConsole.Visible = false;
+
+            Program.ShowWindow(Program.GetConsoleWindow(), 5);
+            infoUI.ShowDialog();
+        }
 
         if (infoUI.SettingsUpdated)
         {

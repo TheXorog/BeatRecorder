@@ -63,6 +63,8 @@ public partial class SettingsUI : Form
         OBSPortBox.Text = _loadedSettings.OBSPort;
         DisplayUserInterfaceCheck.Checked = _loadedSettings.DisplayUI;
         AutomaticRecordingCheck.Checked = _loadedSettings.AutomaticRecording;
+        PauseOnIngamePauseCheck.Checked = _loadedSettings.PauseRecordingOnIngamePause;
+        EntirelyHideConsoleCheck.Checked = _loadedSettings.HideConsole;
     }
 
     private void ShowAdvancedSettings_Click(object sender, EventArgs e)
@@ -178,6 +180,8 @@ public partial class SettingsUI : Form
         _loadedSettings.OBSPort = OBSPortBox.Text;
         _loadedSettings.DisplayUI = DisplayUserInterfaceCheck.Checked;
         _loadedSettings.AutomaticRecording = AutomaticRecordingCheck.Checked;
+        _loadedSettings.PauseRecordingOnIngamePause = PauseOnIngamePauseCheck.Checked;
+        _loadedSettings.HideConsole = EntirelyHideConsoleCheck.Checked;
 
         File.WriteAllText("Settings.json", JsonConvert.SerializeObject(_loadedSettings, Formatting.Indented));
         SettingsUpdated = true;

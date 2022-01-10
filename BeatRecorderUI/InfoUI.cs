@@ -3,6 +3,7 @@ namespace BeatRecorderUI;
 public partial class InfoUI : Form
 {
     public bool SettingsUpdated = false;
+    public bool ShowConsoleAgain = false;
 
     public InfoUI(bool alwaysTopMost = false)
     {
@@ -21,5 +22,17 @@ public partial class InfoUI : Form
             SettingsUpdated = true;
             this.Close();
         }
+    }
+
+    private void ShowConsole_Click(object sender, EventArgs e)
+    {
+        ShowConsoleAgain = true;
+        this.Close();
+    }
+
+    private void Restart_Click(object sender, EventArgs e)
+    {
+        SettingsUpdated = true;
+        this.Close();
     }
 }

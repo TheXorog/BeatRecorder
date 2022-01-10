@@ -41,6 +41,9 @@ partial class InfoUI
             this.ProgressLabel = new System.Windows.Forms.Label();
             this.BeatSaberConnectionLabel = new System.Windows.Forms.Label();
             this.OBSConnectionLabel = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.ShowConsole = new System.Windows.Forms.Button();
+            this.Restart = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -100,9 +103,9 @@ partial class InfoUI
             this.OpenSettings.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(0)))), ((int)(((byte)(84)))));
             this.OpenSettings.FlatAppearance.BorderSize = 0;
             this.OpenSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.OpenSettings.Location = new System.Drawing.Point(689, 283);
+            this.OpenSettings.Location = new System.Drawing.Point(632, 283);
             this.OpenSettings.Name = "OpenSettings";
-            this.OpenSettings.Size = new System.Drawing.Size(83, 27);
+            this.OpenSettings.Size = new System.Drawing.Size(140, 27);
             this.OpenSettings.TabIndex = 5;
             this.OpenSettings.Text = "Settings..";
             this.OpenSettings.UseVisualStyleBackColor = false;
@@ -178,12 +181,52 @@ partial class InfoUI
             this.OBSConnectionLabel.Text = "OBS";
             this.OBSConnectionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label1.ForeColor = System.Drawing.Color.Gray;
+            this.label1.Location = new System.Drawing.Point(341, 295);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(279, 15);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "You can disable the new UI in the advanced settings";
+            // 
+            // ShowConsole
+            // 
+            this.ShowConsole.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(0)))), ((int)(((byte)(84)))));
+            this.ShowConsole.FlatAppearance.BorderSize = 0;
+            this.ShowConsole.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ShowConsole.Location = new System.Drawing.Point(632, 217);
+            this.ShowConsole.Name = "ShowConsole";
+            this.ShowConsole.Size = new System.Drawing.Size(140, 27);
+            this.ShowConsole.TabIndex = 14;
+            this.ShowConsole.Text = "Show Console";
+            this.ShowConsole.UseVisualStyleBackColor = false;
+            this.ShowConsole.Click += new System.EventHandler(this.ShowConsole_Click);
+            // 
+            // Restart
+            // 
+            this.Restart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(0)))), ((int)(((byte)(84)))));
+            this.Restart.FlatAppearance.BorderSize = 0;
+            this.Restart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Restart.Location = new System.Drawing.Point(632, 250);
+            this.Restart.Name = "Restart";
+            this.Restart.Size = new System.Drawing.Size(140, 27);
+            this.Restart.TabIndex = 15;
+            this.Restart.Text = "Restart BeatRecorder";
+            this.Restart.UseVisualStyleBackColor = false;
+            this.Restart.Click += new System.EventHandler(this.Restart_Click);
+            // 
             // InfoUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(23)))), ((int)(((byte)(23)))));
             this.ClientSize = new System.Drawing.Size(784, 321);
+            this.Controls.Add(this.Restart);
+            this.Controls.Add(this.ShowConsole);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.OBSConnectionLabel);
             this.Controls.Add(this.BeatSaberConnectionLabel);
             this.Controls.Add(this.ProgressLabel);
@@ -224,4 +267,7 @@ partial class InfoUI
     public Label MissesLabel;
     public Label OBSConnectionLabel;
     public Label AccuracyLabel;
+    public Label label1;
+    public Button ShowConsole;
+    private Button Restart;
 }

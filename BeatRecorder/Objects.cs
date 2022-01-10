@@ -26,6 +26,7 @@ class Objects
         public string Mod { get; set; } = "http-status";
         public bool DisplayUI { get; set; } = true;
         public bool DisplayUITopmost { get; set; } = true;
+        public bool HideConsole { get; set; } = true;
         public bool AutomaticRecording { get; set; } = true;
         public bool DisplaySteamNotifications { get; set; } = false;
         public string BeatSaberUrl { get; set; } = "127.0.0.1";
