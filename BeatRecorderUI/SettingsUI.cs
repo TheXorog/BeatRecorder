@@ -116,6 +116,10 @@ public partial class SettingsUI : Form
                 AutomaticRecordingCheck.Checked = true;
             }
         }
+
+        if (!AutomaticRecordingCheck.Checked)
+            if (ModSelectionBox.Text == "http-status")
+                MessageBox.Show("When using http-status, disabling this option will prevent seconds from being displayed correctly in the info ui", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
     }
 
     private void ModSelectionBox_SelectedIndexChanged(object sender, EventArgs e)
