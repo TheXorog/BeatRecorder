@@ -183,14 +183,14 @@ partial class InfoUI
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label1.ForeColor = System.Drawing.Color.Gray;
-            this.label1.Location = new System.Drawing.Point(341, 295);
+            this.label1.Location = new System.Drawing.Point(255, 293);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(279, 15);
+            this.label1.Size = new System.Drawing.Size(371, 17);
             this.label1.TabIndex = 13;
             this.label1.Text = "You can disable the new UI in the advanced settings";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // ShowConsole
             // 
