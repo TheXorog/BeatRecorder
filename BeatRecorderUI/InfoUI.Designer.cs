@@ -1,6 +1,6 @@
 ﻿namespace BeatRecorderUI;
 
-partial class Form1
+partial class InfoUI
 {
     /// <summary>
     ///  Required designer variable.

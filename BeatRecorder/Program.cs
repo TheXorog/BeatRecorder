@@ -12,15 +12,14 @@ class Program
     {
         Program program = new Program();
 
-        program.MainAsync(args).ConfigureAwait(true).GetAwaiter().GetResult();
+        program.MainAsync(args).GetAwaiter().GetResult();
     }
 
     private async Task MainAsync(string[] args)
     {
         Console.Clear();
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            Console.SetWindowSize(160, 40);
+        Console.SetWindowSize(160, 40);
 
         if (!Directory.Exists("logs"))
             Directory.CreateDirectory("logs");
@@ -64,7 +63,12 @@ class Program
 
         if (Objects.LoadedSettings.DisplayUI)
         {
-
+            _ = Task.Run(() =>
+            {
+                LogDebug($"Displaying InfoUI");
+                InfoUI infoUI = new InfoUI();
+                infoUI.Show();
+            });
         }
 
         OBSWebSocketObjects.CancelStopRecordingDelay = new CancellationTokenSource();
