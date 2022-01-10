@@ -17,3 +17,7 @@ global using System.Runtime.InteropServices;
 global using BeatRecorderUI;
 
 global using System.ComponentModel;
+
+global using static BeatRecorder.LoglevelEnum;
+
+global using Newtonsoft.Json;
