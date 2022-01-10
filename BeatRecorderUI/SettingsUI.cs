@@ -20,7 +20,7 @@ public partial class SettingsUI : Form
     {
         this.TopMost = beTopMost;
 
-        this.Size = new Size(400, 650);
+        this.Size = new Size(400, 730);
 
         BeatSaberIpBox.Enabled = false;
         BeatSaberPortBox.Enabled = false;
@@ -83,7 +83,7 @@ public partial class SettingsUI : Form
 
         if (ShowAdvancedSettings.Checked)
         {
-            this.Size = new Size(800, 650);
+            this.Size = new Size(800, 730);
 
             BeatSaberIpBox.Enabled = true;
             BeatSaberPortBox.Enabled = true;
@@ -97,7 +97,7 @@ public partial class SettingsUI : Form
         }
         else
         {
-            this.Size = new Size(400, 650);
+            this.Size = new Size(400, 730);
 
             BeatSaberIpBox.Enabled = false;
             BeatSaberPortBox.Enabled = false;

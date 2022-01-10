@@ -36,6 +36,17 @@ class DataPuller
                     LogError($"[BS-DP1] {ex}");
                     return;
                 }
+
+                try
+                {
+                    if (Objects.LoadedSettings.OBSIngameScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                }
+                catch (Exception ex)
+                {
+                    LogError($"[BS-HS] {ex}");
+                    return;
+                }
             }
             else if (DataPullerObjects.DataPullerInLevel && !_status.InLevel)
             {
@@ -58,6 +69,17 @@ class DataPuller
                 catch (Exception ex)
                 {
                     LogError($"[BS-DP1] {ex}");
+                    return;
+                }
+
+                try
+                {
+                    if (Objects.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                }
+                catch (Exception ex)
+                {
+                    LogError($"[BS-HS] {ex}");
                     return;
                 }
             }
@@ -83,6 +105,17 @@ class DataPuller
                         LogError($"[BS-DP1] {ex}");
                         return;
                     }
+
+                    try
+                    {
+                        if (Objects.LoadedSettings.OBSPauseScene != "")
+                            Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSPauseScene}\", \"message-id\":\"PauseRecording\"}}");
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError($"[BS-HS] {ex}");
+                        return;
+                    }
                 }
                 else if (DataPullerObjects.DataPullerPaused && !_status.LevelPaused)
                 {
@@ -98,6 +131,17 @@ class DataPuller
                     catch (Exception ex)
                     {
                         LogError($"[BS-DP1] {ex}");
+                        return;
+                    }
+
+                    try
+                    {
+                        if (Objects.LoadedSettings.OBSIngameScene != "")
+                            Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError($"[BS-HS] {ex}");
                         return;
                     }
                 }

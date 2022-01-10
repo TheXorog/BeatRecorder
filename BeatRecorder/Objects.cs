@@ -46,7 +46,9 @@ class Objects
         public bool DeleteIfQuitAfterSoftFailed { get; set; } = false;
         public bool DeleteFailed { get; set; } = false;
         public bool DeleteSoftFailed { get; set; } = false;
-
+        public string OBSMenuScene { get; set; } = "";
+        public string OBSIngameScene { get; set; } = "";
+        public string OBSPauseScene { get; set; } = "";
 
         // Ignore old Console Log Level
         [JsonProperty("ConsoleLogLevel")]

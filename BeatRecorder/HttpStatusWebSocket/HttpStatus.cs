@@ -23,6 +23,17 @@ class HttpStatus
                 try { HttpStatusObjects.HttpStatusCurrentBeatmap = _status.status.beatmap; } catch { }
                 try { HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance; } catch { }
 
+                try
+                {
+                    if (Objects.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                }
+                catch (Exception ex)
+                {
+                    LogError($"[BS-HS] {ex}");
+                    return;
+                }
+
                 LogInfo("[BS-HS] Connected.");
                 break;
 
@@ -34,6 +45,17 @@ class HttpStatus
                 HttpStatusObjects.FinishedCurrentSong = false;
                 HttpStatusObjects.HttpStatusCurrentBeatmap = _status.status.beatmap;
                 HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
+
+                try
+                {
+                    if (Objects.LoadedSettings.OBSIngameScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                }
+                catch (Exception ex)
+                {
+                    LogError($"[BS-HS] {ex}");
+                    return;
+                }
 
                 try
                 {
@@ -52,6 +74,17 @@ class HttpStatus
                 HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
                 HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
                 HttpStatusObjects.FinishedCurrentSong = true;
+
+                try
+                {
+                    if (Objects.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                }
+                catch (Exception ex)
+                {
+                    LogError($"[BS-HS] {ex}");
+                    return;
+                }
                 break;
 
             case "failed":
@@ -61,6 +94,16 @@ class HttpStatus
                 HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
                 HttpStatusObjects.FailedCurrentSong = true;
 
+                try
+                {
+                    if (Objects.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                }
+                catch (Exception ex)
+                {
+                    LogError($"[BS-HS] {ex}");
+                    return;
+                }
                 break;
 
             case "pause":
@@ -71,6 +114,17 @@ class HttpStatus
                     if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
                         if (Program.obsWebSocket.IsStarted)
                             Program.obsWebSocket.Send($"{{\"request-type\":\"PauseRecording\", \"message-id\":\"PauseRecording\"}}");
+                }
+                catch (Exception ex)
+                {
+                    LogError($"[BS-HS] {ex}");
+                    return;
+                }
+
+                try
+                {
+                    if (Objects.LoadedSettings.OBSPauseScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSPauseScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -93,6 +147,17 @@ class HttpStatus
                     LogError($"[BS-HS] {ex}");
                     return;
                 }
+
+                try
+                {
+                    if (Objects.LoadedSettings.OBSIngameScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                }
+                catch (Exception ex)
+                {
+                    LogError($"[BS-HS] {ex}");
+                    return;
+                }
                 break;
 
             case "menu":
@@ -107,6 +172,17 @@ class HttpStatus
                     HttpStatusObjects.FinishedLastSong = HttpStatusObjects.FinishedCurrentSong;
                     HttpStatusObjects.FailedLastSong = HttpStatusObjects.FailedCurrentSong;
                     _ = OBSWebSocket.StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token);
+                }
+                catch (Exception ex)
+                {
+                    LogError($"[BS-HS] {ex}");
+                    return;
+                }
+
+                try
+                {
+                    if (Objects.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
