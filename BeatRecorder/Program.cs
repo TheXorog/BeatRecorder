@@ -8,6 +8,8 @@ class Program
     internal static WebsocketClient beatSaberWebSocketLiveData { get; set; }
     internal static WebsocketClient obsWebSocket { get; set; }
 
+    internal static InfoUI infoUI;
+
     static void Main(string[] args)
     {
         Program program = new Program();
@@ -65,9 +67,14 @@ class Program
         {
             _ = Task.Run(() =>
             {
+                ShowWindow(GetConsoleWindow(), SW_SHOWMINIMIZED);
                 LogDebug($"Displaying InfoUI");
-                InfoUI infoUI = new InfoUI();
-                infoUI.Show();
+
+                infoUI = new InfoUI();
+                infoUI.ShowDialog();
+
+                LogDebug("InfoUI closed");
+                Environment.Exit(0);
             });
         }
 
@@ -358,4 +365,14 @@ class Program
 
         NotificationList.Add(A, new Objects.NotificationEntry { Message = Text, Delay = DisplayTime, Type = messageType });
     }
+
+    [DllImport("kernel32.dll")]
+    static extern IntPtr GetConsoleWindow();
+
+    [DllImport("user32.dll")]
+    static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    const int SW_HIDE = 0;
+    const int SW_SHOWMINIMIZED = 2;
+    const int SW_SHOW = 5;
 }
