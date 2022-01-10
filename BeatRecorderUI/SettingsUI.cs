@@ -89,6 +89,7 @@ public partial class SettingsUI : Form
 
             DisplayUserInterfaceCheck.Enabled = true;
             AutomaticRecordingCheck.Enabled = true;
+            EntirelyHideConsoleCheck.Enabled = true;
         }
         else
         {
@@ -102,6 +103,7 @@ public partial class SettingsUI : Form
 
             DisplayUserInterfaceCheck.Enabled = false;
             AutomaticRecordingCheck.Enabled = false;
+            EntirelyHideConsoleCheck.Enabled = false;
         }
     }
 
