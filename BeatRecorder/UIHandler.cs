@@ -4,12 +4,12 @@ internal class UIHandler
 {
     internal async Task HandleUI()
     {
-        await Task.Delay(5000);
+        await Task.Delay(500);
 
         Program.ShowWindow(Program.GetConsoleWindow(), 2);
         LogDebug($"Displaying InfoUI");
 
-        var infoUI = new InfoUI();
+        var infoUI = new InfoUI(Objects.LoadedSettings.DisplayUITopmost);
 
         _ = Task.Run(async () =>
         {
@@ -18,17 +18,44 @@ internal class UIHandler
 
             Action UpdateUI = new Action(() =>
             {
-                try
-                {
+            try
+            {
                     if (Program.obsWebSocket.IsRunning)
-                        infoUI.OBSConnectionLabel.BackColor = Color.DarkGreen;
+                    {
+                        if (infoUI.OBSConnectionLabel.BackColor != Color.DarkGreen && infoUI.OBSConnectionLabel.BackColor != Color.Orange)
+                            infoUI.OBSConnectionLabel.BackColor = Color.DarkGreen;
+                    }
                     else
-                        infoUI.OBSConnectionLabel.BackColor = Color.DarkRed;
+                    {
+                        if (infoUI.OBSConnectionLabel.BackColor != Color.DarkRed)
+                            infoUI.OBSConnectionLabel.BackColor = Color.DarkRed;
+                    }
 
                     if (Program.beatSaberWebSocket.IsRunning)
-                        infoUI.BeatSaberConnectionLabel.BackColor = Color.DarkGreen;
+                    {
+                        if (infoUI.BeatSaberConnectionLabel.BackColor != Color.DarkGreen)
+                            infoUI.BeatSaberConnectionLabel.BackColor = Color.DarkGreen;
+                    }
                     else
-                        infoUI.BeatSaberConnectionLabel.BackColor = Color.DarkRed;
+                    {
+                        if (infoUI.BeatSaberConnectionLabel.BackColor != Color.DarkRed)
+                            infoUI.BeatSaberConnectionLabel.BackColor = Color.DarkRed;
+                    }
+
+                    if (OBSWebSocketObjects.OBSRecording)
+                    {
+                        infoUI.OBSConnectionLabel.Text = "(REC) OBS";
+
+                        if (infoUI.OBSConnectionLabel.BackColor != Color.Orange)
+                            infoUI.OBSConnectionLabel.BackColor = Color.Orange;
+                    }
+                    else
+                    {
+                        infoUI.OBSConnectionLabel.Text = "OBS";
+
+                        if (infoUI.OBSConnectionLabel.BackColor != Color.DarkGreen)
+                            infoUI.OBSConnectionLabel.BackColor = Color.DarkGreen;
+                    }
 
                     if (!Program.beatSaberWebSocket.IsRunning)
                         return;

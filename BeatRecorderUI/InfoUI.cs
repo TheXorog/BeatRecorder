@@ -2,11 +2,11 @@ namespace BeatRecorderUI;
 
 public partial class InfoUI : Form
 {
-    public InfoUI()
+    public InfoUI(bool alwaysTopMost = false)
     {
         InitializeComponent();
 
-        this.TopMost = true;
+        this.TopMost = alwaysTopMost;
     }
 
     private void OpenSettings_Click(object sender, EventArgs e)

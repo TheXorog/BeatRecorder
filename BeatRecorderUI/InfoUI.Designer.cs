@@ -112,7 +112,7 @@ partial class InfoUI
             // 
             this.ScoreLabel.AutoSize = true;
             this.ScoreLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ScoreLabel.Location = new System.Drawing.Point(257, 101);
+            this.ScoreLabel.Location = new System.Drawing.Point(257, 139);
             this.ScoreLabel.Name = "ScoreLabel";
             this.ScoreLabel.Size = new System.Drawing.Size(36, 15);
             this.ScoreLabel.TabIndex = 6;
@@ -122,7 +122,7 @@ partial class InfoUI
             // 
             this.ComboLabel.AutoSize = true;
             this.ComboLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ComboLabel.Location = new System.Drawing.Point(257, 116);
+            this.ComboLabel.Location = new System.Drawing.Point(257, 154);
             this.ComboLabel.Name = "ComboLabel";
             this.ComboLabel.Size = new System.Drawing.Size(47, 15);
             this.ComboLabel.TabIndex = 7;
@@ -132,7 +132,7 @@ partial class InfoUI
             // 
             this.AccuracyLabel.AutoSize = true;
             this.AccuracyLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.AccuracyLabel.Location = new System.Drawing.Point(257, 131);
+            this.AccuracyLabel.Location = new System.Drawing.Point(257, 169);
             this.AccuracyLabel.Name = "AccuracyLabel";
             this.AccuracyLabel.Size = new System.Drawing.Size(56, 15);
             this.AccuracyLabel.TabIndex = 8;
@@ -142,7 +142,7 @@ partial class InfoUI
             // 
             this.MissesLabel.AutoSize = true;
             this.MissesLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.MissesLabel.Location = new System.Drawing.Point(257, 146);
+            this.MissesLabel.Location = new System.Drawing.Point(257, 184);
             this.MissesLabel.Name = "MissesLabel";
             this.MissesLabel.Size = new System.Drawing.Size(42, 15);
             this.MissesLabel.TabIndex = 9;

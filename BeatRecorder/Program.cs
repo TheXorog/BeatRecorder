@@ -61,12 +61,6 @@ class Program
         LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
         LogDebug($"{Environment.CurrentDirectory}");
 
-        if (Objects.LoadedSettings.DisplayUI)
-        {
-            UIHandler handler = new();
-            _ = handler.HandleUI();
-        }
-
         OBSWebSocketObjects.CancelStopRecordingDelay = new CancellationTokenSource();
 
         await Task.Run(async () =>
@@ -210,9 +204,15 @@ class Program
             SendNotification("Connected to OBS", 1000, Objects.MessageType.INFO);
         });
 
+        if (Objects.LoadedSettings.DisplayUI)
+        {
+            UIHandler handler = new();
+            _ = handler.HandleUI();
+        }
+
         SendNotification("Note: Using Steam Notifications is still experimental. If you run into issues, please make sure to report them on GitHub.", 20000, Objects.MessageType.ERROR);
 
-        await Task.Delay(5000);
+        await Task.Delay(2000);
         NotifcationLoop();
 
         // Don't close the application
