@@ -29,6 +29,7 @@ partial class SettingsUI
     private void InitializeComponent()
     {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsUI));
             this.BeatSaberIpBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -272,8 +273,7 @@ partial class SettingsUI
             this.DisplaySteamNotificationsCheck.Size = new System.Drawing.Size(248, 19);
             this.DisplaySteamNotificationsCheck.TabIndex = 16;
             this.DisplaySteamNotificationsCheck.Text = "Display Steam Notifications (Experimental)";
-            this.toolTip1.SetToolTip(this.DisplaySteamNotificationsCheck, "Show in-headset Notifications via Steam. Requires Notifactions to be enabled in S" +
-        "teamVR Settings");
+            this.toolTip1.SetToolTip(this.DisplaySteamNotificationsCheck, resources.GetString("DisplaySteamNotificationsCheck.ToolTip"));
             this.DisplaySteamNotificationsCheck.UseVisualStyleBackColor = true;
             // 
             // label8

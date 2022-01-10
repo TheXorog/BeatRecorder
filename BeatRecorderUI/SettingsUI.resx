@@ -60,6 +60,16 @@
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="DisplaySteamNotificationsCheck.ToolTip" xml:space="preserve">
+    <value>Show in-headset Notifications via Steam. Requires Notifactions to be enabled in SteamVR Settings
+
+Currently known issues include:
+- Notifications appearing too far up, this is caused by SteamVR handling Notifcations pretty awful
+- BeatRecorder crashing upon closing SteamVR</value>
+  </data>
   <metadata name="contextMenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>114, 17</value>
   </metadata>

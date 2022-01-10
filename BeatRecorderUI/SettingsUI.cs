@@ -56,7 +56,6 @@ public partial class SettingsUI : Form
 
         DisplaySteamNotificationsCheck.Checked = _loadedSettings.DisplaySteamNotifications;
         AlwaysTopMostCheck.Checked = _loadedSettings.DisplayUITopmost;
-        UITransparencyTrackbar.Value = Convert.ToInt32(_loadedSettings.UITransparency * 100);
 
         BeatSaberIpBox.Text = _loadedSettings.BeatSaberUrl;
         BeatSaberPortBox.Text = _loadedSettings.BeatSaberPort;
@@ -66,8 +65,6 @@ public partial class SettingsUI : Form
         AutomaticRecordingCheck.Checked = _loadedSettings.AutomaticRecording;
         PauseOnIngamePauseCheck.Checked = _loadedSettings.PauseRecordingOnIngamePause;
         EntirelyHideConsoleCheck.Checked = _loadedSettings.HideConsole;
-
-        UITransparencyPercentage.Text = $"{UITransparencyTrackbar.Value}%";
     }
 
     private void ShowAdvancedSettings_Click(object sender, EventArgs e)
@@ -117,11 +114,6 @@ public partial class SettingsUI : Form
                 AutomaticRecordingCheck.Checked = true;
             }
         }
-    }
-
-    private void UITransparencyTrackbar_Scroll(object sender, EventArgs e)
-    {
-        UITransparencyPercentage.Text = $"{UITransparencyTrackbar.Value}%";
     }
 
     private void ModSelectionBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -190,7 +182,6 @@ public partial class SettingsUI : Form
         _loadedSettings.AutomaticRecording = AutomaticRecordingCheck.Checked;
         _loadedSettings.PauseRecordingOnIngamePause = PauseOnIngamePauseCheck.Checked;
         _loadedSettings.HideConsole = EntirelyHideConsoleCheck.Checked;
-        _loadedSettings.UITransparency = (double)((double)UITransparencyTrackbar.Value / 100);
 
         File.WriteAllText("Settings.json", JsonConvert.SerializeObject(_loadedSettings, Formatting.Indented));
         SettingsUpdated = true;
