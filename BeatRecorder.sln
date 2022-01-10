@@ -4,6 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeatRecorder", "BeatRecorder\BeatRecorder.csproj", "{BA868827-924B-41AE-BC79-03BCF671F1BB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{962B9A85-768F-42F5-A7CA-451A61E2A3C0} = {962B9A85-768F-42F5-A7CA-451A61E2A3C0}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeatRecorderUI", "BeatRecorderUI\BeatRecorderUI.csproj", "{962B9A85-768F-42F5-A7CA-451A61E2A3C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{BA868827-924B-41AE-BC79-03BCF671F1BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA868827-924B-41AE-BC79-03BCF671F1BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA868827-924B-41AE-BC79-03BCF671F1BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{962B9A85-768F-42F5-A7CA-451A61E2A3C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{962B9A85-768F-42F5-A7CA-451A61E2A3C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{962B9A85-768F-42F5-A7CA-451A61E2A3C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{962B9A85-768F-42F5-A7CA-451A61E2A3C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
