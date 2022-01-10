@@ -9,13 +9,14 @@ public partial class InfoUI : Form
 
     bool SettingsRequired = false;
 
-    public InfoUI(bool alwaysTopMost = false, bool settingsRequired = false)
+    public InfoUI(string version, bool alwaysTopMost = false, bool settingsRequired = false)
     {
         InitializeComponent();
 
         loadedTopmost = alwaysTopMost;
 
         SettingsRequired = settingsRequired;
+        VersionLabel.Text = $"v{version}";
     }
 
     private void InfoUI_Shown(object sender, EventArgs e)
@@ -53,5 +54,10 @@ public partial class InfoUI : Form
     {
         SettingsUpdated = true;
         this.Close();
+    }
+
+    private void CheckForUpdates_Click(object sender, EventArgs e)
+    {
+        System.Diagnostics.Process.Start("cmd", "/C start https://github.com/TheXorog/BeatRecorder/releases");
     }
 }

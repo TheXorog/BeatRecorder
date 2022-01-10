@@ -8,6 +8,8 @@ internal class UIHandler
     {
         await Task.Delay(500);
 
+        bool DisplayedUpdateNotice = false;
+
         if (!Objects.LoadedSettings.HideConsole)
             Program.ShowWindow(Program.GetConsoleWindow(), 2);
         else
@@ -15,7 +17,7 @@ internal class UIHandler
 
         LogDebug($"Displaying InfoUI");
 
-        var infoUI = new InfoUI(Objects.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
+        var infoUI = new InfoUI(Program.CurrentVersion, Objects.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
 
         _ = Task.Run(async () =>
         {
@@ -34,12 +36,18 @@ internal class UIHandler
 
                         MessageBox.Show($"A password is required to log into the obs websocket.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                        var infoUI2 = new InfoUI(Objects.LoadedSettings.DisplayUITopmost, true);
+                        var infoUI2 = new InfoUI(Program.CurrentVersion, Objects.LoadedSettings.DisplayUITopmost, true);
                         infoUI2.ShowDialog();
                         Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
                         Thread.Sleep(2000);
                         Environment.Exit(0);
                         return;
+                    }
+
+                    if (Objects.UpdateAvailable && !DisplayedUpdateNotice)
+                    {
+                        DisplayedUpdateNotice = true;
+                        MessageBox.Show($"There's a new version available.\n\n{Objects.UpdateText}", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
                     if (Program.obsWebSocket.IsRunning)

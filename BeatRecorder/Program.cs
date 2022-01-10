@@ -77,6 +77,9 @@ class Program
                     LogFatal($"[BR] You're running an outdated version of BeatRecorder, please update at https://github.com/TheXorog/BeatRecorder/releases/latest." +
                                         $"\n\nWhat changed in the new version:\n\n" +
                                         $"{repo.Body}\n");
+
+                    Objects.UpdateText = repo.Body;
+                    Objects.UpdateAvailable = true;
                 }
             }
             catch (Exception ex)
@@ -241,7 +244,7 @@ class Program
         LogInfo($"Please configure BeatRecorder using the config file that was just opened. If you're done, save and quit notepad and BeatRecorder will restart for you.");
 
         Objects.SettingsRequired = true;
-        var infoUI = new InfoUI(Objects.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
+        var infoUI = new InfoUI(Program.CurrentVersion, Objects.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
         infoUI.ShowDialog();
         LogDebug("Settings updated via UI");
         Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);

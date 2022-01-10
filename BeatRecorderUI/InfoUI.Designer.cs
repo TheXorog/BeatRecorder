@@ -45,6 +45,8 @@ partial class InfoUI
             this.ShowConsole = new System.Windows.Forms.Button();
             this.Restart = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.CheckForUpdates = new System.Windows.Forms.Button();
+            this.VersionLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -198,7 +200,7 @@ partial class InfoUI
             this.ShowConsole.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(0)))), ((int)(((byte)(84)))));
             this.ShowConsole.FlatAppearance.BorderSize = 0;
             this.ShowConsole.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ShowConsole.Location = new System.Drawing.Point(632, 217);
+            this.ShowConsole.Location = new System.Drawing.Point(632, 184);
             this.ShowConsole.Name = "ShowConsole";
             this.ShowConsole.Size = new System.Drawing.Size(140, 27);
             this.ShowConsole.TabIndex = 14;
@@ -211,7 +213,7 @@ partial class InfoUI
             this.Restart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(0)))), ((int)(((byte)(84)))));
             this.Restart.FlatAppearance.BorderSize = 0;
             this.Restart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Restart.Location = new System.Drawing.Point(632, 250);
+            this.Restart.Location = new System.Drawing.Point(632, 217);
             this.Restart.Name = "Restart";
             this.Restart.Size = new System.Drawing.Size(140, 27);
             this.Restart.TabIndex = 15;
@@ -231,12 +233,38 @@ partial class InfoUI
     " a shot.";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // CheckForUpdates
+            // 
+            this.CheckForUpdates.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(0)))), ((int)(((byte)(84)))));
+            this.CheckForUpdates.FlatAppearance.BorderSize = 0;
+            this.CheckForUpdates.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CheckForUpdates.Location = new System.Drawing.Point(632, 250);
+            this.CheckForUpdates.Name = "CheckForUpdates";
+            this.CheckForUpdates.Size = new System.Drawing.Size(140, 27);
+            this.CheckForUpdates.TabIndex = 17;
+            this.CheckForUpdates.Text = "Check for updates..";
+            this.CheckForUpdates.UseVisualStyleBackColor = false;
+            this.CheckForUpdates.Click += new System.EventHandler(this.CheckForUpdates_Click);
+            // 
+            // VersionLabel
+            // 
+            this.VersionLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.VersionLabel.ForeColor = System.Drawing.Color.Gray;
+            this.VersionLabel.Location = new System.Drawing.Point(632, 164);
+            this.VersionLabel.Name = "VersionLabel";
+            this.VersionLabel.Size = new System.Drawing.Size(140, 17);
+            this.VersionLabel.TabIndex = 18;
+            this.VersionLabel.Text = " ";
+            this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // InfoUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(23)))), ((int)(((byte)(23)))));
             this.ClientSize = new System.Drawing.Size(784, 321);
+            this.Controls.Add(this.VersionLabel);
+            this.Controls.Add(this.CheckForUpdates);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.Restart);
             this.Controls.Add(this.ShowConsole);
@@ -288,4 +316,6 @@ partial class InfoUI
     public Button ShowConsole;
     private Button Restart;
     public Label label2;
+    private Button CheckForUpdates;
+    public Label VersionLabel;
 }
