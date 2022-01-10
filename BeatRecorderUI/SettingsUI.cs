@@ -45,32 +45,42 @@ public partial class SettingsUI : Form
             return;
         }
 
-        ModSelectionBox.SelectedIndex = ModSelectionBox.Items.IndexOf(_loadedSettings.Mod);
-        OBSPasswordBox.Text = _loadedSettings.OBSPassword;
-        FileFormatBox.Text = _loadedSettings.FileFormat;
-        StopRecordingDelay.Value = _loadedSettings.StopRecordingDelay;
+        try
+        {
+            ModSelectionBox.SelectedIndex = ModSelectionBox.Items.IndexOf(_loadedSettings.Mod);
+            OBSPasswordBox.Text = _loadedSettings.OBSPassword;
+            FileFormatBox.Text = _loadedSettings.FileFormat;
+            StopRecordingDelay.Value = _loadedSettings.StopRecordingDelay;
 
-        DeleteIfShorterThan.Value = _loadedSettings.DeleteIfShorterThan;
-        DeleteIfQuit.Checked = _loadedSettings.DeleteQuit;
-        DeleteIfQuitAfterSoftFailCheck.Checked = _loadedSettings.DeleteIfQuitAfterSoftFailed;
-        DeleteIfSoftFailedCheck.Checked = _loadedSettings.DeleteSoftFailed;
-        DeleteIfFailedCheck.Checked = _loadedSettings.DeleteFailed;
+            DeleteIfShorterThan.Value = _loadedSettings.DeleteIfShorterThan;
+            DeleteIfQuit.Checked = _loadedSettings.DeleteQuit;
+            DeleteIfQuitAfterSoftFailCheck.Checked = _loadedSettings.DeleteIfQuitAfterSoftFailed;
+            DeleteIfSoftFailedCheck.Checked = _loadedSettings.DeleteSoftFailed;
+            DeleteIfFailedCheck.Checked = _loadedSettings.DeleteFailed;
 
-        IngameSceneBox.Text = _loadedSettings.OBSIngameScene;
-        MenuSceneBox.Text = _loadedSettings.OBSMenuScene;
-        PauseSceneBox.Text = _loadedSettings.OBSPauseScene;
+            IngameSceneBox.Text = _loadedSettings.OBSIngameScene;
+            MenuSceneBox.Text = _loadedSettings.OBSMenuScene;
+            PauseSceneBox.Text = _loadedSettings.OBSPauseScene;
 
-        DisplaySteamNotificationsCheck.Checked = _loadedSettings.DisplaySteamNotifications;
-        AlwaysTopMostCheck.Checked = _loadedSettings.DisplayUITopmost;
+            DisplaySteamNotificationsCheck.Checked = _loadedSettings.DisplaySteamNotifications;
+            AlwaysTopMostCheck.Checked = _loadedSettings.DisplayUITopmost;
 
-        BeatSaberIpBox.Text = _loadedSettings.BeatSaberUrl;
-        BeatSaberPortBox.Text = _loadedSettings.BeatSaberPort;
-        OBSIpBox.Text = _loadedSettings.OBSUrl;
-        OBSPortBox.Text = _loadedSettings.OBSPort;
-        DisplayUserInterfaceCheck.Checked = _loadedSettings.DisplayUI;
-        AutomaticRecordingCheck.Checked = _loadedSettings.AutomaticRecording;
-        PauseOnIngamePauseCheck.Checked = _loadedSettings.PauseRecordingOnIngamePause;
-        EntirelyHideConsoleCheck.Checked = _loadedSettings.HideConsole;
+            BeatSaberIpBox.Text = _loadedSettings.BeatSaberUrl;
+            BeatSaberPortBox.Text = _loadedSettings.BeatSaberPort;
+            OBSIpBox.Text = _loadedSettings.OBSUrl;
+            OBSPortBox.Text = _loadedSettings.OBSPort;
+            DisplayUserInterfaceCheck.Checked = _loadedSettings.DisplayUI;
+            AutomaticRecordingCheck.Checked = _loadedSettings.AutomaticRecording;
+            PauseOnIngamePauseCheck.Checked = _loadedSettings.PauseRecordingOnIngamePause;
+            EntirelyHideConsoleCheck.Checked = _loadedSettings.HideConsole;
+        }
+        catch (Exception)
+        {
+            this.Hide();
+            MessageBox.Show($"Failed to load settings, please avoid manually editing the config file from now on.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            this.Close();
+            return;
+        }
     }
 
     private void ShowAdvancedSettings_Click(object sender, EventArgs e)
