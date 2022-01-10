@@ -59,6 +59,8 @@ partial class SettingsUI
             this.DisplayUserInterfaceCheck = new System.Windows.Forms.CheckBox();
             this.AlwaysTopMostCheck = new System.Windows.Forms.CheckBox();
             this.AutomaticRecordingCheck = new System.Windows.Forms.CheckBox();
+            this.Save = new System.Windows.Forms.Button();
+            this.Cancel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.BeatSaberPortBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OBSPortBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.StopRecordingDelay)).BeginInit();
@@ -196,6 +198,9 @@ partial class SettingsUI
             this.ModSelectionBox.Name = "ModSelectionBox";
             this.ModSelectionBox.Size = new System.Drawing.Size(360, 23);
             this.ModSelectionBox.TabIndex = 12;
+            this.ModSelectionBox.SelectedIndexChanged += new System.EventHandler(this.ModSelectionBox_SelectedIndexChanged);
+            this.ModSelectionBox.TextUpdate += new System.EventHandler(this.ModSelectionBox_TextUpdate);
+            this.ModSelectionBox.TextChanged += new System.EventHandler(this.ModSelectionBox_TextChanged);
             // 
             // label7
             // 
@@ -402,7 +407,7 @@ partial class SettingsUI
             this.ShowAdvancedSettings.FlatAppearance.BorderSize = 0;
             this.ShowAdvancedSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ShowAdvancedSettings.ForeColor = System.Drawing.Color.White;
-            this.ShowAdvancedSettings.Location = new System.Drawing.Point(296, 430);
+            this.ShowAdvancedSettings.Location = new System.Drawing.Point(296, 530);
             this.ShowAdvancedSettings.Name = "ShowAdvancedSettings";
             this.ShowAdvancedSettings.Size = new System.Drawing.Size(76, 19);
             this.ShowAdvancedSettings.TabIndex = 29;
@@ -437,7 +442,7 @@ partial class SettingsUI
             this.AlwaysTopMostCheck.Text = "Always display BeatRecorder on top";
             this.AlwaysTopMostCheck.UseVisualStyleBackColor = true;
             // 
-            // AutomaticRecording
+            // AutomaticRecordingCheck
             // 
             this.AutomaticRecordingCheck.AutoSize = true;
             this.AutomaticRecordingCheck.Enabled = false;
@@ -445,19 +450,49 @@ partial class SettingsUI
             this.AutomaticRecordingCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AutomaticRecordingCheck.ForeColor = System.Drawing.Color.White;
             this.AutomaticRecordingCheck.Location = new System.Drawing.Point(412, 226);
-            this.AutomaticRecordingCheck.Name = "AutomaticRecording";
+            this.AutomaticRecordingCheck.Name = "AutomaticRecordingCheck";
             this.AutomaticRecordingCheck.Size = new System.Drawing.Size(134, 19);
             this.AutomaticRecordingCheck.TabIndex = 32;
             this.AutomaticRecordingCheck.Text = "Automatically record";
             this.AutomaticRecordingCheck.UseVisualStyleBackColor = true;
             this.AutomaticRecordingCheck.Click += new System.EventHandler(this.AutomaticRecording_Click);
             // 
+            // Save
+            // 
+            this.Save.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(0)))), ((int)(((byte)(84)))));
+            this.Save.FlatAppearance.BorderSize = 0;
+            this.Save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Save.ForeColor = System.Drawing.Color.White;
+            this.Save.Location = new System.Drawing.Point(12, 522);
+            this.Save.Name = "Save";
+            this.Save.Size = new System.Drawing.Size(83, 27);
+            this.Save.TabIndex = 33;
+            this.Save.Text = "Save";
+            this.Save.UseVisualStyleBackColor = false;
+            this.Save.Click += new System.EventHandler(this.Save_Click);
+            // 
+            // Cancel
+            // 
+            this.Cancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(0)))), ((int)(((byte)(84)))));
+            this.Cancel.FlatAppearance.BorderSize = 0;
+            this.Cancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Cancel.ForeColor = System.Drawing.Color.White;
+            this.Cancel.Location = new System.Drawing.Point(101, 522);
+            this.Cancel.Name = "Cancel";
+            this.Cancel.Size = new System.Drawing.Size(83, 27);
+            this.Cancel.TabIndex = 34;
+            this.Cancel.Text = "Cancel";
+            this.Cancel.UseVisualStyleBackColor = false;
+            this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
+            // 
             // SettingsUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(23)))), ((int)(((byte)(23)))));
-            this.ClientSize = new System.Drawing.Size(784, 461);
+            this.ClientSize = new System.Drawing.Size(784, 561);
+            this.Controls.Add(this.Cancel);
+            this.Controls.Add(this.Save);
             this.Controls.Add(this.AutomaticRecordingCheck);
             this.Controls.Add(this.AlwaysTopMostCheck);
             this.Controls.Add(this.DisplayUserInterfaceCheck);
@@ -537,4 +572,6 @@ partial class SettingsUI
     private CheckBox DisplayUserInterfaceCheck;
     private CheckBox AlwaysTopMostCheck;
     private CheckBox AutomaticRecordingCheck;
+    private Button Save;
+    private Button Cancel;
 }

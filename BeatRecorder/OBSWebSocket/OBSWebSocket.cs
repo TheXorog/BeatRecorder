@@ -4,6 +4,9 @@ class OBSWebSocket
 {
     internal static async Task StartRecording()
     {
+        if (!Objects.LoadedSettings.AutomaticRecording)
+            return;
+
         if (Program.obsWebSocket.IsStarted)
         {
             if (OBSWebSocketObjects.OBSRecording)
@@ -37,6 +40,9 @@ class OBSWebSocket
 
     internal static async Task StopRecording(CancellationToken CancelToken, bool ForceStop = false)
     {
+        if (!Objects.LoadedSettings.AutomaticRecording)
+            return;
+
         if (Program.obsWebSocket.IsStarted)
         {
             if (OBSWebSocketObjects.OBSRecording)

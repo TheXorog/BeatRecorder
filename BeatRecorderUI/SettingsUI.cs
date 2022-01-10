@@ -5,6 +5,8 @@ public partial class SettingsUI : Form
 {
     bool beTopMost = false;
 
+    internal bool SettingsUpdated = false;
+
     public SettingsUI(bool topMost)
     {
         InitializeComponent();
@@ -12,11 +14,13 @@ public partial class SettingsUI : Form
         beTopMost = topMost;
     }
 
+    BeatRecorder.Objects.Settings? _loadedSettings = null;
+
     private void SettingsUI_Shown(object sender, EventArgs e)
     {
         this.TopMost = beTopMost;
 
-        this.Size = new Size(400, 500);
+        this.Size = new Size(400, 600);
 
         BeatSaberIpBox.Enabled = false;
         BeatSaberPortBox.Enabled = false;
@@ -26,9 +30,6 @@ public partial class SettingsUI : Form
 
         DisplayUserInterfaceCheck.Enabled = false;
         AutomaticRecordingCheck.Enabled = false;
-
-
-        BeatRecorder.Objects.Settings? _loadedSettings = null;
 
         if (File.Exists("Settings.json"))
             _loadedSettings = JsonConvert.DeserializeObject<BeatRecorder.Objects.Settings>(File.ReadAllText("Settings.json"));
@@ -76,7 +77,7 @@ public partial class SettingsUI : Form
 
         if (ShowAdvancedSettings.Checked)
         {
-            this.Size = new Size(800, 500);
+            this.Size = new Size(800, 600);
 
             BeatSaberIpBox.Enabled = true;
             BeatSaberPortBox.Enabled = true;
@@ -89,7 +90,7 @@ public partial class SettingsUI : Form
         }
         else
         {
-            this.Size = new Size(400, 500);
+            this.Size = new Size(400, 600);
 
             BeatSaberIpBox.Enabled = false;
             BeatSaberPortBox.Enabled = false;
@@ -111,5 +112,75 @@ public partial class SettingsUI : Form
                 AutomaticRecordingCheck.Checked = true;
             }
         }
+    }
+
+    private void ModSelectionBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (!ModSelectionBox.Items.Contains(ModSelectionBox.Text))
+        {
+            ModSelectionBox.SelectedIndex = 0;
+        }
+
+        if (ModSelectionBox.Text == "datapuller")
+            BeatSaberPortBox.Value = 2946;
+
+        if (ModSelectionBox.Text == "http-status")
+            BeatSaberPortBox.Value = 6557;
+    }
+
+    private void ModSelectionBox_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    private void ModSelectionBox_TextUpdate(object sender, EventArgs e)
+    {
+        if (!ModSelectionBox.Items.Contains(ModSelectionBox.Text))
+        {
+            ModSelectionBox.SelectedIndex = 0;
+        }
+
+        if (ModSelectionBox.Text == "datapuller")
+            BeatSaberPortBox.Value = 2946;
+
+        if (ModSelectionBox.Text == "http-status")
+            BeatSaberPortBox.Value = 6557;
+    }
+
+    private void Cancel_Click(object sender, EventArgs e)
+    {
+        this.Close();
+    }
+
+    private void Save_Click(object sender, EventArgs e)
+    {
+        if (_loadedSettings is null)
+            return;
+
+        _loadedSettings.Mod = ModSelectionBox.Text;
+        _loadedSettings.OBSPassword = OBSPasswordBox.Text;
+        _loadedSettings.AskToSaveOBSPassword = AskForPassOBSPasswordCheck.Checked;
+        _loadedSettings.FileFormat = FileFormatBox.Text;
+        _loadedSettings.StopRecordingDelay = Convert.ToInt32(StopRecordingDelay.Value);
+
+        _loadedSettings.DeleteIfShorterThan = Convert.ToInt32(DeleteIfShorterThan.Value);
+        _loadedSettings.DeleteQuit = DeleteIfQuit.Checked;
+        _loadedSettings.DeleteIfQuitAfterSoftFailed = DeleteIfQuitAfterSoftFailCheck.Checked;
+        _loadedSettings.DeleteSoftFailed = DeleteIfSoftFailedCheck.Checked;
+        _loadedSettings.DeleteFailed = DeleteIfFailedCheck.Checked;
+
+        _loadedSettings.DisplaySteamNotifications = DisplaySteamNotificationsCheck.Checked;
+        _loadedSettings.DisplayUITopmost = AlwaysTopMostCheck.Checked;
+
+        _loadedSettings.BeatSaberUrl = BeatSaberIpBox.Text;
+        _loadedSettings.BeatSaberPort = BeatSaberPortBox.Text;
+        _loadedSettings.OBSUrl = OBSIpBox.Text;
+        _loadedSettings.OBSPort = OBSPortBox.Text;
+        _loadedSettings.DisplayUI = DisplayUserInterfaceCheck.Checked;
+        _loadedSettings.AutomaticRecording = AutomaticRecordingCheck.Checked;
+
+        File.WriteAllText("Settings.json", JsonConvert.SerializeObject(_loadedSettings, Formatting.Indented));
+        SettingsUpdated = true;
+        this.Close();
     }
 }

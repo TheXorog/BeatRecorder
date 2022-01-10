@@ -165,6 +165,15 @@ internal class UIHandler
 
         infoUI.ShowDialog();
 
+        if (infoUI.SettingsUpdated)
+        {
+            LogDebug("Settings updated via UI");
+            Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+            await Task.Delay(5000);
+            Environment.Exit(0);
+            return;
+        }
+
         LogDebug("InfoUI closed");
         Environment.Exit(0);
     }
