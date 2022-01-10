@@ -20,6 +20,7 @@ global using Xorog.Logger;
 global using static Xorog.Logger.Logger;
 global using static Xorog.Logger.LoggerObjects;
 global using System.Runtime.InteropServices;
+global using BeatRecorderUI;
 
 global using BeatRecorder;
 global using Valve.VR;
