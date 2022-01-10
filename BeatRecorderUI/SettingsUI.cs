@@ -54,6 +54,10 @@ public partial class SettingsUI : Form
         DeleteIfSoftFailedCheck.Checked = _loadedSettings.DeleteSoftFailed;
         DeleteIfFailedCheck.Checked = _loadedSettings.DeleteFailed;
 
+        IngameSceneBox.Text = _loadedSettings.OBSIngameScene;
+        MenuSceneBox.Text = _loadedSettings.OBSMenuScene;
+        PauseSceneBox.Text = _loadedSettings.OBSPauseScene;
+
         DisplaySteamNotificationsCheck.Checked = _loadedSettings.DisplaySteamNotifications;
         AlwaysTopMostCheck.Checked = _loadedSettings.DisplayUITopmost;
 
@@ -176,6 +180,10 @@ public partial class SettingsUI : Form
         _loadedSettings.DeleteIfQuitAfterSoftFailed = DeleteIfQuitAfterSoftFailCheck.Checked;
         _loadedSettings.DeleteSoftFailed = DeleteIfSoftFailedCheck.Checked;
         _loadedSettings.DeleteFailed = DeleteIfFailedCheck.Checked;
+
+        _loadedSettings.OBSIngameScene = IngameSceneBox.Text;
+        _loadedSettings.OBSMenuScene = MenuSceneBox.Text;
+        _loadedSettings.OBSPauseScene = PauseSceneBox.Text;
 
         _loadedSettings.DisplaySteamNotifications = DisplaySteamNotificationsCheck.Checked;
         _loadedSettings.DisplayUITopmost = AlwaysTopMostCheck.Checked;

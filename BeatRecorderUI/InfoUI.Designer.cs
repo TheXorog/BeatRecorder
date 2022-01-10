@@ -44,6 +44,7 @@ partial class InfoUI
             this.label1 = new System.Windows.Forms.Label();
             this.ShowConsole = new System.Windows.Forms.Button();
             this.Restart = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -183,7 +184,7 @@ partial class InfoUI
             // 
             // label1
             // 
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
             this.label1.ForeColor = System.Drawing.Color.Gray;
             this.label1.Location = new System.Drawing.Point(255, 293);
             this.label1.Name = "label1";
@@ -218,12 +219,25 @@ partial class InfoUI
             this.Restart.UseVisualStyleBackColor = false;
             this.Restart.Click += new System.EventHandler(this.Restart_Click);
             // 
+            // label2
+            // 
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
+            this.label2.ForeColor = System.Drawing.Color.Gray;
+            this.label2.Location = new System.Drawing.Point(255, 262);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(371, 31);
+            this.label2.TabIndex = 16;
+            this.label2.Text = "To find out why something isn\'t working, you can check your log files. It\'s worth" +
+    " a shot.";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // InfoUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(23)))), ((int)(((byte)(23)))));
             this.ClientSize = new System.Drawing.Size(784, 321);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.Restart);
             this.Controls.Add(this.ShowConsole);
             this.Controls.Add(this.label1);
@@ -273,4 +287,5 @@ partial class InfoUI
     public Label label1;
     public Button ShowConsole;
     private Button Restart;
+    public Label label2;
 }

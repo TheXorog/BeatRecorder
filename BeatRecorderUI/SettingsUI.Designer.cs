@@ -80,7 +80,14 @@ partial class SettingsUI
             this.Cancel = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.PauseOnIngamePauseCheck = new System.Windows.Forms.CheckBox();
+            this.MenuSceneBox = new System.Windows.Forms.TextBox();
+            this.IngameSceneBox = new System.Windows.Forms.TextBox();
+            this.PauseSceneBox = new System.Windows.Forms.TextBox();
             this.EntirelyHideConsoleCheck = new System.Windows.Forms.CheckBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.BeatSaberPortBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OBSPortBox)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
@@ -554,7 +561,7 @@ partial class SettingsUI
             this.ShowAdvancedSettings.FlatAppearance.BorderSize = 0;
             this.ShowAdvancedSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ShowAdvancedSettings.ForeColor = System.Drawing.Color.White;
-            this.ShowAdvancedSettings.Location = new System.Drawing.Point(296, 580);
+            this.ShowAdvancedSettings.Location = new System.Drawing.Point(296, 656);
             this.ShowAdvancedSettings.Name = "ShowAdvancedSettings";
             this.ShowAdvancedSettings.Size = new System.Drawing.Size(76, 19);
             this.ShowAdvancedSettings.TabIndex = 29;
@@ -611,7 +618,7 @@ partial class SettingsUI
             this.Save.FlatAppearance.BorderSize = 0;
             this.Save.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Save.ForeColor = System.Drawing.Color.White;
-            this.Save.Location = new System.Drawing.Point(12, 572);
+            this.Save.Location = new System.Drawing.Point(13, 652);
             this.Save.Name = "Save";
             this.Save.Size = new System.Drawing.Size(83, 27);
             this.Save.TabIndex = 33;
@@ -625,7 +632,7 @@ partial class SettingsUI
             this.Cancel.FlatAppearance.BorderSize = 0;
             this.Cancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Cancel.ForeColor = System.Drawing.Color.White;
-            this.Cancel.Location = new System.Drawing.Point(101, 572);
+            this.Cancel.Location = new System.Drawing.Point(102, 652);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(83, 27);
             this.Cancel.TabIndex = 34;
@@ -647,6 +654,45 @@ partial class SettingsUI
             this.toolTip1.SetToolTip(this.PauseOnIngamePauseCheck, "Always display BeatRecorder in front of everything else");
             this.PauseOnIngamePauseCheck.UseVisualStyleBackColor = true;
             // 
+            // MenuSceneBox
+            // 
+            this.MenuSceneBox.BackColor = System.Drawing.Color.Black;
+            this.MenuSceneBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.MenuSceneBox.ContextMenuStrip = this.contextMenuStrip1;
+            this.MenuSceneBox.ForeColor = System.Drawing.Color.White;
+            this.MenuSceneBox.Location = new System.Drawing.Point(12, 495);
+            this.MenuSceneBox.Name = "MenuSceneBox";
+            this.MenuSceneBox.PlaceholderText = "Don\'t switch scene when going into the menu";
+            this.MenuSceneBox.Size = new System.Drawing.Size(360, 23);
+            this.MenuSceneBox.TabIndex = 37;
+            this.toolTip1.SetToolTip(this.MenuSceneBox, "The obs scene that should be displayed while in the menu");
+            // 
+            // IngameSceneBox
+            // 
+            this.IngameSceneBox.BackColor = System.Drawing.Color.Black;
+            this.IngameSceneBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.IngameSceneBox.ContextMenuStrip = this.contextMenuStrip1;
+            this.IngameSceneBox.ForeColor = System.Drawing.Color.White;
+            this.IngameSceneBox.Location = new System.Drawing.Point(12, 543);
+            this.IngameSceneBox.Name = "IngameSceneBox";
+            this.IngameSceneBox.PlaceholderText = "Don\'t switch scene when going ingame";
+            this.IngameSceneBox.Size = new System.Drawing.Size(360, 23);
+            this.IngameSceneBox.TabIndex = 39;
+            this.toolTip1.SetToolTip(this.IngameSceneBox, "The obs scene that should be displayed while in a song");
+            // 
+            // PauseSceneBox
+            // 
+            this.PauseSceneBox.BackColor = System.Drawing.Color.Black;
+            this.PauseSceneBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.PauseSceneBox.ContextMenuStrip = this.contextMenuStrip1;
+            this.PauseSceneBox.ForeColor = System.Drawing.Color.White;
+            this.PauseSceneBox.Location = new System.Drawing.Point(12, 591);
+            this.PauseSceneBox.Name = "PauseSceneBox";
+            this.PauseSceneBox.PlaceholderText = "Don\'t switch scene when pausing the game";
+            this.PauseSceneBox.Size = new System.Drawing.Size(360, 23);
+            this.PauseSceneBox.TabIndex = 41;
+            this.toolTip1.SetToolTip(this.PauseSceneBox, "The obs scene that should be displayed while in the pause menu");
+            // 
             // EntirelyHideConsoleCheck
             // 
             this.EntirelyHideConsoleCheck.AutoSize = true;
@@ -661,12 +707,63 @@ partial class SettingsUI
             this.EntirelyHideConsoleCheck.Text = "Entirely Hide Console";
             this.EntirelyHideConsoleCheck.UseVisualStyleBackColor = true;
             // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label13.ForeColor = System.Drawing.Color.White;
+            this.label13.Location = new System.Drawing.Point(12, 473);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(166, 17);
+            this.label13.TabIndex = 38;
+            this.label13.Text = "Menu Scene (exact name)";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label14.ForeColor = System.Drawing.Color.White;
+            this.label14.Location = new System.Drawing.Point(12, 521);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(177, 17);
+            this.label14.TabIndex = 40;
+            this.label14.Text = "Ingame Scene (exact name)";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label15.ForeColor = System.Drawing.Color.White;
+            this.label15.Location = new System.Drawing.Point(12, 569);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(167, 17);
+            this.label15.TabIndex = 42;
+            this.label15.Text = "Pause Scene (exact name)";
+            // 
+            // label16
+            // 
+            this.label16.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label16.ForeColor = System.Drawing.Color.Gray;
+            this.label16.Location = new System.Drawing.Point(12, 632);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(360, 17);
+            this.label16.TabIndex = 43;
+            this.label16.Text = "You can hover over items to get more details";
+            this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // SettingsUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(23)))), ((int)(((byte)(23)))));
-            this.ClientSize = new System.Drawing.Size(784, 611);
+            this.ClientSize = new System.Drawing.Size(784, 691);
+            this.Controls.Add(this.label16);
+            this.Controls.Add(this.label15);
+            this.Controls.Add(this.PauseSceneBox);
+            this.Controls.Add(this.label14);
+            this.Controls.Add(this.IngameSceneBox);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.MenuSceneBox);
             this.Controls.Add(this.EntirelyHideConsoleCheck);
             this.Controls.Add(this.PauseOnIngamePauseCheck);
             this.Controls.Add(this.Cancel);
@@ -771,4 +868,11 @@ partial class SettingsUI
     private ToolStripMenuItem maxComboToolStripMenuItem;
     private ToolStripMenuItem scoreToolStripMenuItem;
     private ToolStripMenuItem rawScoreToolStripMenuItem;
+    private TextBox MenuSceneBox;
+    private Label label13;
+    private Label label14;
+    private TextBox IngameSceneBox;
+    private Label label15;
+    private TextBox PauseSceneBox;
+    public Label label16;
 }
