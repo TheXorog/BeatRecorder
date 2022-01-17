@@ -293,7 +293,7 @@ class HttpStatus
                     {
                         if (Objects.LoadedSettings.DeleteSoftFailed)
                         {
-                            LogDebug($"[OBSC] Soft-Failed. Deletion requested.");
+                            LogDebug($"[BR] Soft-Failed. Deletion requested.");
                             DeleteFile = true;
                         }
 
@@ -306,13 +306,13 @@ class HttpStatus
                     {
                         if (Objects.LoadedSettings.DeleteQuit)
                         {
-                            LogDebug($"[OBSC] Quit. Deletion requested.");
+                            LogDebug($"[BR] Quit. Deletion requested.");
                             DeleteFile = true;
 
                             if (GeneratedAccuracy == "NF-")
                                 if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                 {
-                                    LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
+                                    LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
                                     DeleteFile = false;
                                 }
                         }
@@ -324,7 +324,7 @@ class HttpStatus
                     {
                         if (Objects.LoadedSettings.DeleteFailed)
                         {
-                            LogDebug($"[OBSC] Failed. Deletion requested.");
+                            LogDebug($"[BR] Failed. Deletion requested.");
                             DeleteFile = true;
                         }
                         else
@@ -373,7 +373,7 @@ class HttpStatus
 
             if (Objects.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
             {
-                LogDebug($"[OBSC] The recording is too short. Deletion requested.");
+                LogDebug($"[BR] The recording is too short. Deletion requested.");
                 DeleteFile = true;
             }
 
@@ -446,32 +446,32 @@ class HttpStatus
                 {
                     if (!DeleteFile)
                     {
-                        LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
+                        LogInfo($"[BR] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                         File.Move(OldFileName, NewFileName);
-                        LogInfo($"[OBSC] Successfully renamed.");
+                        LogInfo($"[BR] Successfully renamed.");
                         Program.SendNotification("Recording renamed.", 1000, Objects.MessageType.INFO);
                     }
                     else
                     {
-                        LogInfo($"[OBSC] Deleting \"{fileInfo.Name}\"..");
+                        LogInfo($"[BR] Deleting \"{fileInfo.Name}\"..");
                         File.Delete(OldFileName);
-                        LogInfo($"[OBSC] Successfully deleted.");
+                        LogInfo($"[BR] Successfully deleted.");
                         Program.SendNotification("Recording deleted.", 1000, Objects.MessageType.INFO);
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[OBSC] {ex}.");
+                    LogError($"[BR] {ex}.");
                 }
             }
             else
             {
-                LogError($"[OBSC] {OldFileName} doesn't exist.");
+                LogError($"[BR] {OldFileName} doesn't exist.");
             }
         }
         else
         {
-            LogError($"[OBSC] Last recorded file can't be renamed.");
+            LogError($"[BR] Last recorded file can't be renamed.");
         }
     }
 }

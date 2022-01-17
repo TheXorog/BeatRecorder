@@ -44,7 +44,7 @@ class DataPuller
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    LogError($"[BS-DP1] {ex}");
                     return;
                 }
             }
@@ -79,7 +79,7 @@ class DataPuller
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    LogError($"[BS-DP1] {ex}");
                     return;
                 }
             }
@@ -113,7 +113,7 @@ class DataPuller
                     }
                     catch (Exception ex)
                     {
-                        LogError($"[BS-HS] {ex}");
+                        LogError($"[BS-DP1] {ex}");
                         return;
                     }
                 }
@@ -141,7 +141,7 @@ class DataPuller
                     }
                     catch (Exception ex)
                     {
-                        LogError($"[BS-HS] {ex}");
+                        LogError($"[BS-DP1] {ex}");
                         return;
                     }
                 }
@@ -265,10 +265,10 @@ class DataPuller
     {
         if (BeatmapInfo != null)
         {
-            LogDebug($"[OBSC] BeatmapInfo: {JsonConvert.SerializeObject(BeatmapInfo)}");
-            LogDebug($"[OBSC] PerformanceInfo: {JsonConvert.SerializeObject(PerformanceInfo)}");
-            LogDebug($"[OBSC] OldFileName: {OldFileName}");
-            LogDebug($"[OBSC] HighestCombo: {HighestCombo}");
+            LogDebug($"[BR] BeatmapInfo: {JsonConvert.SerializeObject(BeatmapInfo)}");
+            LogDebug($"[BR] PerformanceInfo: {JsonConvert.SerializeObject(PerformanceInfo)}");
+            LogDebug($"[BR] OldFileName: {OldFileName}");
+            LogDebug($"[BR] HighestCombo: {HighestCombo}");
             bool DeleteFile = false;
             string NewName = Objects.LoadedSettings.FileFormat;
 
@@ -290,10 +290,10 @@ class DataPuller
 
                     if ((BeatmapInfo.LevelFailed || PerformanceInfo.PlayerHealth <= 0) && BeatmapInfo.Modifiers.noFailOn0Energy)
                     {
-                        LogDebug($"[OBSC] Soft-Failed.");
+                        LogDebug($"[BR] Soft-Failed.");
                         if (Objects.LoadedSettings.DeleteSoftFailed)
                         {
-                            LogDebug($"[OBSC] Soft-Failed. Deletion requested.");
+                            LogDebug($"[BR] Soft-Failed. Deletion requested.");
                             DeleteFile = true;
                         }
 
@@ -302,21 +302,21 @@ class DataPuller
 
                     if (BeatmapInfo.LevelFinished)
                     {
-                        LogDebug($"[OBSC] Level finished");
+                        LogDebug($"[BR] Level finished");
                         GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
                     }
                     else if (BeatmapInfo.LevelQuit)
                     {
-                        LogDebug($"[OBSC] Level quit");
+                        LogDebug($"[BR] Level quit");
                         if (Objects.LoadedSettings.DeleteQuit)
                         {
-                            LogDebug($"[OBSC] Quit. Deletion requested.");
+                            LogDebug($"[BR] Quit. Deletion requested.");
                             DeleteFile = true;
 
                             if (GeneratedAccuracy == "NF-")
                                 if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                 {
-                                    LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
+                                    LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
                                     DeleteFile = false;
                                 }
                         }
@@ -325,10 +325,10 @@ class DataPuller
                     }
                     else if (BeatmapInfo.LevelFailed && !BeatmapInfo.Modifiers.noFailOn0Energy)
                     {
-                        LogDebug($"[OBSC] Level failed.");
+                        LogDebug($"[BR] Level failed.");
                         if (Objects.LoadedSettings.DeleteFailed)
                         {
-                            LogDebug($"[OBSC] Failed. Deletion requested.");
+                            LogDebug($"[BR] Failed. Deletion requested.");
                             DeleteFile = true;
                         }
                         else
@@ -340,16 +340,16 @@ class DataPuller
                     {
                         if (!BeatmapInfo.LevelQuit && !BeatmapInfo.LevelFinished)
                         {
-                            LogDebug($"[OBSC] Level restarted");
+                            LogDebug($"[BR] Level restarted");
                             if (Objects.LoadedSettings.DeleteQuit)
                             {
-                                LogDebug($"[OBSC] Quit. Deletion requested.");
+                                LogDebug($"[BR] Quit. Deletion requested.");
                                 DeleteFile = true;
 
                                 if (GeneratedAccuracy == "NF-")
                                     if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                     {
-                                        LogDebug($"[OBSC] Soft-Failed but quit, deletion request reverted.");
+                                        LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
                                         DeleteFile = false;
                                     }
                             }
@@ -358,12 +358,12 @@ class DataPuller
                         }
                         else
                         {
-                            LogDebug($"[OBSC] Level finished?");
+                            LogDebug($"[BR] Level finished?");
                             GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
                         }
                     }
 
-                    LogDebug($"[OBSC] {GeneratedAccuracy}");
+                    LogDebug($"[BR] {GeneratedAccuracy}");
                     NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
                 }
 
@@ -404,7 +404,7 @@ class DataPuller
 
             if (Objects.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
             {
-                LogDebug($"[OBSC] The recording is too short. Deletion requested.");
+                LogDebug($"[BR] The recording is too short. Deletion requested.");
                 DeleteFile = true;
             }
 
@@ -477,32 +477,32 @@ class DataPuller
                 {
                     if (!DeleteFile)
                     {
-                        LogInfo($"[OBSC] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
+                        LogInfo($"[BR] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                         File.Move(OldFileName, NewFileName);
-                        LogInfo($"[OBSC] Successfully renamed.");
+                        LogInfo($"[BR] Successfully renamed.");
                         Program.SendNotification("Recording renamed.", 1000, Objects.MessageType.INFO);
                     }
                     else
                     {
-                        LogInfo($"[OBSC] Deleting \"{fileInfo.Name}\"..");
+                        LogInfo($"[BR] Deleting \"{fileInfo.Name}\"..");
                         File.Delete(OldFileName);
-                        LogInfo($"[OBSC] Successfully deleted.");
+                        LogInfo($"[BR] Successfully deleted.");
                         Program.SendNotification("Recording deleted.", 1000, Objects.MessageType.INFO);
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[OBSC] {ex}.");
+                    LogError($"[BR] {ex}.");
                 }
             }
             else
             {
-                LogError($"[OBSC] {OldFileName} doesn't exist.");
+                LogError($"[BR] {OldFileName} doesn't exist.");
             }
         }
         else
         {
-            LogError($"[OBSC] Last recorded file can't be renamed.");
+            LogError($"[BR] Last recorded file can't be renamed.");
         }
     }
 }
