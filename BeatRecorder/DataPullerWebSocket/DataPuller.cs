@@ -428,20 +428,32 @@ class DataPuller
 
             if (NewName.Contains("<difficulty>"))
             {
-                if (BeatmapInfo.Difficulty.ToLower() == "expertplus")
-                    NewName = NewName.Replace("<difficulty>", "Expert+");
-                else
-                    NewName = NewName.Replace("<difficulty>", BeatmapInfo.Difficulty);
+                switch (BeatmapInfo.Difficulty.ToLower())
+                {
+                    case "expertplus":
+                        NewName = NewName.Replace("<difficulty>", "Expert+");
+                        break;
+                    default:
+                        NewName = NewName.Replace("<difficulty>", BeatmapInfo.Difficulty);
+                        break;
+                }
             }
 
             if (NewName.Contains("<short-difficulty>"))
             {
-                if (BeatmapInfo.Difficulty.ToLower() == "expert")
-                    NewName = NewName.Replace("<short-difficulty>", "EX");
-                else if (BeatmapInfo.Difficulty.ToLower() == "expert+" || BeatmapInfo.Difficulty.ToLower() == "expertplus")
-                    NewName = NewName.Replace("<short-difficulty>", "EX+");
-                else
-                    NewName = NewName.Replace("<short-difficulty>", BeatmapInfo.Difficulty.Remove(1, BeatmapInfo.Difficulty.Length - 1));
+                switch (BeatmapInfo.Difficulty.ToLower())
+                {
+                    case "expert":
+                        NewName = NewName.Replace("<short-difficulty>", "EX");
+                        break;
+                    case "expert+":
+                    case "expertplus":
+                        NewName = NewName.Replace("<short-difficulty>", "EX+");
+                        break;
+                    default:
+                        NewName = NewName.Replace("<short-difficulty>", BeatmapInfo.Difficulty.Remove(1, BeatmapInfo.Difficulty.Length - 1));
+                        break;
+                }
             }
 
             if (File.Exists($"{OldFileName}"))
