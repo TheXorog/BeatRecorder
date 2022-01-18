@@ -26,7 +26,7 @@ Files are saved where-ever you set your output folder to in OBS.
 
 **If you have encountered any bugs or issues with this application, feel free to create an issue with your problem.**
 
-**If you want to get it fixed faster or it's something urgent, you can join [my Discord](https://discord.gg/gzEjZE9Mre) and hit me (`MIRA#5555`) with a ping.**
+**If you want to get it fixed faster or it's something urgent, you can join [my Discord](https://discord.gg/gzEjZE9Mre) and hit me (`Mira#2000`) with a ping.**
 
 
 ## Requirements
