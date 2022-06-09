@@ -4,6 +4,8 @@ class Program
 {
     public static string CurrentVersion = "1.6";
 
+    public static Settings LoadedSettings = new();
+
     internal static WebsocketClient beatSaberWebSocket { get; set; }
     internal static WebsocketClient beatSaberWebSocketLiveData { get; set; }
     internal static WebsocketClient obsWebSocket { get; set; }
@@ -44,12 +46,12 @@ class Program
         {
             try
             {
-                Objects.LoadedSettings = JsonConvert.DeserializeObject<Objects.Settings>(File.ReadAllText("Settings.json"));
-                File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
+                Program.LoadedSettings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("Settings.json"));
+                File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.LoadedSettings, Formatting.Indented));
 
-                ChangeLogLevel(Objects.LoadedSettings.ConsoleLogLevelEnum);
+                ChangeLogLevel(Program.LoadedSettings.ConsoleLogLevel);
 
-                if (Objects.LoadedSettings.Mod != "http-status" && Objects.LoadedSettings.Mod != "datapuller")
+                if (Program.LoadedSettings.Mod != "http-status" && Program.LoadedSettings.Mod != "datapuller")
                 {
                     throw new Exception("Invalid Mod selected.");
                 }
@@ -69,7 +71,7 @@ class Program
             return;
         }
 
-        LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented)}\n");
+        LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(Program.LoadedSettings, Formatting.Indented)}\n");
         LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
         LogDebug($"{Environment.CurrentDirectory}");
 
@@ -100,7 +102,7 @@ class Program
             }
         });
 
-        if (Objects.LoadedSettings.Mod == "datapuller")
+        if (Program.LoadedSettings.Mod == "datapuller")
         {
             // Connect to MapData Endpoint of DataPuller's WebSocket
 
@@ -114,7 +116,7 @@ class Program
                         }
                 });
 
-                beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/BSDataPuller/MapData"), factory)
+                beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedSettings.BeatSaberUrl}:{Program.LoadedSettings.BeatSaberPort}/BSDataPuller/MapData"), factory)
                 {
                     ReconnectTimeout = null,
                     ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -143,7 +145,7 @@ class Program
                                 }
                     });
 
-                    beatSaberWebSocketLiveData = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/BSDataPuller/LiveData"), factory)
+                    beatSaberWebSocketLiveData = new WebsocketClient(new Uri($"ws://{Program.LoadedSettings.BeatSaberUrl}:{Program.LoadedSettings.BeatSaberPort}/BSDataPuller/LiveData"), factory)
                     {
                         ReconnectTimeout = null,
                         ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -158,7 +160,7 @@ class Program
                     LogDebug("[BS-DP2] Connected.");
                 });
         }
-        else if (Objects.LoadedSettings.Mod == "http-status")
+        else if (Program.LoadedSettings.Mod == "http-status")
         {
             _ = Task.Run(() =>
             {
@@ -173,7 +175,7 @@ class Program
                         }
                 });
 
-                beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.BeatSaberUrl}:{Objects.LoadedSettings.BeatSaberPort}/socket"), factory)
+                beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedSettings.BeatSaberUrl}:{Program.LoadedSettings.BeatSaberPort}/socket"), factory)
                 {
                     ReconnectTimeout = null,
                     ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -199,7 +201,7 @@ class Program
                         }
             });
 
-            obsWebSocket = new WebsocketClient(new Uri($"ws://{Objects.LoadedSettings.OBSUrl}:{Objects.LoadedSettings.OBSPort}"), factory)
+            obsWebSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedSettings.OBSUrl}:{Program.LoadedSettings.OBSPort}"), factory)
             {
                 ReconnectTimeout = null,
                 ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -216,16 +218,16 @@ class Program
 
             LogInfo($"[OBS] Connected.");
 
-            SendNotification("Connected to OBS", 1000, Objects.MessageType.INFO);
+            SendNotification("Connected to OBS", 1000, MessageType.INFO);
         });
 
-        if (Objects.LoadedSettings.DisplayUI)
+        if (Program.LoadedSettings.DisplayUI)
         {
             UIHandler handler = new();
             _ = handler.HandleUI();
         }
 
-        SendNotification("Note: Using Steam Notifications is still experimental. If you run into issues, please make sure to report them on GitHub.", 20000, Objects.MessageType.ERROR);
+        SendNotification("Note: Using Steam Notifications is still experimental. If you run into issues, please make sure to report them on GitHub.", 20000, MessageType.ERROR);
 
         await Task.Delay(2000);
         NotifcationLoop();
@@ -236,7 +238,7 @@ class Program
 
     private static void ResetSettings()
     {
-        Objects.LoadedSettings = new();
+        Program.LoadedSettings = new();
 
         if (File.Exists("Settings.json"))
         {
@@ -250,26 +252,26 @@ class Program
             catch { }
         }
 
-        File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Objects.LoadedSettings, Formatting.Indented));
+        File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.LoadedSettings, Formatting.Indented));
 
-        SendNotification("Your settings were reset due to an error. Please check your desktop.", 10000, Objects.MessageType.ERROR);
+        SendNotification("Your settings were reset due to an error. Please check your desktop.", 10000, MessageType.ERROR);
         LogInfo($"Please configure BeatRecorder using the config file that was just opened. If you're done, save and quit notepad and BeatRecorder will restart for you.");
 
         Objects.SettingsRequired = true;
-        var infoUI = new InfoUI(Program.CurrentVersion, Objects.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
+        var infoUI = new InfoUI(Program.CurrentVersion, Program.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
         infoUI.ShowDialog();
         LogDebug("Settings updated via UI");
-        Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+        Process.Start(Environment.ProcessPath);
         Thread.Sleep(2000);
         Environment.Exit(0);
         return;
     }
 
-    public static Dictionary<int, Objects.NotificationEntry> NotificationList = new();
+    public static Dictionary<int, NotificationEntry> NotificationList = new();
 
     public static void NotifcationLoop()
     {
-        if (Objects.LoadedSettings.DisplaySteamNotifications)
+        if (Program.LoadedSettings.DisplaySteamNotifications)
         {
             LogFatal($"\n\nUsing Steam Notifications is still experimental. Issues might include:\n" +
                             $"- notifications not dissapearing\n" +
@@ -312,12 +314,12 @@ class Program
                         {
                             BitmapData TextureData = new();
 
-                            if (b.Value.Type == Objects.MessageType.INFO)
+                            if (b.Value.Type == MessageType.INFO)
                                 TextureData = Info_notification_bitmap.LockBits(
                                         new Rectangle(0, 0, Info_notification_bitmap.Width, Info_notification_bitmap.Height),
                                         System.Drawing.Imaging.ImageLockMode.ReadOnly,
                                         System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                            else if (b.Value.Type == Objects.MessageType.ERROR)
+                            else if (b.Value.Type == MessageType.ERROR)
                                 TextureData = Error_notification_bitmap.LockBits(
                                         new Rectangle(0, 0, Error_notification_bitmap.Width, Error_notification_bitmap.Height),
                                         System.Drawing.Imaging.ImageLockMode.ReadOnly,
@@ -331,9 +333,9 @@ class Program
                             var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, Valve.VR.EVRNotificationType.Persistent, b.Value.Message, Valve.VR.EVRNotificationStyle.Application, notification_icon);
                             LogDebug($"[BR] Displayed Notification {NotificationId}: {b.Value.Message}");
 
-                            if (b.Value.Type == Objects.MessageType.INFO)
+                            if (b.Value.Type == MessageType.INFO)
                                 Info_notification_bitmap.UnlockBits(TextureData);
-                            else if (b.Value.Type == Objects.MessageType.ERROR)
+                            else if (b.Value.Type == MessageType.ERROR)
                                 Error_notification_bitmap.UnlockBits(TextureData);
 
                             if (NotificationId == 0)
@@ -363,14 +365,14 @@ class Program
         }
     }
 
-    public static void SendNotification(string Text, int DisplayTime = 2000, Objects.MessageType messageType = Objects.MessageType.INFO)
+    public static void SendNotification(string Text, int DisplayTime = 2000, MessageType messageType = MessageType.INFO)
     {
         int A = 0;
 
         while (NotificationList.ContainsKey(A))
             A = new Random().Next();
 
-        NotificationList.Add(A, new Objects.NotificationEntry { Message = Text, Delay = DisplayTime, Type = messageType });
+        NotificationList.Add(A, new NotificationEntry { Message = Text, Delay = DisplayTime, Type = messageType });
     }
 
     [DllImport("kernel32.dll")]

@@ -17,6 +17,9 @@ global using System.Drawing;
 global using System.Drawing.Imaging;
 global using System.Windows.Forms;
 
+global using BeatRecorder.Entities;
+global using BeatRecorder.Enums;
+
 global using Xorog.Logger;
 global using static Xorog.Logger.Logger;
 global using static Xorog.Logger.LoggerObjects;

@@ -4,7 +4,7 @@ class OBSWebSocket
 {
     internal static async Task StartRecording()
     {
-        if (!Objects.LoadedSettings.AutomaticRecording)
+        if (!Program.LoadedSettings.AutomaticRecording)
             return;
 
         if (Program.obsWebSocket.IsStarted)
@@ -22,8 +22,8 @@ class OBSWebSocket
                 Thread.Sleep(20);
             }
 
-            if (Objects.LoadedSettings.MininumWaitUntilRecordingCanStart > 199 || Objects.LoadedSettings.MininumWaitUntilRecordingCanStart < 2001)
-                Thread.Sleep(Objects.LoadedSettings.MininumWaitUntilRecordingCanStart);
+            if (Program.LoadedSettings.MininumWaitUntilRecordingCanStart > 199 || Program.LoadedSettings.MininumWaitUntilRecordingCanStart < 2001)
+                Thread.Sleep(Program.LoadedSettings.MininumWaitUntilRecordingCanStart);
             else
             {
                 LogError("The MininumWaitUntilRecordingCanStart has to be between 200ms and 2000ms. Defaulting to a wait time of 800ms.");
@@ -40,7 +40,7 @@ class OBSWebSocket
 
     internal static async Task StopRecording(CancellationToken CancelToken, bool ForceStop = false)
     {
-        if (!Objects.LoadedSettings.AutomaticRecording)
+        if (!Program.LoadedSettings.AutomaticRecording)
             return;
 
         if (Program.obsWebSocket.IsStarted)
@@ -49,11 +49,11 @@ class OBSWebSocket
             {
                 if (!ForceStop)
                 {
-                    if (Objects.LoadedSettings.StopRecordingDelay > 0 && Objects.LoadedSettings.StopRecordingDelay < 21)
+                    if (Program.LoadedSettings.StopRecordingDelay > 0 && Program.LoadedSettings.StopRecordingDelay < 21)
                     {
                         try
                         {
-                            await Task.Delay(Objects.LoadedSettings.StopRecordingDelay * 1000, CancelToken);
+                            await Task.Delay(Program.LoadedSettings.StopRecordingDelay * 1000, CancelToken);
                         }
                         catch (OperationCanceledException)
                         {

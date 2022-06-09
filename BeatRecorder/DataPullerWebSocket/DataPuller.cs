@@ -39,8 +39,8 @@ class DataPuller
 
                 try
                 {
-                    if (Objects.LoadedSettings.OBSIngameScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                    if (Program.LoadedSettings.OBSIngameScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -74,8 +74,8 @@ class DataPuller
 
                 try
                 {
-                    if (Objects.LoadedSettings.OBSMenuScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                    if (Program.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -96,7 +96,7 @@ class DataPuller
 
                     try
                     {
-                        if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                        if (Program.LoadedSettings.PauseRecordingOnIngamePause)
                             if (Program.obsWebSocket.IsStarted)
                                 Program.obsWebSocket.Send($"{{\"request-type\":\"PauseRecording\", \"message-id\":\"PauseRecording\"}}");
                     }
@@ -108,8 +108,8 @@ class DataPuller
 
                     try
                     {
-                        if (Objects.LoadedSettings.OBSPauseScene != "")
-                            Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSPauseScene}\", \"message-id\":\"PauseRecording\"}}");
+                        if (Program.LoadedSettings.OBSPauseScene != "")
+                            Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSPauseScene}\", \"message-id\":\"PauseRecording\"}}");
                     }
                     catch (Exception ex)
                     {
@@ -124,7 +124,7 @@ class DataPuller
 
                     try
                     {
-                        if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                        if (Program.LoadedSettings.PauseRecordingOnIngamePause)
                             if (Program.obsWebSocket.IsStarted)
                                 Program.obsWebSocket.Send($"{{\"request-type\":\"ResumeRecording\", \"message-id\":\"ResumeRecording\"}}");
                     }
@@ -136,8 +136,8 @@ class DataPuller
 
                     try
                     {
-                        if (Objects.LoadedSettings.OBSIngameScene != "")
-                            Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                        if (Program.LoadedSettings.OBSIngameScene != "")
+                            Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
                     }
                     catch (Exception ex)
                     {
@@ -172,11 +172,11 @@ class DataPuller
 
     internal static void MapDataReconnected(ReconnectionInfo msg)
     {
-        Program.SendNotification("Connected to Beat Saber", 1000, Objects.MessageType.INFO);
+        Program.SendNotification("Connected to Beat Saber", 1000, MessageType.INFO);
         if (msg.Type != ReconnectionType.Initial)
         {
             LogWarn($"[BS-DP1] Reconnected: {msg.Type}");
-            Objects.LastDP1Warning = Objects.ConnectionTypeWarning.CONNECTED;
+            Objects.LastDP1Warning = ConnectionTypeWarning.CONNECTED;
         }
     }
 
@@ -196,12 +196,12 @@ class DataPuller
 
             if (!processCollection.Any(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")))
             {
-                if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.NO_PROCESS)
+                if (Objects.LastDP1Warning != ConnectionTypeWarning.NO_PROCESS)
                 {
                     LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
-                    Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, Objects.MessageType.ERROR);
+                    Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, MessageType.ERROR);
                 }
-                Objects.LastDP1Warning = Objects.ConnectionTypeWarning.NO_PROCESS;
+                Objects.LastDP1Warning = ConnectionTypeWarning.NO_PROCESS;
             }
             else
             {
@@ -219,31 +219,31 @@ class DataPuller
                 }
                 else
                 {
-                    if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.NOT_MODDED)
+                    if (Objects.LastDP1Warning != ConnectionTypeWarning.NOT_MODDED)
                     {
                         LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
-                        Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, Objects.MessageType.ERROR);
+                        Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, MessageType.ERROR);
                     }
-                    Objects.LastDP1Warning = Objects.ConnectionTypeWarning.NOT_MODDED;
+                    Objects.LastDP1Warning = ConnectionTypeWarning.NOT_MODDED;
                 }
 
                 if (FoundWebSocketDll)
                 {
-                    if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
+                    if (Objects.LastDP1Warning != ConnectionTypeWarning.MOD_INSTALLED)
                     {
                         LogFatal($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
-                        Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, Objects.MessageType.ERROR);
+                        Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, MessageType.ERROR);
                     }
-                    Objects.LastDP1Warning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
+                    Objects.LastDP1Warning = ConnectionTypeWarning.MOD_INSTALLED;
                 }
                 else
                 {
-                    if (Objects.LastDP1Warning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
+                    if (Objects.LastDP1Warning != ConnectionTypeWarning.MOD_NOT_INSTALLED)
                     {
                         LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
-                        Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, Objects.MessageType.ERROR);
+                        Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, MessageType.ERROR);
                     }
-                    Objects.LastDP1Warning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
+                    Objects.LastDP1Warning = ConnectionTypeWarning.MOD_NOT_INSTALLED;
                 }
             }
         }
@@ -270,7 +270,7 @@ class DataPuller
             LogDebug($"[BR] OldFileName: {OldFileName}");
             LogDebug($"[BR] HighestCombo: {HighestCombo}");
             bool DeleteFile = false;
-            string NewName = Objects.LoadedSettings.FileFormat;
+            string NewName = Program.LoadedSettings.FileFormat;
 
             if (PerformanceInfo != null)
             {
@@ -290,7 +290,7 @@ class DataPuller
                     if ((BeatmapInfo.LevelFailed || PerformanceInfo.PlayerHealth <= 0) && BeatmapInfo.Modifiers.noFailOn0Energy)
                     {
                         LogDebug($"[BR] Soft-Failed.");
-                        if (Objects.LoadedSettings.DeleteSoftFailed)
+                        if (Program.LoadedSettings.DeleteSoftFailed)
                         {
                             LogDebug($"[BR] Soft-Failed. Deletion requested.");
                             DeleteFile = true;
@@ -307,13 +307,13 @@ class DataPuller
                     else if (BeatmapInfo.LevelQuit)
                     {
                         LogDebug($"[BR] Level quit");
-                        if (Objects.LoadedSettings.DeleteQuit)
+                        if (Program.LoadedSettings.DeleteQuit)
                         {
                             LogDebug($"[BR] Quit. Deletion requested.");
                             DeleteFile = true;
 
                             if (GeneratedAccuracy == "NF-")
-                                if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
+                                if (!Program.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                 {
                                     LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
                                     DeleteFile = false;
@@ -325,7 +325,7 @@ class DataPuller
                     else if (BeatmapInfo.LevelFailed && !BeatmapInfo.Modifiers.noFailOn0Energy)
                     {
                         LogDebug($"[BR] Level failed.");
-                        if (Objects.LoadedSettings.DeleteFailed)
+                        if (Program.LoadedSettings.DeleteFailed)
                         {
                             LogDebug($"[BR] Failed. Deletion requested.");
                             DeleteFile = true;
@@ -340,13 +340,13 @@ class DataPuller
                         if (!BeatmapInfo.LevelQuit && !BeatmapInfo.LevelFinished)
                         {
                             LogDebug($"[BR] Level restarted");
-                            if (Objects.LoadedSettings.DeleteQuit)
+                            if (Program.LoadedSettings.DeleteQuit)
                             {
                                 LogDebug($"[BR] Quit. Deletion requested.");
                                 DeleteFile = true;
 
                                 if (GeneratedAccuracy == "NF-")
-                                    if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
+                                    if (!Program.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                     {
                                         LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
                                         DeleteFile = false;
@@ -401,7 +401,7 @@ class DataPuller
                     NewName = NewName.Replace("<misses>", $"0");
             }
 
-            if (Objects.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
+            if (Program.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
             {
                 LogDebug($"[BR] The recording is too short. Deletion requested.");
                 DeleteFile = true;
@@ -480,14 +480,14 @@ class DataPuller
                         LogInfo($"[BR] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                         File.Move(OldFileName, NewFileName);
                         LogInfo($"[BR] Successfully renamed.");
-                        Program.SendNotification("Recording renamed.", 1000, Objects.MessageType.INFO);
+                        Program.SendNotification("Recording renamed.", 1000, MessageType.INFO);
                     }
                     else
                     {
                         LogInfo($"[BR] Deleting \"{fileInfo.Name}\"..");
                         File.Delete(OldFileName);
                         LogInfo($"[BR] Successfully deleted.");
-                        Program.SendNotification("Recording deleted.", 1000, Objects.MessageType.INFO);
+                        Program.SendNotification("Recording deleted.", 1000, MessageType.INFO);
                     }
                 }
                 catch (Exception ex)

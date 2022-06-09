@@ -10,14 +10,14 @@ internal class UIHandler
 
         bool DisplayedUpdateNotice = false;
 
-        if (!Objects.LoadedSettings.HideConsole)
+        if (!Program.LoadedSettings.HideConsole)
             Program.ShowWindow(Program.GetConsoleWindow(), 2);
         else
             Program.ShowWindow(Program.GetConsoleWindow(), 0);
 
         LogDebug($"Displaying InfoUI");
 
-        var infoUI = new InfoUI(Program.CurrentVersion, Objects.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
+        var infoUI = new InfoUI(Program.CurrentVersion, Program.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
 
         _ = Task.Run(async () =>
         {
@@ -36,7 +36,7 @@ internal class UIHandler
 
                         MessageBox.Show($"A password is required to log into the obs websocket.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                        var infoUI2 = new InfoUI(Program.CurrentVersion, Objects.LoadedSettings.DisplayUITopmost, true);
+                        var infoUI2 = new InfoUI(Program.CurrentVersion, Program.LoadedSettings.DisplayUITopmost, true);
                         infoUI2.ShowDialog();
                         Process.Start(Environment.ProcessPath);
                         Thread.Sleep(2000);
@@ -93,7 +93,7 @@ internal class UIHandler
                     if (HttpStatusObjects.HttpStatusCurrentPerformance is null && DataPullerObjects.DataPullerCurrentBeatmap is null)
                         return;
 
-                    switch (Objects.LoadedSettings.Mod)
+                    switch (Program.LoadedSettings.Mod)
                     {
                         case "http-status":
 

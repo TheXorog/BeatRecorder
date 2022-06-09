@@ -25,8 +25,8 @@ class HttpStatus
 
                 try
                 {
-                    if (Objects.LoadedSettings.OBSMenuScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                    if (Program.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -48,8 +48,8 @@ class HttpStatus
 
                 try
                 {
-                    if (Objects.LoadedSettings.OBSIngameScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                    if (Program.LoadedSettings.OBSIngameScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -77,8 +77,8 @@ class HttpStatus
 
                 try
                 {
-                    if (Objects.LoadedSettings.OBSMenuScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                    if (Program.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -96,8 +96,8 @@ class HttpStatus
 
                 try
                 {
-                    if (Objects.LoadedSettings.OBSMenuScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                    if (Program.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -111,7 +111,7 @@ class HttpStatus
 
                 try
                 {
-                    if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                    if (Program.LoadedSettings.PauseRecordingOnIngamePause)
                         if (Program.obsWebSocket.IsStarted)
                             Program.obsWebSocket.Send($"{{\"request-type\":\"PauseRecording\", \"message-id\":\"PauseRecording\"}}");
                 }
@@ -123,8 +123,8 @@ class HttpStatus
 
                 try
                 {
-                    if (Objects.LoadedSettings.OBSPauseScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSPauseScene}\", \"message-id\":\"PauseRecording\"}}");
+                    if (Program.LoadedSettings.OBSPauseScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSPauseScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -138,7 +138,7 @@ class HttpStatus
 
                 try
                 {
-                    if (Objects.LoadedSettings.PauseRecordingOnIngamePause)
+                    if (Program.LoadedSettings.PauseRecordingOnIngamePause)
                         if (Program.obsWebSocket.IsStarted)
                             Program.obsWebSocket.Send($"{{\"request-type\":\"ResumeRecording\", \"message-id\":\"ResumeRecording\"}}");
                 }
@@ -150,8 +150,8 @@ class HttpStatus
 
                 try
                 {
-                    if (Objects.LoadedSettings.OBSIngameScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                    if (Program.LoadedSettings.OBSIngameScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -181,8 +181,8 @@ class HttpStatus
 
                 try
                 {
-                    if (Objects.LoadedSettings.OBSMenuScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Objects.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                    if (Program.LoadedSettings.OBSMenuScene != "")
+                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
                 }
                 catch (Exception ex)
                 {
@@ -202,8 +202,8 @@ class HttpStatus
         if (msg.Type != ReconnectionType.Initial)
             LogWarn($"[BS-HS] Reconnected: {msg.Type}");
 
-        Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.CONNECTED;
-        Program.SendNotification("Connected to Beat Saber", 1000, Objects.MessageType.INFO);
+        Objects.LastHttpStatusWarning = ConnectionTypeWarning.CONNECTED;
+        Program.SendNotification("Connected to Beat Saber", 1000, MessageType.INFO);
     }
 
     internal static void Disconnected(DisconnectionInfo msg)
@@ -214,12 +214,12 @@ class HttpStatus
 
             if (!processCollection.Any(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")))
             {
-                if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.NO_PROCESS)
+                if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.NO_PROCESS)
                 {
                     LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
-                    Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, Objects.MessageType.ERROR);
+                    Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, MessageType.ERROR);
                 }
-                Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.NO_PROCESS;
+                Objects.LastHttpStatusWarning = ConnectionTypeWarning.NO_PROCESS;
             }
             else
             {
@@ -237,31 +237,31 @@ class HttpStatus
                 }
                 else
                 {
-                    if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.NOT_MODDED)
+                    if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.NOT_MODDED)
                     {
                         LogFatal($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
-                        Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, Objects.MessageType.ERROR);
+                        Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, MessageType.ERROR);
                     }
-                    Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.NOT_MODDED;
+                    Objects.LastHttpStatusWarning = ConnectionTypeWarning.NOT_MODDED;
                 }
 
                 if (FoundWebSocketDll)
                 {
-                    if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.MOD_INSTALLED)
+                    if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.MOD_INSTALLED)
                     {
                         LogFatal($"[BS-HS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
-                        Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, Objects.MessageType.ERROR);
+                        Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, MessageType.ERROR);
                     }
-                    Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.MOD_INSTALLED;
+                    Objects.LastHttpStatusWarning = ConnectionTypeWarning.MOD_INSTALLED;
                 }
                 else
                 {
-                    if (Objects.LastHttpStatusWarning != Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED)
+                    if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.MOD_NOT_INSTALLED)
                     {
                         LogFatal($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
-                        Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, Objects.MessageType.ERROR);
+                        Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, MessageType.ERROR);
                     }
-                    Objects.LastHttpStatusWarning = Objects.ConnectionTypeWarning.MOD_NOT_INSTALLED;
+                    Objects.LastHttpStatusWarning = ConnectionTypeWarning.MOD_NOT_INSTALLED;
                 }
             }
         }
@@ -276,7 +276,7 @@ class HttpStatus
         if (BeatmapInfo != null)
         {
             bool DeleteFile = false;
-            string NewName = Objects.LoadedSettings.FileFormat;
+            string NewName = Program.LoadedSettings.FileFormat;
 
             if (PerformanceInfo != null)
             {
@@ -291,7 +291,7 @@ class HttpStatus
 
                     if (PerformanceInfo.softFailed)
                     {
-                        if (Objects.LoadedSettings.DeleteSoftFailed)
+                        if (Program.LoadedSettings.DeleteSoftFailed)
                         {
                             LogDebug($"[BR] Soft-Failed. Deletion requested.");
                             DeleteFile = true;
@@ -304,13 +304,13 @@ class HttpStatus
                         GeneratedAccuracy += $"{Math.Round((float)(((float)PerformanceInfo.score * (float)100) / (float)BeatmapInfo.maxScore), 2)}";
                     else
                     {
-                        if (Objects.LoadedSettings.DeleteQuit)
+                        if (Program.LoadedSettings.DeleteQuit)
                         {
                             LogDebug($"[BR] Quit. Deletion requested.");
                             DeleteFile = true;
 
                             if (GeneratedAccuracy == "NF-")
-                                if (!Objects.LoadedSettings.DeleteIfQuitAfterSoftFailed)
+                                if (!Program.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                 {
                                     LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
                                     DeleteFile = false;
@@ -322,7 +322,7 @@ class HttpStatus
 
                     if (FailedLast)
                     {
-                        if (Objects.LoadedSettings.DeleteFailed)
+                        if (Program.LoadedSettings.DeleteFailed)
                         {
                             LogDebug($"[BR] Failed. Deletion requested.");
                             DeleteFile = true;
@@ -371,7 +371,7 @@ class HttpStatus
                     NewName = NewName.Replace("<misses>", $"0");
             }
 
-            if (Objects.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
+            if (Program.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
             {
                 LogDebug($"[BR] The recording is too short. Deletion requested.");
                 DeleteFile = true;
@@ -461,14 +461,14 @@ class HttpStatus
                         LogInfo($"[BR] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                         File.Move(OldFileName, NewFileName);
                         LogInfo($"[BR] Successfully renamed.");
-                        Program.SendNotification("Recording renamed.", 1000, Objects.MessageType.INFO);
+                        Program.SendNotification("Recording renamed.", 1000, MessageType.INFO);
                     }
                     else
                     {
                         LogInfo($"[BR] Deleting \"{fileInfo.Name}\"..");
                         File.Delete(OldFileName);
                         LogInfo($"[BR] Successfully deleted.");
-                        Program.SendNotification("Recording deleted.", 1000, Objects.MessageType.INFO);
+                        Program.SendNotification("Recording deleted.", 1000, MessageType.INFO);
                     }
                 }
                 catch (Exception ex)
