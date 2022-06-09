@@ -55,6 +55,9 @@ class Program
                 {
                     throw new Exception("Invalid Mod selected.");
                 }
+
+                if (!string.IsNullOrWhiteSpace(Program.LoadedSettings.OBSPassword))
+                    AddBlacklist(Program.LoadedSettings.OBSPassword);
             }
             catch (Exception ex)
             {
