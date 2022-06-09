@@ -31,7 +31,6 @@ partial class SettingsUI
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsUI));
             this.BeatSaberIpBox = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.BeatSaberPortBox = new System.Windows.Forms.NumericUpDown();
@@ -104,15 +103,6 @@ partial class SettingsUI
             this.BeatSaberIpBox.Name = "BeatSaberIpBox";
             this.BeatSaberIpBox.Size = new System.Drawing.Size(360, 23);
             this.BeatSaberIpBox.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(38, 15);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "label1";
             // 
             // label2
             // 
@@ -781,7 +771,6 @@ partial class SettingsUI
             this.Controls.Add(this.BeatSaberPortBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.BeatSaberIpBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "SettingsUI";
@@ -803,7 +792,6 @@ partial class SettingsUI
     #endregion
 
     private TextBox BeatSaberIpBox;
-    private Label label1;
     private Label label2;
     private Label label3;
     private NumericUpDown BeatSaberPortBox;

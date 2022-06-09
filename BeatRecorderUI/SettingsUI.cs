@@ -16,7 +16,7 @@ public partial class SettingsUI : Form
         SettingsRequired = settingsRequired;
     }
 
-    BeatRecorder.Objects.Settings? _loadedSettings = null;
+    BeatRecorder.Objects.Settings _loadedSettings = null;
 
     private void SettingsUI_Shown(object sender, EventArgs e)
     {
