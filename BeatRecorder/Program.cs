@@ -74,6 +74,14 @@ class Program
             return;
         }
 
+        LogDebug($"Enviroment Details\n\n" +
+                $"Dotnet Version: {Environment.Version}\n" +
+                $"OS & Version: {Environment.OSVersion}\n\n" +
+                $"OS 64x: {Environment.Is64BitOperatingSystem}\n" +
+                $"Process 64x: {Environment.Is64BitProcess}\n\n" +
+                $"Current Directory: {Environment.CurrentDirectory}\n" +
+                $"Commandline: {Environment.CommandLine}\n");
+
         LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(Program.LoadedSettings, Formatting.Indented)}\n");
         LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
         LogDebug($"{Environment.CurrentDirectory}");
