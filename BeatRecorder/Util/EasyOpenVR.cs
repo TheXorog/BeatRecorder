@@ -10,7 +10,7 @@ public sealed class EasyOpenVRSingleton
     private EasyOpenVRSingleton() { }
 
     private bool _debug = true;
-    private Random _rnd = new Random();
+    private Random _rnd = new();
     private EVRApplicationType _appType = EVRApplicationType.VRApplication_Background;
     private Action<string> _debugLogAction = null;
 
@@ -67,14 +67,14 @@ public sealed class EasyOpenVRSingleton
     #region statistics
     public Compositor_CumulativeStats GetCumulativeStats()
     {
-        Compositor_CumulativeStats stats = new Compositor_CumulativeStats();
+        Compositor_CumulativeStats stats = new();
         OpenVR.Compositor.GetCumulativeStats(ref stats, (uint)Marshal.SizeOf(stats));
         return stats;
     }
 
     public Compositor_FrameTiming GetFrameTiming()
     {
-        Compositor_FrameTiming timing = new Compositor_FrameTiming();
+        Compositor_FrameTiming timing = new();
         timing.m_nSize = (uint)Marshal.SizeOf(timing);
         var success = OpenVR.Compositor.GetFrameTiming(ref timing, 0);
         if (!success) DebugLog("Could not get frame timing.");
@@ -102,7 +102,7 @@ public sealed class EasyOpenVRSingleton
     #region chaperone
     public HmdQuad_t GetPlayAreaRect()
     {
-        HmdQuad_t rect = new HmdQuad_t();
+        HmdQuad_t rect = new();
         var success = OpenVR.Chaperone.GetPlayAreaRect(ref rect);
         if (!success) DebugLog("Failure getting PlayAreaRect");
         return rect;
@@ -182,7 +182,7 @@ public sealed class EasyOpenVRSingleton
         */
     public VRControllerState_t GetControllerState(uint index)
     {
-        VRControllerState_t state = new VRControllerState_t();
+        VRControllerState_t state = new();
         var success = OpenVR.System.GetControllerState(index, ref state, (uint)Marshal.SizeOf(state));
         if (!success) DebugLog("Failure getting ControllerState");
         return state;
@@ -234,7 +234,7 @@ public sealed class EasyOpenVRSingleton
     public string GetStringTrackedDeviceProperty(uint index, ETrackedDeviceProperty property)
     {
         var error = new ETrackedPropertyError();
-        StringBuilder sb = new StringBuilder((int)OpenVR.k_unMaxPropertyStringSize);
+        StringBuilder sb = new((int)OpenVR.k_unMaxPropertyStringSize);
         OpenVR.System.GetStringTrackedDeviceProperty(index, property, sb, OpenVR.k_unMaxPropertyStringSize, ref error);
         DebugLog(error);
         return sb.ToString();
@@ -291,7 +291,7 @@ public sealed class EasyOpenVRSingleton
     #endregion
 
     #region events
-    private Dictionary<EVREventType, List<Action<VREvent_t>>> _events = new Dictionary<EVREventType, List<Action<VREvent_t>>>();
+    private Dictionary<EVREventType, List<Action<VREvent_t>>> _events = new();
 
     ///<summary>Register an event that should trigger an action, run UpdateEvents() to get new events.</summary>
     public void RegisterEvent(EVREventType type, Action<VREvent_t> action)
@@ -436,8 +436,8 @@ public sealed class EasyOpenVRSingleton
         public ulong sourceHandle;
     }
 
-    private List<InputAction> _inputActions = new List<InputAction>();
-    private List<VRActiveActionSet_t> _inputActionSets = new List<VRActiveActionSet_t>();
+    private List<InputAction> _inputActions = new();
+    private List<VRActiveActionSet_t> _inputActionSets = new();
 
     /**
         * Load the actions manifest to register actions for the application
@@ -774,7 +774,7 @@ public sealed class EasyOpenVRSingleton
         * pointed out what was missing in May and December 2017, yet again in January 2019 and boom, now we have it!
         */
 
-    private List<uint> _notifications = new List<uint>();
+    private List<uint> _notifications = new();
 
     /*
         * We initialize an overlay to display notifications with.
@@ -1418,7 +1418,7 @@ public sealed class EasyOpenVRSingleton
 
         public static NotificationBitmap_t NotificationBitmapFromBitmapData(BitmapData TextureData)
         {
-            NotificationBitmap_t notification_icon = new NotificationBitmap_t();
+            NotificationBitmap_t notification_icon = new();
             notification_icon.m_pImageData = TextureData.Scan0;
             notification_icon.m_nWidth = TextureData.Width;
             notification_icon.m_nHeight = TextureData.Height;

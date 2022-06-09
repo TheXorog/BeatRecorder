@@ -1,6 +1,5 @@
-﻿#pragma warning disable CS8601 // Possible null reference assignment.
+﻿namespace BeatRecorderUI;
 
-namespace BeatRecorderUI;
 public partial class SettingsUI : Form
 {
     bool beTopMost = false;

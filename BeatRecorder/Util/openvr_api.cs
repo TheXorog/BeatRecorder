@@ -2193,7 +2193,7 @@ public class CVRSystem
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			PollNextEventUnion u;
-			VREvent_t_Packed event_packed = new VREvent_t_Packed();
+			VREvent_t_Packed event_packed = new();
 			u.pPollNextEventPacked = null;
 			u.pPollNextEvent = FnTable.PollNextEvent;
 			bool packed_result = u.pPollNextEventPacked(ref event_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VREvent_t_Packed)));
@@ -2239,7 +2239,7 @@ public class CVRSystem
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			GetControllerStateUnion u;
-			VRControllerState_t_Packed state_packed = new VRControllerState_t_Packed(pControllerState);
+			VRControllerState_t_Packed state_packed = new(pControllerState);
 			u.pGetControllerStatePacked = null;
 			u.pGetControllerState = FnTable.GetControllerState;
 			bool packed_result = u.pGetControllerStatePacked(unControllerDeviceIndex,ref state_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VRControllerState_t_Packed)));
@@ -2270,7 +2270,7 @@ public class CVRSystem
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			GetControllerStateWithPoseUnion u;
-			VRControllerState_t_Packed state_packed = new VRControllerState_t_Packed(pControllerState);
+			VRControllerState_t_Packed state_packed = new(pControllerState);
 			u.pGetControllerStateWithPosePacked = null;
 			u.pGetControllerStateWithPose = FnTable.GetControllerStateWithPose;
 			bool packed_result = u.pGetControllerStateWithPosePacked(eOrigin,unControllerDeviceIndex,ref state_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VRControllerState_t_Packed)),ref pTrackedDevicePose);
@@ -3359,7 +3359,7 @@ public class CVROverlay
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			PollNextOverlayEventUnion u;
-			VREvent_t_Packed event_packed = new VREvent_t_Packed();
+			VREvent_t_Packed event_packed = new();
 			u.pPollNextOverlayEventPacked = null;
 			u.pPollNextOverlayEvent = FnTable.PollNextOverlayEvent;
 			bool packed_result = u.pPollNextOverlayEventPacked(ulOverlayHandle,ref event_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VREvent_t_Packed)));
@@ -3765,7 +3765,7 @@ public class CVRRenderModels
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			GetComponentStateUnion u;
-			VRControllerState_t_Packed state_packed = new VRControllerState_t_Packed(pControllerState);
+			VRControllerState_t_Packed state_packed = new(pControllerState);
 			u.pGetComponentStatePacked = null;
 			u.pGetComponentState = FnTable.GetComponentState;
 			bool packed_result = u.pGetComponentStatePacked(pchRenderModelNameUtf8,pchComponentNameUtf8,ref state_packed,ref pState,ref pComponentState);
@@ -7475,7 +7475,7 @@ public class OpenVR
 		{
 			uint pathSize = 512;
 			uint requiredPathSize = 512;
-			System.Text.StringBuilder path = new System.Text.StringBuilder((int)pathSize);
+			System.Text.StringBuilder path = new((int)pathSize);
 			bool success = OpenVRInterop.GetRuntimePath(path, pathSize, ref requiredPathSize);
 			if (success == false)
 			{

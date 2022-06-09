@@ -24,7 +24,7 @@ internal class UIHandler
             string lastCover = "";
             Image coverArt = null;
 
-            Action UpdateUI = new Action(() =>
+            Action UpdateUI = new(() =>
             {
                 try
                 {
@@ -38,7 +38,7 @@ internal class UIHandler
 
                         var infoUI2 = new InfoUI(Program.CurrentVersion, Objects.LoadedSettings.DisplayUITopmost, true);
                         infoUI2.ShowDialog();
-                        Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+                        Process.Start(Environment.ProcessPath);
                         Thread.Sleep(2000);
                         Environment.Exit(0);
                         return;
@@ -116,10 +116,12 @@ internal class UIHandler
                                     lastCover = HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover;
 
                                     byte[] byteBuffer = Convert.FromBase64String(HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover);
-                                    MemoryStream memoryStream = new MemoryStream(byteBuffer);
-                                    memoryStream.Position = 0;
+                                    MemoryStream memoryStream = new(byteBuffer)
+                                    {
+                                        Position = 0
+                                    };
 
-                                    Bitmap bmpReturn = (Bitmap)Bitmap.FromStream(memoryStream);
+                                        Bitmap bmpReturn = (Bitmap)Bitmap.FromStream(memoryStream);
                                     coverArt = bmpReturn;
                                 }
                             }
@@ -127,7 +129,7 @@ internal class UIHandler
                             {
                                 if (lastCover != "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg")
                                 {
-                                    Stopwatch sc = new Stopwatch();
+                                    Stopwatch sc = new();
                                     sc.Start();
 
                                     LogWarn($"Failed to get cover art from song.");
@@ -176,17 +178,17 @@ internal class UIHandler
                             {
                                 if (lastCover != DataPullerObjects.DataPullerCurrentBeatmap?.coverImage?.ToString())
                                 {
-                                    Stopwatch sc = new Stopwatch();
+                                    Stopwatch sc = new();
                                     sc.Start();
 
-                                    LogDebug($"Downloading cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()}'..");
+                                    LogDebug($"Downloading cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage}'..");
 
                                     lastCover = DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString();
 
                                     new HttpClient().GetStreamAsync(DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()).ContinueWith(t =>
                                     {
                                         coverArt = Bitmap.FromStream(t.Result);
-                                        LogDebug($"Downloaded cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()}' in {sc.ElapsedMilliseconds}ms");
+                                        LogDebug($"Downloaded cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage}' in {sc.ElapsedMilliseconds}ms");
 
                                         sc.Stop();
                                     });
@@ -198,7 +200,7 @@ internal class UIHandler
 
                                 if (lastCover != "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg")
                                 {
-                                    Stopwatch sc = new Stopwatch();
+                                    Stopwatch sc = new();
                                     sc.Start();
 
                                     LogWarn($"Failed to get cover art from song.");
@@ -277,7 +279,7 @@ internal class UIHandler
         if (infoUI.SettingsUpdated)
         {
             LogDebug("Settings updated via UI");
-            Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+            Process.Start(Environment.ProcessPath);
             await Task.Delay(5000);
             Environment.Exit(0);
             return;

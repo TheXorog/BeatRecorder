@@ -10,7 +10,7 @@ class Program
 
     static void Main(string[] args)
     {
-        Program program = new Program();
+        Program program = new();
 
         program.MainAsync(args).GetAwaiter().GetResult();
     }

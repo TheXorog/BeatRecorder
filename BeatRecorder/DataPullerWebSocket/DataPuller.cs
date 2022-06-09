@@ -4,7 +4,7 @@ class DataPuller
 {
     internal static void MapDataMessageRecieved(string e)
     {
-        DataPullerObjects.DataPullerMain _status = new DataPullerObjects.DataPullerMain();
+        DataPullerObjects.DataPullerMain _status = new();
 
         try
         {
@@ -151,7 +151,7 @@ class DataPuller
 
     internal static void LiveDataMessageRecieved(string e)
     {
-        DataPullerObjects.DataPullerData _status = new DataPullerObjects.DataPullerData();
+        DataPullerObjects.DataPullerData _status = new();
 
         try
         {
@@ -461,7 +461,7 @@ class DataPuller
 
                 string FileExist = "";
 
-                FileInfo fileInfo = new FileInfo(OldFileName);
+                FileInfo fileInfo = new(OldFileName);
 
                 while (File.Exists($"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}"))
                 {

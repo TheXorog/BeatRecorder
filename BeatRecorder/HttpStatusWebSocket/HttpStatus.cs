@@ -4,7 +4,7 @@ class HttpStatus
 {
     internal static void MessageReceived(string e)
     {
-        HttpStatusObjects.BeatSaberEvent _status = new HttpStatusObjects.BeatSaberEvent();
+        HttpStatusObjects.BeatSaberEvent _status = new();
 
         try
         {
@@ -430,7 +430,7 @@ class HttpStatus
 
                 string FileExist = "";
 
-                FileInfo fileInfo = new FileInfo(OldFileName);
+                FileInfo fileInfo = new(OldFileName);
 
                 while (File.Exists($"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}"))
                 {
