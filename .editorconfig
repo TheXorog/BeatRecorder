@@ -8,3 +8,6 @@ dotnet_diagnostic.IDE1006.severity = silent
 
 # IDE0047: Remove unnecessary parentheses
 dotnet_diagnostic.IDE0047.severity = silent
+
+# IDE0078: Use pattern matching
+dotnet_diagnostic.IDE0078.severity = silent
