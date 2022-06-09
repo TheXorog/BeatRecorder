@@ -90,32 +90,32 @@ internal class UIHandler
                     if (!Program.beatSaberWebSocket.IsRunning)
                         return;
 
-                    if (HttpStatusObjects.HttpStatusCurrentPerformance is null && DataPullerObjects.DataPullerCurrentBeatmap is null)
+                    if (HttpStatusStatus.HttpStatusCurrentPerformance is null && DataPullerStatus.DataPullerCurrentBeatmap is null)
                         return;
 
                     switch (Program.LoadedSettings.Mod)
                     {
                         case "http-status":
 
-                        if (HttpStatusObjects.HttpStatusCurrentBeatmap != null)
+                        if (HttpStatusStatus.HttpStatusCurrentBeatmap != null)
                         {
-                            infoUI.SongNameLabel.Text = $"{HttpStatusObjects.HttpStatusCurrentBeatmap.songName}{(HttpStatusObjects.HttpStatusCurrentBeatmap.songSubName != "" ? $" {HttpStatusObjects.HttpStatusCurrentBeatmap.songSubName}" : "")}";
-                            infoUI.SongAuthorLabel.Text = HttpStatusObjects.HttpStatusCurrentBeatmap.songAuthorName;
+                            infoUI.SongNameLabel.Text = $"{HttpStatusStatus.HttpStatusCurrentBeatmap.songName}{(HttpStatusStatus.HttpStatusCurrentBeatmap.songSubName != "" ? $" {HttpStatusStatus.HttpStatusCurrentBeatmap.songSubName}" : "")}";
+                            infoUI.SongAuthorLabel.Text = HttpStatusStatus.HttpStatusCurrentBeatmap.songAuthorName;
                             infoUI.SongAuthorLabel.Location = new Point(infoUI.SongNameLabel.Location.X, infoUI.SongNameLabel.Location.Y + infoUI.SongNameLabel.Height);
                             infoUI.BSRLabel.Text = $"";
                             infoUI.MapperLabel.Text = $"";
 
-                            infoUI.ProgressLabel.Text = $"{TimeSpan.FromSeconds(OBSWebSocketObjects.RecordingSeconds).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}/{TimeSpan.FromSeconds(HttpStatusObjects.HttpStatusCurrentBeatmap.length / 1000).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}";
+                            infoUI.ProgressLabel.Text = $"{TimeSpan.FromSeconds(OBSWebSocketObjects.RecordingSeconds).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}/{TimeSpan.FromSeconds(HttpStatusStatus.HttpStatusCurrentBeatmap.length / 1000).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}";
 
-                            if (HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover != null)
+                            if (HttpStatusStatus.HttpStatusCurrentBeatmap?.songCover != null)
                             {
-                                if (lastCover != HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover)
+                                if (lastCover != HttpStatusStatus.HttpStatusCurrentBeatmap?.songCover)
                                 {
                                     LogDebug($"Generating cover art from base64 string..");
 
-                                    lastCover = HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover;
+                                    lastCover = HttpStatusStatus.HttpStatusCurrentBeatmap?.songCover;
 
-                                    byte[] byteBuffer = Convert.FromBase64String(HttpStatusObjects.HttpStatusCurrentBeatmap?.songCover);
+                                    byte[] byteBuffer = Convert.FromBase64String(HttpStatusStatus.HttpStatusCurrentBeatmap?.songCover);
                                     MemoryStream memoryStream = new(byteBuffer)
                                     {
                                         Position = 0
@@ -149,12 +149,12 @@ internal class UIHandler
                             }
                         }
 
-                        if (HttpStatusObjects.HttpStatusCurrentPerformance != null)
+                        if (HttpStatusStatus.HttpStatusCurrentPerformance != null)
                         {
-                            infoUI.ScoreLabel.Text = String.Format("{0:n0}", HttpStatusObjects.HttpStatusCurrentPerformance.score);
-                            infoUI.ComboLabel.Text = $"{HttpStatusObjects.HttpStatusCurrentPerformance?.combo}x";
-                            infoUI.AccuracyLabel.Text = $"{Math.Round((decimal)((decimal)((decimal)HttpStatusObjects.HttpStatusCurrentPerformance.score / (decimal)HttpStatusObjects.HttpStatusCurrentPerformance.currentMaxScore) * 100), 2)}%";
-                            infoUI.MissesLabel.Text = $"{HttpStatusObjects.HttpStatusCurrentPerformance.missedNotes} Misses";
+                            infoUI.ScoreLabel.Text = String.Format("{0:n0}", HttpStatusStatus.HttpStatusCurrentPerformance.score);
+                            infoUI.ComboLabel.Text = $"{HttpStatusStatus.HttpStatusCurrentPerformance?.combo}x";
+                            infoUI.AccuracyLabel.Text = $"{Math.Round((decimal)((decimal)((decimal)HttpStatusStatus.HttpStatusCurrentPerformance.score / (decimal)HttpStatusStatus.HttpStatusCurrentPerformance.currentMaxScore) * 100), 2)}%";
+                            infoUI.MissesLabel.Text = $"{HttpStatusStatus.HttpStatusCurrentPerformance.missedNotes} Misses";
 
                             if (coverArt != null && infoUI.pictureBox1.Image != coverArt)
                             {
@@ -166,29 +166,29 @@ internal class UIHandler
 
                         case "datapuller":
 
-                        if (DataPullerObjects.DataPullerCurrentBeatmap != null)
+                        if (DataPullerStatus.DataPullerCurrentBeatmap != null)
                         {
-                            infoUI.SongNameLabel.Text = $"{DataPullerObjects.DataPullerCurrentBeatmap.SongName}{(DataPullerObjects.DataPullerCurrentBeatmap.SongSubName != "" ? $" {DataPullerObjects.DataPullerCurrentBeatmap.SongSubName}" : "")}";
-                            infoUI.SongAuthorLabel.Text = DataPullerObjects.DataPullerCurrentBeatmap.SongAuthor;
+                            infoUI.SongNameLabel.Text = $"{DataPullerStatus.DataPullerCurrentBeatmap.SongName}{(DataPullerStatus.DataPullerCurrentBeatmap.SongSubName != "" ? $" {DataPullerStatus.DataPullerCurrentBeatmap.SongSubName}" : "")}";
+                            infoUI.SongAuthorLabel.Text = DataPullerStatus.DataPullerCurrentBeatmap.SongAuthor;
                             infoUI.SongAuthorLabel.Location = new Point(infoUI.SongNameLabel.Location.X, infoUI.SongNameLabel.Location.Y + infoUI.SongNameLabel.Height);
-                            infoUI.BSRLabel.Text = $"BSR: {DataPullerObjects.DataPullerCurrentBeatmap.BSRKey?.ToString().TrimEnd()}";
-                            infoUI.MapperLabel.Text = $"Mapper: {DataPullerObjects.DataPullerCurrentBeatmap.Mapper}";
+                            infoUI.BSRLabel.Text = $"BSR: {DataPullerStatus.DataPullerCurrentBeatmap.BSRKey?.ToString().TrimEnd()}";
+                            infoUI.MapperLabel.Text = $"Mapper: {DataPullerStatus.DataPullerCurrentBeatmap.Mapper}";
 
-                            if (DataPullerObjects.DataPullerCurrentBeatmap?.coverImage != null)
+                            if (DataPullerStatus.DataPullerCurrentBeatmap?.coverImage != null)
                             {
-                                if (lastCover != DataPullerObjects.DataPullerCurrentBeatmap?.coverImage?.ToString())
+                                if (lastCover != DataPullerStatus.DataPullerCurrentBeatmap?.coverImage?.ToString())
                                 {
                                     Stopwatch sc = new();
                                     sc.Start();
 
-                                    LogDebug($"Downloading cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage}'..");
+                                    LogDebug($"Downloading cover art from '{DataPullerStatus.DataPullerCurrentBeatmap.coverImage}'..");
 
-                                    lastCover = DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString();
+                                    lastCover = DataPullerStatus.DataPullerCurrentBeatmap.coverImage.ToString();
 
-                                    new HttpClient().GetStreamAsync(DataPullerObjects.DataPullerCurrentBeatmap.coverImage.ToString()).ContinueWith(t =>
+                                    new HttpClient().GetStreamAsync(DataPullerStatus.DataPullerCurrentBeatmap.coverImage.ToString()).ContinueWith(t =>
                                     {
                                         coverArt = Bitmap.FromStream(t.Result);
-                                        LogDebug($"Downloaded cover art from '{DataPullerObjects.DataPullerCurrentBeatmap.coverImage}' in {sc.ElapsedMilliseconds}ms");
+                                        LogDebug($"Downloaded cover art from '{DataPullerStatus.DataPullerCurrentBeatmap.coverImage}' in {sc.ElapsedMilliseconds}ms");
 
                                         sc.Stop();
                                     });
@@ -220,14 +220,14 @@ internal class UIHandler
                             }
                         }
 
-                        if (DataPullerObjects.DataPullerCurrentPerformance != null)
+                        if (DataPullerStatus.DataPullerCurrentPerformance != null)
                         {
-                            infoUI.ScoreLabel.Text = String.Format("{0:n0}", DataPullerObjects.DataPullerCurrentPerformance.Score);
-                            infoUI.ComboLabel.Text = $"{DataPullerObjects.DataPullerCurrentPerformance?.Combo}x";
-                            infoUI.AccuracyLabel.Text = $"{Math.Round((decimal)DataPullerObjects.DataPullerCurrentPerformance.Accuracy, 2)}%";
-                            infoUI.MissesLabel.Text = $"{DataPullerObjects.DataPullerCurrentPerformance.Misses} Misses";
+                            infoUI.ScoreLabel.Text = String.Format("{0:n0}", DataPullerStatus.DataPullerCurrentPerformance.Score);
+                            infoUI.ComboLabel.Text = $"{DataPullerStatus.DataPullerCurrentPerformance?.Combo}x";
+                            infoUI.AccuracyLabel.Text = $"{Math.Round((decimal)DataPullerStatus.DataPullerCurrentPerformance.Accuracy, 2)}%";
+                            infoUI.MissesLabel.Text = $"{DataPullerStatus.DataPullerCurrentPerformance.Misses} Misses";
 
-                            infoUI.ProgressLabel.Text = $"{TimeSpan.FromSeconds(DataPullerObjects.DataPullerCurrentPerformance.TimeElapsed).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}/{TimeSpan.FromSeconds(DataPullerObjects.DataPullerCurrentBeatmap.Length).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}";
+                            infoUI.ProgressLabel.Text = $"{TimeSpan.FromSeconds(DataPullerStatus.DataPullerCurrentPerformance.TimeElapsed).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}/{TimeSpan.FromSeconds(DataPullerStatus.DataPullerCurrentBeatmap.Length).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}";
 
                             if (coverArt != null && infoUI.pictureBox1.Image != coverArt)
                             {

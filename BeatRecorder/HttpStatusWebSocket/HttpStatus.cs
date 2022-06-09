@@ -4,11 +4,11 @@ class HttpStatus
 {
     internal static void MessageReceived(string e)
     {
-        HttpStatusObjects.BeatSaberEvent _status;
+        HttpStatusStatus.BeatSaberEvent _status;
 
         try
         {
-            _status = JsonConvert.DeserializeObject<HttpStatusObjects.BeatSaberEvent>(e);
+            _status = JsonConvert.DeserializeObject<HttpStatusStatus.BeatSaberEvent>(e);
         }
         catch (Exception ex)
         {
@@ -20,8 +20,8 @@ class HttpStatus
         {
             case "hello":
 
-                try { HttpStatusObjects.HttpStatusCurrentBeatmap = _status.status.beatmap; } catch { }
-                try { HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance; } catch { }
+                try { HttpStatusStatus.HttpStatusCurrentBeatmap = _status.status.beatmap; } catch { }
+                try { HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance; } catch { }
 
                 try
                 {
@@ -41,10 +41,10 @@ class HttpStatus
                 LogDebug("[BS-HS] Song started.");
                 LogInfo($"[BS-HS] Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
 
-                HttpStatusObjects.FailedCurrentSong = false;
-                HttpStatusObjects.FinishedCurrentSong = false;
-                HttpStatusObjects.HttpStatusCurrentBeatmap = _status.status.beatmap;
-                HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
+                HttpStatusStatus.FailedCurrentSong = false;
+                HttpStatusStatus.FinishedCurrentSong = false;
+                HttpStatusStatus.HttpStatusCurrentBeatmap = _status.status.beatmap;
+                HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
 
                 try
                 {
@@ -71,9 +71,9 @@ class HttpStatus
             case "finished":
                 LogInfo("[BS-HS] Song finished.");
 
-                HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
-                HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
-                HttpStatusObjects.FinishedCurrentSong = true;
+                HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
+                HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
+                HttpStatusStatus.FinishedCurrentSong = true;
 
                 try
                 {
@@ -90,9 +90,9 @@ class HttpStatus
             case "failed":
                 LogInfo("[BS-HS] Song failed.");
 
-                HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
-                HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
-                HttpStatusObjects.FailedCurrentSong = true;
+                HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
+                HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
+                HttpStatusStatus.FailedCurrentSong = true;
 
                 try
                 {
@@ -166,11 +166,11 @@ class HttpStatus
 
                 try
                 {
-                    HttpStatusObjects.HttpStatusLastPerformance = HttpStatusObjects.HttpStatusCurrentPerformance;
-                    HttpStatusObjects.HttpStatusLastBeatmap = HttpStatusObjects.HttpStatusCurrentBeatmap;
+                    HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
+                    HttpStatusStatus.HttpStatusLastBeatmap = HttpStatusStatus.HttpStatusCurrentBeatmap;
 
-                    HttpStatusObjects.FinishedLastSong = HttpStatusObjects.FinishedCurrentSong;
-                    HttpStatusObjects.FailedLastSong = HttpStatusObjects.FailedCurrentSong;
+                    HttpStatusStatus.FinishedLastSong = HttpStatusStatus.FinishedCurrentSong;
+                    HttpStatusStatus.FailedLastSong = HttpStatusStatus.FailedCurrentSong;
                     _ = OBSWebSocket.StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token);
                 }
                 catch (Exception ex)
@@ -192,7 +192,7 @@ class HttpStatus
                 break;
 
             case "scoreChanged":
-                HttpStatusObjects.HttpStatusCurrentPerformance = _status.status.performance;
+                HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
                 break;
         }
     }
@@ -271,7 +271,7 @@ class HttpStatus
         }
     }
 
-    internal static void HandleFile(HttpStatusObjects.Beatmap BeatmapInfo, HttpStatusObjects.Performance PerformanceInfo, string OldFileName, bool FinishedLast, bool FailedLast)
+    internal static void HandleFile(HttpStatusStatus.Beatmap BeatmapInfo, HttpStatusStatus.Performance PerformanceInfo, string OldFileName, bool FinishedLast, bool FailedLast)
     {
         if (BeatmapInfo != null)
         {

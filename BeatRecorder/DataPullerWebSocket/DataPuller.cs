@@ -4,11 +4,11 @@ class DataPuller
 {
     internal static void MapDataMessageRecieved(string e)
     {
-        DataPullerObjects.DataPullerMain _status;
+        DataPullerStatus.DataPullerMain _status;
 
         try
         {
-            _status = JsonConvert.DeserializeObject<DataPullerObjects.DataPullerMain>(e);
+            _status = JsonConvert.DeserializeObject<DataPullerStatus.DataPullerMain>(e);
         }
         catch (Exception ex)
         {
@@ -16,19 +16,19 @@ class DataPuller
             return;
         }
 
-        if (DataPullerObjects.DataPullerInLevel != _status.InLevel)
+        if (DataPullerStatus.DataPullerInLevel != _status.InLevel)
         {
-            if (!DataPullerObjects.DataPullerInLevel && _status.InLevel)
+            if (!DataPullerStatus.DataPullerInLevel && _status.InLevel)
             {
-                DataPullerObjects.DataPullerInLevel = true;
+                DataPullerStatus.DataPullerInLevel = true;
                 LogDebug("[BS-DP1] Song started.");
                 LogInfo($"[BS-DP1] Started playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
-                DataPullerObjects.DataPullerCurrentBeatmap = _status;
+                DataPullerStatus.DataPullerCurrentBeatmap = _status;
 
                 try
                 {
-                    DataPullerObjects.CurrentSongCombo = 0;
+                    DataPullerStatus.CurrentSongCombo = 0;
                     _ = OBSWebSocket.StartRecording();
                 }
                 catch (Exception ex)
@@ -48,21 +48,21 @@ class DataPuller
                     return;
                 }
             }
-            else if (DataPullerObjects.DataPullerInLevel && !_status.InLevel)
+            else if (DataPullerStatus.DataPullerInLevel && !_status.InLevel)
             {
                 Thread.Sleep(500);
-                DataPullerObjects.DataPullerInLevel = false;
-                DataPullerObjects.DataPullerPaused = false;
+                DataPullerStatus.DataPullerInLevel = false;
+                DataPullerStatus.DataPullerPaused = false;
                 LogDebug("[BS-DP1] Menu entered.");
                 LogInfo($"[BS-DP1] Stopped playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
                 try
                 {
-                    DataPullerObjects.DataPullerCurrentBeatmap = _status;
+                    DataPullerStatus.DataPullerCurrentBeatmap = _status;
 
-                    DataPullerObjects.DataPullerLastPerformance = DataPullerObjects.DataPullerCurrentPerformance;
-                    DataPullerObjects.DataPullerLastBeatmap = DataPullerObjects.DataPullerCurrentBeatmap;
-                    DataPullerObjects.LastSongCombo = DataPullerObjects.CurrentSongCombo;
+                    DataPullerStatus.DataPullerLastPerformance = DataPullerStatus.DataPullerCurrentPerformance;
+                    DataPullerStatus.DataPullerLastBeatmap = DataPullerStatus.DataPullerCurrentBeatmap;
+                    DataPullerStatus.LastSongCombo = DataPullerStatus.CurrentSongCombo;
 
                     _ = OBSWebSocket.StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token);
                 }
@@ -87,11 +87,11 @@ class DataPuller
 
         if (_status.InLevel)
         {
-            if (DataPullerObjects.DataPullerPaused != _status.LevelPaused)
+            if (DataPullerStatus.DataPullerPaused != _status.LevelPaused)
             {
-                if (!DataPullerObjects.DataPullerPaused && _status.LevelPaused)
+                if (!DataPullerStatus.DataPullerPaused && _status.LevelPaused)
                 {
-                    DataPullerObjects.DataPullerPaused = true;
+                    DataPullerStatus.DataPullerPaused = true;
                     LogInfo("[BS-DP1] Song paused.");
 
                     try
@@ -117,9 +117,9 @@ class DataPuller
                         return;
                     }
                 }
-                else if (DataPullerObjects.DataPullerPaused && !_status.LevelPaused)
+                else if (DataPullerStatus.DataPullerPaused && !_status.LevelPaused)
                 {
-                    DataPullerObjects.DataPullerPaused = false;
+                    DataPullerStatus.DataPullerPaused = false;
                     LogInfo("[BS-DP1] Song resumed.");
 
                     try
@@ -151,11 +151,11 @@ class DataPuller
 
     internal static void LiveDataMessageRecieved(string e)
     {
-        DataPullerObjects.DataPullerData _status;
+        DataPullerStatus.DataPullerData _status;
 
         try
         {
-            _status = JsonConvert.DeserializeObject<DataPullerObjects.DataPullerData>(e);
+            _status = JsonConvert.DeserializeObject<DataPullerStatus.DataPullerData>(e);
         }
         catch (Exception ex)
         {
@@ -163,11 +163,11 @@ class DataPuller
             return;
         }
 
-        if (DataPullerObjects.DataPullerInLevel)
-            DataPullerObjects.DataPullerCurrentPerformance = _status;
+        if (DataPullerStatus.DataPullerInLevel)
+            DataPullerStatus.DataPullerCurrentPerformance = _status;
 
-        if (DataPullerObjects.CurrentSongCombo < _status.Combo)
-            DataPullerObjects.CurrentSongCombo = _status.Combo;
+        if (DataPullerStatus.CurrentSongCombo < _status.Combo)
+            DataPullerStatus.CurrentSongCombo = _status.Combo;
     }
 
     internal static void MapDataReconnected(ReconnectionInfo msg)
@@ -261,7 +261,7 @@ class DataPuller
             LogDebug($"[BS-DP2] Disconnected: {msg.Type}");
     }
 
-    internal static void HandleFile(DataPullerObjects.DataPullerMain BeatmapInfo, DataPullerObjects.DataPullerData PerformanceInfo, string OldFileName, int HighestCombo)
+    internal static void HandleFile(DataPullerStatus.DataPullerMain BeatmapInfo, DataPullerStatus.DataPullerData PerformanceInfo, string OldFileName, int HighestCombo)
     {
         if (BeatmapInfo != null)
         {

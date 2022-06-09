@@ -1,11 +1,12 @@
-﻿namespace BeatRecorder;
-class DataPullerObjects
-{
-    internal static DataPullerObjects.DataPullerData DataPullerLastPerformance { get; set; }
-    internal static DataPullerObjects.DataPullerMain DataPullerLastBeatmap { get; set; }
+﻿namespace BeatRecorder.Entities;
 
-    internal static DataPullerObjects.DataPullerData DataPullerCurrentPerformance { get; set; }
-    internal static DataPullerObjects.DataPullerMain DataPullerCurrentBeatmap { get; set; }
+class DataPullerStatus
+{
+    internal static DataPullerStatus.DataPullerData DataPullerLastPerformance { get; set; }
+    internal static DataPullerStatus.DataPullerMain DataPullerLastBeatmap { get; set; }
+
+    internal static DataPullerStatus.DataPullerData DataPullerCurrentPerformance { get; set; }
+    internal static DataPullerStatus.DataPullerMain DataPullerCurrentBeatmap { get; set; }
 
 
 

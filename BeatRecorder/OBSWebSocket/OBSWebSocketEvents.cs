@@ -162,9 +162,9 @@ class OBSWebSocketEvents
             OBSWebSocketObjects.OBSRecording = false;
 
             if (Program.LoadedSettings.Mod == "http-status")
-                HttpStatus.HandleFile(HttpStatusObjects.HttpStatusLastBeatmap, HttpStatusObjects.HttpStatusLastPerformance, RecordingStopped.recordingFilename, HttpStatusObjects.FinishedLastSong, HttpStatusObjects.FailedLastSong);
+                HttpStatus.HandleFile(HttpStatusStatus.HttpStatusLastBeatmap, HttpStatusStatus.HttpStatusLastPerformance, RecordingStopped.recordingFilename, HttpStatusStatus.FinishedLastSong, HttpStatusStatus.FailedLastSong);
             else if (Program.LoadedSettings.Mod == "datapuller")
-                DataPuller.HandleFile(DataPullerObjects.DataPullerLastBeatmap, DataPullerObjects.DataPullerLastPerformance, RecordingStopped.recordingFilename, DataPullerObjects.LastSongCombo);
+                DataPuller.HandleFile(DataPullerStatus.DataPullerLastBeatmap, DataPullerStatus.DataPullerLastPerformance, RecordingStopped.recordingFilename, DataPullerStatus.LastSongCombo);
         }
         else if (msg.Text.Contains("\"update-type\":\"RecordingStarted\""))
         {
