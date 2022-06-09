@@ -1,6 +1,4 @@
-﻿#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-namespace BeatRecorder;
+﻿namespace BeatRecorder;
 
 class Objects
 {
@@ -53,10 +51,6 @@ class Objects
         public string OBSMenuScene { get; set; } = "";
         public string OBSIngameScene { get; set; } = "";
         public string OBSPauseScene { get; set; } = "";
-
-        // Ignore old Console Log Level
-        [JsonProperty("ConsoleLogLevel")]
-        private int MigrationConsoleLogLevel { set { } }
     }
 
     // Shedule-based logger

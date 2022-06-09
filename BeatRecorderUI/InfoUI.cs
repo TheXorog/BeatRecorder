@@ -25,7 +25,7 @@ public partial class InfoUI : Form
 
         if (SettingsRequired)
         {
-            SettingsUI settingsUI = new SettingsUI(this.TopMost);
+            SettingsUI settingsUI = new(this.TopMost);
             this.Hide();
             settingsUI.ShowDialog();
             this.Close();
@@ -34,7 +34,7 @@ public partial class InfoUI : Form
 
     private void OpenSettings_Click(object sender, EventArgs e)
     {
-        SettingsUI settingsUI = new SettingsUI(this.TopMost);
+        SettingsUI settingsUI = new(this.TopMost);
         settingsUI.ShowDialog();
 
         if (settingsUI.SettingsUpdated)

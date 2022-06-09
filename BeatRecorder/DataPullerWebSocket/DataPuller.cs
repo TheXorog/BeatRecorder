@@ -4,7 +4,7 @@ class DataPuller
 {
     internal static void MapDataMessageRecieved(string e)
     {
-        DataPullerObjects.DataPullerMain _status = new();
+        DataPullerObjects.DataPullerMain _status;
 
         try
         {
@@ -151,7 +151,7 @@ class DataPuller
 
     internal static void LiveDataMessageRecieved(string e)
     {
-        DataPullerObjects.DataPullerData _status = new();
+        DataPullerObjects.DataPullerData _status;
 
         try
         {
@@ -278,10 +278,9 @@ class DataPuller
 
                 if (NewName.Contains("<rank>"))
                 {
-                    if (PerformanceInfo.Rank != "" && PerformanceInfo.Rank != null)
-                        NewName = NewName.Replace("<rank>", PerformanceInfo.Rank);
-                    else
-                        NewName = NewName.Replace("<rank>", "E");
+                    NewName = PerformanceInfo.Rank is not "" and not null
+                        ? NewName.Replace("<rank>", PerformanceInfo.Rank)
+                        : NewName.Replace("<rank>", "E");
                 }
 
                 if (NewName.Contains("<accuracy>"))
@@ -428,32 +427,21 @@ class DataPuller
 
             if (NewName.Contains("<difficulty>"))
             {
-                switch (BeatmapInfo.Difficulty.ToLower())
+                NewName = BeatmapInfo.Difficulty.ToLower() switch
                 {
-                    case "expertplus":
-                        NewName = NewName.Replace("<difficulty>", "Expert+");
-                        break;
-                    default:
-                        NewName = NewName.Replace("<difficulty>", BeatmapInfo.Difficulty);
-                        break;
-                }
+                    "expertplus" => NewName.Replace("<difficulty>", "Expert+"),
+                    _ => NewName.Replace("<difficulty>", BeatmapInfo.Difficulty),
+                };
             }
 
             if (NewName.Contains("<short-difficulty>"))
             {
-                switch (BeatmapInfo.Difficulty.ToLower())
+                NewName = BeatmapInfo.Difficulty.ToLower() switch
                 {
-                    case "expert":
-                        NewName = NewName.Replace("<short-difficulty>", "EX");
-                        break;
-                    case "expert+":
-                    case "expertplus":
-                        NewName = NewName.Replace("<short-difficulty>", "EX+");
-                        break;
-                    default:
-                        NewName = NewName.Replace("<short-difficulty>", BeatmapInfo.Difficulty.Remove(1, BeatmapInfo.Difficulty.Length - 1));
-                        break;
-                }
+                    "expert" => NewName.Replace("<short-difficulty>", "EX"),
+                    "expert+" or "expertplus" => NewName.Replace("<short-difficulty>", "EX+"),
+                    _ => NewName.Replace("<short-difficulty>", BeatmapInfo.Difficulty.Remove(1, BeatmapInfo.Difficulty.Length - 1)),
+                };
             }
 
             if (File.Exists($"{OldFileName}"))

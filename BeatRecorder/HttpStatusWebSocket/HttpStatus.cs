@@ -4,7 +4,7 @@ class HttpStatus
 {
     internal static void MessageReceived(string e)
     {
-        HttpStatusObjects.BeatSaberEvent _status = new();
+        HttpStatusObjects.BeatSaberEvent _status;
 
         try
         {
