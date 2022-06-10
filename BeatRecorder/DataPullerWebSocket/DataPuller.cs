@@ -64,7 +64,7 @@ class DataPuller
                     DataPullerStatus.DataPullerLastBeatmap = DataPullerStatus.DataPullerCurrentBeatmap;
                     DataPullerStatus.LastSongCombo = DataPullerStatus.CurrentSongCombo;
 
-                    _ = OBSWebSocket.StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token);
+                    _ = OBSWebSocket.StopRecording(OBSWebSocketStatus.CancelStopRecordingDelay.Token);
                 }
                 catch (Exception ex)
                 {
@@ -401,7 +401,7 @@ class DataPuller
                     NewName = NewName.Replace("<misses>", $"0");
             }
 
-            if (Program.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
+            if (Program.LoadedSettings.DeleteIfShorterThan > OBSWebSocketStatus.RecordingSeconds)
             {
                 LogDebug($"[BR] The recording is too short. Deletion requested.");
                 DeleteFile = true;

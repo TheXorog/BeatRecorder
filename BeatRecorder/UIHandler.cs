@@ -72,7 +72,7 @@ internal class UIHandler
                             infoUI.BeatSaberConnectionLabel.BackColor = Color.DarkRed;
                     }
 
-                    if (OBSWebSocketObjects.OBSRecording)
+                    if (OBSWebSocketStatus.OBSRecording)
                     {
                         infoUI.OBSConnectionLabel.Text = "(REC) OBS";
 
@@ -105,7 +105,7 @@ internal class UIHandler
                             infoUI.BSRLabel.Text = $"";
                             infoUI.MapperLabel.Text = $"";
 
-                            infoUI.ProgressLabel.Text = $"{TimeSpan.FromSeconds(OBSWebSocketObjects.RecordingSeconds).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}/{TimeSpan.FromSeconds(HttpStatusStatus.HttpStatusCurrentBeatmap.length / 1000).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}";
+                            infoUI.ProgressLabel.Text = $"{TimeSpan.FromSeconds(OBSWebSocketStatus.RecordingSeconds).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}/{TimeSpan.FromSeconds(HttpStatusStatus.HttpStatusCurrentBeatmap.length / 1000).GetShortTimeFormat(Extensions.TimeFormat.MINUTES)}";
 
                             if (HttpStatusStatus.HttpStatusCurrentBeatmap?.songCover != null)
                             {

@@ -9,15 +9,15 @@ class OBSWebSocket
 
         if (Program.obsWebSocket.IsStarted)
         {
-            if (OBSWebSocketObjects.OBSRecording)
+            if (OBSWebSocketStatus.OBSRecording)
             {
-                OBSWebSocketObjects.CancelStopRecordingDelay.Cancel();
-                await StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token, true);
+                OBSWebSocketStatus.CancelStopRecordingDelay.Cancel();
+                await StopRecording(OBSWebSocketStatus.CancelStopRecordingDelay.Token, true);
             }
 
-            OBSWebSocketObjects.CancelStopRecordingDelay = new CancellationTokenSource();
+            OBSWebSocketStatus.CancelStopRecordingDelay = new CancellationTokenSource();
 
-            while (OBSWebSocketObjects.OBSRecording)
+            while (OBSWebSocketStatus.OBSRecording)
             {
                 Thread.Sleep(20);
             }
@@ -45,7 +45,7 @@ class OBSWebSocket
 
         if (Program.obsWebSocket.IsStarted)
         {
-            if (OBSWebSocketObjects.OBSRecording)
+            if (OBSWebSocketStatus.OBSRecording)
             {
                 if (!ForceStop)
                 {

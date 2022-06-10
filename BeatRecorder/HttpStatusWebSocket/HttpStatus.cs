@@ -171,7 +171,7 @@ class HttpStatus
 
                     HttpStatusStatus.FinishedLastSong = HttpStatusStatus.FinishedCurrentSong;
                     HttpStatusStatus.FailedLastSong = HttpStatusStatus.FailedCurrentSong;
-                    _ = OBSWebSocket.StopRecording(OBSWebSocketObjects.CancelStopRecordingDelay.Token);
+                    _ = OBSWebSocket.StopRecording(OBSWebSocketStatus.CancelStopRecordingDelay.Token);
                 }
                 catch (Exception ex)
                 {
@@ -371,7 +371,7 @@ class HttpStatus
                     NewName = NewName.Replace("<misses>", $"0");
             }
 
-            if (Program.LoadedSettings.DeleteIfShorterThan > OBSWebSocketObjects.RecordingSeconds)
+            if (Program.LoadedSettings.DeleteIfShorterThan > OBSWebSocketStatus.RecordingSeconds)
             {
                 LogDebug($"[BR] The recording is too short. Deletion requested.");
                 DeleteFile = true;

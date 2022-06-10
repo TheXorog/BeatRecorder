@@ -10,7 +10,7 @@ class OBSWebSocketEvents
     {
         if (msg.Text.Contains($"\"message-id\":\"{RequiredAuthenticationGuid}\""))
         {
-            OBSWebSocketObjects.AuthenticationRequired required = JsonConvert.DeserializeObject<OBSWebSocketObjects.AuthenticationRequired>(msg.Text);
+            AuthenticationRequired required = JsonConvert.DeserializeObject<AuthenticationRequired>(msg.Text);
 
             if (required.authRequired)
             {
@@ -121,7 +121,7 @@ class OBSWebSocketEvents
         }
         else if (msg.Text.Contains($"\"message-id\":\"{AuthenticationGuid}\""))
         {
-            OBSWebSocketObjects.AuthenticationRequired required = JsonConvert.DeserializeObject<OBSWebSocketObjects.AuthenticationRequired>(msg.Text);
+            AuthenticationRequired required = JsonConvert.DeserializeObject<AuthenticationRequired>(msg.Text);
 
             if (required.status == "ok")
             {
@@ -144,10 +144,10 @@ class OBSWebSocketEvents
         }
         else if (msg.Text.Contains($"\"message-id\":\"{CheckIfRecording}\""))
         {
-            OBSWebSocketObjects.RecordingStatus recordingStatus = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStatus>(msg.Text);
+            RecordingStatus recordingStatus = JsonConvert.DeserializeObject<RecordingStatus>(msg.Text);
 
-            OBSWebSocketObjects.OBSRecording = recordingStatus.isRecording;
-            OBSWebSocketObjects.OBSRecordingPaused = recordingStatus.isRecordingPaused;
+            OBSWebSocketStatus.OBSRecording = recordingStatus.isRecording;
+            OBSWebSocketStatus.OBSRecordingPaused = recordingStatus.isRecordingPaused;
 
             if (recordingStatus.isRecording)
                 LogWarn($"[OBS] A recording is already running.");
@@ -156,10 +156,10 @@ class OBSWebSocketEvents
         if (msg.Text.Contains("\"update-type\":\"RecordingStopped\""))
         {
             Program.SendNotification("Recording stopped.", 1000, MessageType.INFO);
-            OBSWebSocketObjects.RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<OBSWebSocketObjects.RecordingStopped>(msg.Text);
+            RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<RecordingStopped>(msg.Text);
 
             LogInfo($"[OBS] Recording stopped.");
-            OBSWebSocketObjects.OBSRecording = false;
+            OBSWebSocketStatus.OBSRecording = false;
 
             if (Program.LoadedSettings.Mod == "http-status")
                 HttpStatus.HandleFile(HttpStatusStatus.HttpStatusLastBeatmap, HttpStatusStatus.HttpStatusLastPerformance, RecordingStopped.recordingFilename, HttpStatusStatus.FinishedLastSong, HttpStatusStatus.FailedLastSong);
@@ -170,29 +170,29 @@ class OBSWebSocketEvents
         {
             Program.SendNotification("Recording started.", 1000, MessageType.INFO);
             LogInfo($"[OBS] Recording started.");
-            OBSWebSocketObjects.OBSRecording = true;
-            while (OBSWebSocketObjects.OBSRecording)
+            OBSWebSocketStatus.OBSRecording = true;
+            while (OBSWebSocketStatus.OBSRecording)
             {
                 await Task.Delay(1000);
 
-                if (!OBSWebSocketObjects.OBSRecordingPaused)
+                if (!OBSWebSocketStatus.OBSRecordingPaused)
                 {
-                    OBSWebSocketObjects.RecordingSeconds++;
+                    OBSWebSocketStatus.RecordingSeconds++;
                 }
             }
-            OBSWebSocketObjects.RecordingSeconds = 0;
+            OBSWebSocketStatus.RecordingSeconds = 0;
         }
         else if (msg.Text.Contains("\"update-type\":\"RecordingPaused\""))
         {
             Program.SendNotification("Recording paused.", 1000, MessageType.INFO);
             LogInfo($"[OBS] Recording paused.");
-            OBSWebSocketObjects.OBSRecordingPaused = true;
+            OBSWebSocketStatus.OBSRecordingPaused = true;
         }
         else if (msg.Text.Contains("\"update-type\":\"RecordingResumed\""))
         {
             Program.SendNotification("Recording resumed.", 500, MessageType.INFO);
             LogInfo($"[OBS] Recording resumed.");
-            OBSWebSocketObjects.OBSRecordingPaused = false;
+            OBSWebSocketStatus.OBSRecordingPaused = false;
         }
     }
 

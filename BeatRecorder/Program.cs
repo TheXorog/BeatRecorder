@@ -86,7 +86,7 @@ class Program
         LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
         LogDebug($"{Environment.CurrentDirectory}");
 
-        OBSWebSocketObjects.CancelStopRecordingDelay = new CancellationTokenSource();
+        OBSWebSocketStatus.CancelStopRecordingDelay = new CancellationTokenSource();
 
         await Task.Run(async () =>
         {
