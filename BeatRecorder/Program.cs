@@ -2,7 +2,7 @@
 
 class Program
 {
-    public static string CurrentVersion = "1.6";
+    public static string CurrentVersion = "1.6.1";
 
     public static Settings LoadedSettings = new();
 
