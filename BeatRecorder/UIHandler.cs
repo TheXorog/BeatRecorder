@@ -83,8 +83,16 @@ internal class UIHandler
                     {
                         infoUI.OBSConnectionLabel.Text = "OBS";
 
-                        if (infoUI.OBSConnectionLabel.BackColor != Color.DarkGreen)
-                            infoUI.OBSConnectionLabel.BackColor = Color.DarkGreen;
+                        if (!Program.obsWebSocket.IsRunning)
+                        {
+                            if (infoUI.OBSConnectionLabel.BackColor != Color.DarkRed)
+                                infoUI.OBSConnectionLabel.BackColor = Color.DarkRed;
+                        }
+                        else
+                        {
+                            if (infoUI.OBSConnectionLabel.BackColor != Color.DarkGreen)
+                                infoUI.OBSConnectionLabel.BackColor = Color.DarkGreen;
+                        }
                     }
 
                     if (!Program.beatSaberWebSocket.IsRunning)
