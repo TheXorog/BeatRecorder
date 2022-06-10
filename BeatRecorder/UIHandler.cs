@@ -135,23 +135,29 @@ internal class UIHandler
                                 }
                                 else
                                 {
-                                    if (lastCover != "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg")
+                                    if (lastCover != "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg")
                                     {
                                         Stopwatch sc = new();
                                         sc.Start();
 
                                         LogWarn($"Failed to get cover art from song.");
-                                        LogDebug($"Downloading default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg'..");
+                                        LogDebug($"Downloading default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg'..");
 
-                                        lastCover = "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg";
+                                        lastCover = "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg";
 
-                                        new HttpClient().GetStreamAsync("https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg").ContinueWith(t =>
+                                        new HttpClient().GetStreamAsync("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").ContinueWith(t =>
                                         {
+                                            sc.Stop();
+
+                                            if (!t.IsCompletedSuccessfully)
+                                            {
+                                                LogError($"Failed to download default cover art", t.Exception);
+                                                return;
+                                            }
+
                                             coverArt = Bitmap.FromStream(t.Result);
 
-                                            LogDebug($"Downloaded default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
-
-                                            sc.Stop();
+                                            LogDebug($"Downloaded default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
                                         });
                                     }
                                 }
@@ -206,23 +212,29 @@ internal class UIHandler
                                 {
                                     // TODO: BeatSaver Details sometimes dont load which causes the cover fall back to default
 
-                                    if (lastCover != "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg")
+                                    if (lastCover != "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg")
                                     {
                                         Stopwatch sc = new();
                                         sc.Start();
 
                                         LogWarn($"Failed to get cover art from song.");
-                                        LogDebug($"Downloading default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg'..");
+                                        LogDebug($"Downloading default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg'..");
 
-                                        lastCover = "https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg";
+                                        lastCover = "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg";
 
-                                        new HttpClient().GetStreamAsync("https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg").ContinueWith(t =>
+                                        new HttpClient().GetStreamAsync("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").ContinueWith(t =>
                                         {
+                                            sc.Stop();
+
+                                            if (!t.IsCompletedSuccessfully)
+                                            {
+                                                LogError($"Failed to download default cover art", t.Exception);
+                                                return;
+                                            }
+
                                             coverArt = Bitmap.FromStream(t.Result);
 
-                                            LogDebug($"Downloaded default cover art from 'https://readie.global-gaming.co/bsdp-overlay/assets/images/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
-
-                                            sc.Stop();
+                                            LogDebug($"Downloaded default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
                                         });
                                     }
                                 }
