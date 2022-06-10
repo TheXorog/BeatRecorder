@@ -1,4 +1,6 @@
-# BeatRecorder
+# <img src="/BeatRecorder/Assets/Icon.png" alt="drawing" width="30"/> BeatRecorder
+
+
 
 ## Table of Contents  
 
