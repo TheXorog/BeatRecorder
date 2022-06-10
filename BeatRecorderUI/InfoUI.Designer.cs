@@ -28,6 +28,7 @@ partial class InfoUI
     /// </summary>
     private void InitializeComponent()
     {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InfoUI));
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.SongNameLabel = new System.Windows.Forms.Label();
             this.SongAuthorLabel = new System.Windows.Forms.Label();
@@ -284,10 +285,10 @@ partial class InfoUI
             this.Controls.Add(this.pictureBox1);
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "InfoUI";
-            this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "BeatRecorder";
             this.TopMost = true;

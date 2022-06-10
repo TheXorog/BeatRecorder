@@ -8,7 +8,13 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <StartupObject>BeatRecorder.Program</StartupObject>
     <Nullable>disable</Nullable>
+    <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
+    <PackageIcon>Icon.png</PackageIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Icon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
@@ -29,6 +35,10 @@
   <ItemGroup>
     <None Update="Assets\Error.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
     <None Update="Assets\Info.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
