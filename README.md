@@ -115,4 +115,5 @@ Any difference that affects the way BeatRecorder works will be documented here. 
 
 ## Contributing or forking
 
-It should be as easy as cloning the repository and running `dotnet restore`.
+Before building, you'll need [Xorog.Logger](https://github.com/Fortunevale/Xorog.Logger).
+From there on, it should be as easy as cloning the repository and running `dotnet restore`.
