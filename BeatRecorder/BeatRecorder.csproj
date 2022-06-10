@@ -27,10 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Error.png">
+    <None Update="Assets\Error.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Info.png">
+    <None Update="Assets\Info.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="openvr_api.dll">

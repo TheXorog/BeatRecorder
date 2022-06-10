@@ -4,6 +4,10 @@
 // This file is auto-generated, do not edit it.
 //
 //=============================================================================
+#pragma warning disable IDE0090
+#pragma warning disable CA2101
+#pragma warning disable CA1069
+
 #if !OPENVR_XR_API
 
 using System;

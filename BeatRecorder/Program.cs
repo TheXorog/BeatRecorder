@@ -289,8 +289,20 @@ class Program
         {
             _ = Task.Run(() =>
             {
-                Bitmap Info_notification_bitmap = new($"{AppDomain.CurrentDomain.BaseDirectory}Resources\\Info.png");
-                Bitmap Error_notification_bitmap = new($"{AppDomain.CurrentDomain.BaseDirectory}Resources\\Error.png");
+                LogInfo("Loading Notification Assets..");
+                Bitmap InfoIcon;
+                Bitmap ErrorIcon;
+
+                try
+                {
+                    InfoIcon = new($"{AppDomain.CurrentDomain.BaseDirectory}Assets\\Info.png");
+                    ErrorIcon = new($"{AppDomain.CurrentDomain.BaseDirectory}Assets\\Error.png");
+                }
+                catch (Exception ex)
+                {
+                    LogFatal("Failed load Notifaction Assets", ex);
+                    return;
+                }
 
                 while (true)
                 {
@@ -317,35 +329,29 @@ class Program
                         while (NotificationList.Count == 0)
                             Thread.Sleep(500);
 
-                        NotificationBitmap_t notification_icon;
+                        NotificationBitmap_t NotifactionIcon;
 
                         foreach (var b in NotificationList.ToList())
                         {
                             BitmapData TextureData = new();
 
                             if (b.Type == MessageType.INFO)
-                                TextureData = Info_notification_bitmap.LockBits(
-                                        new Rectangle(0, 0, Info_notification_bitmap.Width, Info_notification_bitmap.Height),
-                                        ImageLockMode.ReadOnly,
-                                        PixelFormat.Format32bppArgb);
+                                TextureData = InfoIcon.LockBits(new Rectangle(0, 0, InfoIcon.Width, InfoIcon.Height), ImageLockMode.ReadOnly,PixelFormat.Format32bppArgb);
                             else if (b.Type == MessageType.ERROR)
-                                TextureData = Error_notification_bitmap.LockBits(
-                                        new Rectangle(0, 0, Error_notification_bitmap.Width, Error_notification_bitmap.Height),
-                                        ImageLockMode.ReadOnly,
-                                        PixelFormat.Format32bppArgb);
+                                TextureData = ErrorIcon.LockBits(new Rectangle(0, 0, ErrorIcon.Width, ErrorIcon.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
-                            notification_icon.m_pImageData = TextureData.Scan0;
-                            notification_icon.m_nWidth = TextureData.Width;
-                            notification_icon.m_nHeight = TextureData.Height;
-                            notification_icon.m_nBytesPerPixel = 4;
+                            NotifactionIcon.m_pImageData = TextureData.Scan0;
+                            NotifactionIcon.m_nWidth = TextureData.Width;
+                            NotifactionIcon.m_nHeight = TextureData.Height;
+                            NotifactionIcon.m_nBytesPerPixel = 4;
 
-                            var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, EVRNotificationType.Persistent, b.Message, EVRNotificationStyle.Application, notification_icon);
+                            var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, EVRNotificationType.Persistent, b.Message, EVRNotificationStyle.Application, NotifactionIcon);
                             LogDebug($"[BR] Displayed Notification {NotificationId}: {b.Message}");
 
                             if (b.Type == MessageType.INFO)
-                                Info_notification_bitmap.UnlockBits(TextureData);
+                                InfoIcon.UnlockBits(TextureData);
                             else if (b.Type == MessageType.ERROR)
-                                Error_notification_bitmap.UnlockBits(TextureData);
+                                ErrorIcon.UnlockBits(TextureData);
 
                             if (NotificationId == 0)
                                 return;
@@ -355,7 +361,7 @@ class Program
 
                             if (error != EVRNotificationError.OK)
                             {
-                                LogError($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
+                                LogFatal($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
                             }
 
                             LogDebug($"[BR] Dismissed Notification {NotificationId}");
