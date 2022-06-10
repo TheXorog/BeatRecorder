@@ -1,6 +1,6 @@
 ﻿namespace BeatRecorder.Entities;
 
-class DataPullerStatus
+public class DataPullerStatus
 {
     internal static DataPullerStatus.DataPullerData DataPullerLastPerformance { get; set; }
     internal static DataPullerStatus.DataPullerMain DataPullerLastBeatmap { get; set; }

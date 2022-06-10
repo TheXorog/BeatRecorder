@@ -2,9 +2,9 @@
 
 class Program
 {
-    public static string CurrentVersion = "1.6.1";
+    public static readonly string CurrentVersion = "1.6.1";
 
-    public static Settings LoadedSettings = new();
+    public static Settings LoadedSettings = null;
 
     internal static WebsocketClient beatSaberWebSocket { get; set; }
     internal static WebsocketClient beatSaberWebSocketLiveData { get; set; }
@@ -12,17 +12,11 @@ class Program
 
     static void Main(string[] args)
     {
-        Program program = new();
-
-        program.MainAsync(args).GetAwaiter().GetResult();
+        new Program().MainAsync(args).GetAwaiter().GetResult();
     }
 
     private async Task MainAsync(string[] args)
     {
-        Console.Clear();
-
-        Console.SetWindowSize(160, 40);
-
         if (!Directory.Exists("logs"))
             Directory.CreateDirectory("logs");
 

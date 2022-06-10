@@ -10,7 +10,7 @@ class OBSWebSocketEvents
     {
         if (msg.Text.Contains($"\"message-id\":\"{RequiredAuthenticationGuid}\""))
         {
-            AuthenticationRequired required = JsonConvert.DeserializeObject<AuthenticationRequired>(msg.Text);
+            LoginInfo required = JsonConvert.DeserializeObject<LoginInfo>(msg.Text);
 
             if (required.authRequired)
             {
@@ -121,7 +121,7 @@ class OBSWebSocketEvents
         }
         else if (msg.Text.Contains($"\"message-id\":\"{AuthenticationGuid}\""))
         {
-            AuthenticationRequired required = JsonConvert.DeserializeObject<AuthenticationRequired>(msg.Text);
+            LoginInfo required = JsonConvert.DeserializeObject<LoginInfo>(msg.Text);
 
             if (required.status == "ok")
             {

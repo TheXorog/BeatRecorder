@@ -1,6 +1,6 @@
 ﻿namespace BeatRecorder.Entities;
 
-class HttpStatusStatus
+public class HttpStatusStatus
 {
     internal static HttpStatusStatus.Performance HttpStatusLastPerformance { get; set; }
     internal static HttpStatusStatus.Beatmap HttpStatusLastBeatmap { get; set; }
