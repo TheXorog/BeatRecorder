@@ -85,7 +85,7 @@ internal class Settings
     /// <summary>
     /// The file name
     /// </summary>
-    public string FileFormat { get; set; } = "[<rank>][<accuracy>][<max-combo>x] <song-name> - <song-author> [<mapper>]";
+    public string FileFormat { get; set; } = "[<rank>][<accuracy>][<max-combo>x] <song-name-with-sub> - <song-author> [<mapper>]";
 
     /// <summary>
     /// How long to wait before actually stopping the recording after exiting a song

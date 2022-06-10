@@ -239,6 +239,15 @@ public partial class SettingsUI : Form
         FileFormatBox.SelectionStart = preEdit + "<song-name>".Length;
     }
 
+    private void songNameWithSubNameToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        int preEdit = FileFormatBox.SelectionStart;
+
+        FileFormatBox.Text = FileFormatBox.Text.Insert(FileFormatBox.SelectionStart, "<song-name-with-sub>");
+
+        FileFormatBox.SelectionStart = preEdit + "<song-name-with-sub>".Length;
+    }
+
     private void songAuthorToolStripMenuItem_Click(object sender, EventArgs e)
     {
         int preEdit = FileFormatBox.SelectionStart;

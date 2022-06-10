@@ -410,6 +410,9 @@ class DataPuller
             if (NewName.Contains("<song-name>"))
                 NewName = NewName.Replace("<song-name>", BeatmapInfo.SongName);
 
+            if (NewName.Contains("<song-name-with-sub>"))
+                NewName = NewName.Replace("<song-name-with-sub>", $"{BeatmapInfo.SongName}{(!string.IsNullOrWhiteSpace(BeatmapInfo.SongSubName) ? $" {BeatmapInfo.SongSubName}" : "")}");
+
             if (NewName.Contains("<song-author>"))
                 NewName = NewName.Replace("<song-author>", BeatmapInfo.SongAuthor);
 

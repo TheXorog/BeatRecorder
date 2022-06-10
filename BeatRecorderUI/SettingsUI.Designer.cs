@@ -86,6 +86,7 @@ partial class SettingsUI
             this.label14 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
+            this.songNameWithSubNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.BeatSaberPortBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OBSPortBox)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
@@ -287,6 +288,7 @@ partial class SettingsUI
             this.difficultyToolStripMenuItem,
             this.shortDifficultyToolStripMenuItem,
             this.songNameToolStripMenuItem,
+            this.songNameWithSubNameToolStripMenuItem,
             this.songAuthorToolStripMenuItem,
             this.songSubNameToolStripMenuItem,
             this.mapperToolStripMenuItem,
@@ -299,103 +301,103 @@ partial class SettingsUI
             this.scoreToolStripMenuItem,
             this.rawScoreToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(160, 312);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(221, 356);
             // 
             // difficultyToolStripMenuItem
             // 
             this.difficultyToolStripMenuItem.Name = "difficultyToolStripMenuItem";
-            this.difficultyToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.difficultyToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.difficultyToolStripMenuItem.Text = "Difficulty";
             this.difficultyToolStripMenuItem.Click += new System.EventHandler(this.difficultyToolStripMenuItem_Click);
             // 
             // shortDifficultyToolStripMenuItem
             // 
             this.shortDifficultyToolStripMenuItem.Name = "shortDifficultyToolStripMenuItem";
-            this.shortDifficultyToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.shortDifficultyToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.shortDifficultyToolStripMenuItem.Text = "Short Difficulty";
             this.shortDifficultyToolStripMenuItem.Click += new System.EventHandler(this.shortDifficultyToolStripMenuItem_Click);
             // 
             // songNameToolStripMenuItem
             // 
             this.songNameToolStripMenuItem.Name = "songNameToolStripMenuItem";
-            this.songNameToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.songNameToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.songNameToolStripMenuItem.Text = "Song Name";
             this.songNameToolStripMenuItem.Click += new System.EventHandler(this.songNameToolStripMenuItem_Click);
             // 
             // songAuthorToolStripMenuItem
             // 
             this.songAuthorToolStripMenuItem.Name = "songAuthorToolStripMenuItem";
-            this.songAuthorToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.songAuthorToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.songAuthorToolStripMenuItem.Text = "Song Author";
             this.songAuthorToolStripMenuItem.Click += new System.EventHandler(this.songAuthorToolStripMenuItem_Click);
             // 
             // songSubNameToolStripMenuItem
             // 
             this.songSubNameToolStripMenuItem.Name = "songSubNameToolStripMenuItem";
-            this.songSubNameToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.songSubNameToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.songSubNameToolStripMenuItem.Text = "Song Sub Name";
             this.songSubNameToolStripMenuItem.Click += new System.EventHandler(this.songSubNameToolStripMenuItem_Click);
             // 
             // mapperToolStripMenuItem
             // 
             this.mapperToolStripMenuItem.Name = "mapperToolStripMenuItem";
-            this.mapperToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.mapperToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.mapperToolStripMenuItem.Text = "Mapper";
             this.mapperToolStripMenuItem.Click += new System.EventHandler(this.mapperToolStripMenuItem_Click);
             // 
             // levelIdHashToolStripMenuItem
             // 
             this.levelIdHashToolStripMenuItem.Name = "levelIdHashToolStripMenuItem";
-            this.levelIdHashToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.levelIdHashToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.levelIdHashToolStripMenuItem.Text = "Level Id/Hash";
             this.levelIdHashToolStripMenuItem.Click += new System.EventHandler(this.levelIdHashToolStripMenuItem_Click);
             // 
             // bPMToolStripMenuItem
             // 
             this.bPMToolStripMenuItem.Name = "bPMToolStripMenuItem";
-            this.bPMToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.bPMToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.bPMToolStripMenuItem.Text = "BPM";
             this.bPMToolStripMenuItem.Click += new System.EventHandler(this.bPMToolStripMenuItem_Click);
             // 
             // rankToolStripMenuItem
             // 
             this.rankToolStripMenuItem.Name = "rankToolStripMenuItem";
-            this.rankToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.rankToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.rankToolStripMenuItem.Text = "Rank";
             this.rankToolStripMenuItem.Click += new System.EventHandler(this.rankToolStripMenuItem_Click);
             // 
             // accuracyToolStripMenuItem
             // 
             this.accuracyToolStripMenuItem.Name = "accuracyToolStripMenuItem";
-            this.accuracyToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.accuracyToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.accuracyToolStripMenuItem.Text = "Accuracy";
             this.accuracyToolStripMenuItem.Click += new System.EventHandler(this.accuracyToolStripMenuItem_Click);
             // 
             // missesToolStripMenuItem
             // 
             this.missesToolStripMenuItem.Name = "missesToolStripMenuItem";
-            this.missesToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.missesToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.missesToolStripMenuItem.Text = "Misses";
             this.missesToolStripMenuItem.Click += new System.EventHandler(this.missesToolStripMenuItem_Click);
             // 
             // maxComboToolStripMenuItem
             // 
             this.maxComboToolStripMenuItem.Name = "maxComboToolStripMenuItem";
-            this.maxComboToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.maxComboToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.maxComboToolStripMenuItem.Text = "Max-Combo";
             this.maxComboToolStripMenuItem.Click += new System.EventHandler(this.maxComboToolStripMenuItem_Click);
             // 
             // scoreToolStripMenuItem
             // 
             this.scoreToolStripMenuItem.Name = "scoreToolStripMenuItem";
-            this.scoreToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.scoreToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.scoreToolStripMenuItem.Text = "Score";
             this.scoreToolStripMenuItem.Click += new System.EventHandler(this.scoreToolStripMenuItem_Click);
             // 
             // rawScoreToolStripMenuItem
             // 
             this.rawScoreToolStripMenuItem.Name = "rawScoreToolStripMenuItem";
-            this.rawScoreToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.rawScoreToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.rawScoreToolStripMenuItem.Text = "Raw Score";
             this.rawScoreToolStripMenuItem.Click += new System.EventHandler(this.rawScoreToolStripMenuItem_Click);
             // 
@@ -726,6 +728,13 @@ partial class SettingsUI
             this.label16.Text = "You can hover over items to get more details";
             this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // songNameWithSubNameToolStripMenuItem
+            // 
+            this.songNameWithSubNameToolStripMenuItem.Name = "songNameWithSubNameToolStripMenuItem";
+            this.songNameWithSubNameToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this.songNameWithSubNameToolStripMenuItem.Text = "Song Name with Sub Name";
+            this.songNameWithSubNameToolStripMenuItem.Click += new System.EventHandler(this.songNameWithSubNameToolStripMenuItem_Click);
+            // 
             // SettingsUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -848,4 +857,5 @@ partial class SettingsUI
     private Label label15;
     private TextBox PauseSceneBox;
     public Label label16;
+    private ToolStripMenuItem songNameWithSubNameToolStripMenuItem;
 }

@@ -379,6 +379,9 @@ class HttpStatus
 
             if (NewName.Contains("<song-name>"))
                 NewName = NewName.Replace("<song-name>", BeatmapInfo.songName);
+            
+            if (NewName.Contains("<song-name-with-sub>"))
+                NewName = NewName.Replace("<song-name-with-sub>", $"{BeatmapInfo.songName}{(!string.IsNullOrWhiteSpace(BeatmapInfo.songSubName) ? $" {BeatmapInfo.songSubName}" : "")}");
 
             if (NewName.Contains("<song-author>"))
                 NewName = NewName.Replace("<song-author>", BeatmapInfo.songAuthorName);
