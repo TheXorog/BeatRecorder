@@ -11,9 +11,9 @@ internal class UIHandler
         bool DisplayedUpdateNotice = false;
 
         if (!Program.LoadedSettings.HideConsole)
-            Program.ShowWindow(Program.GetConsoleWindow(), 2);
+            ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 2);
         else
-            Program.ShowWindow(Program.GetConsoleWindow(), 0);
+            ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 0);
 
         LogDebug($"Displaying InfoUI");
 
@@ -268,7 +268,7 @@ internal class UIHandler
         });
 
         infoUI.ShowDialog();
-        Program.ShowWindow(Program.GetConsoleWindow(), 5);
+        ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 5);
 
         while (OBSPasswordRequired)
             await Task.Delay(1000);
@@ -278,11 +278,11 @@ internal class UIHandler
             infoUI.ShowConsoleAgain = false;
             infoUI.ShowConsole.Visible = false;
 
-            Program.ShowWindow(Program.GetConsoleWindow(), 5);
+            ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 5);
             infoUI.ShowDialog();
         }
 
-        Program.ShowWindow(Program.GetConsoleWindow(), 5);
+        ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 5);
 
         if (infoUI.SettingsUpdated)
         {

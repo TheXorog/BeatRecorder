@@ -46,18 +46,18 @@ class Program
         {
             try
             {
-                Program.LoadedSettings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("Settings.json"));
-                File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.LoadedSettings, Formatting.Indented));
+                LoadedSettings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("Settings.json"));
+                File.WriteAllText("Settings.json", JsonConvert.SerializeObject(LoadedSettings, Formatting.Indented));
 
-                ChangeLogLevel(Program.LoadedSettings.ConsoleLogLevel);
+                ChangeLogLevel(LoadedSettings.ConsoleLogLevel);
 
-                if (Program.LoadedSettings.Mod != "http-status" && Program.LoadedSettings.Mod != "datapuller")
+                if (LoadedSettings.Mod != "http-status" && LoadedSettings.Mod != "datapuller")
                 {
                     throw new Exception("Invalid Mod selected.");
                 }
 
-                if (!string.IsNullOrWhiteSpace(Program.LoadedSettings.OBSPassword))
-                    AddBlacklist(Program.LoadedSettings.OBSPassword);
+                if (!string.IsNullOrWhiteSpace(LoadedSettings.OBSPassword))
+                    AddBlacklist(LoadedSettings.OBSPassword);
             }
             catch (Exception ex)
             {
@@ -82,7 +82,7 @@ class Program
                 $"Current Directory: {Environment.CurrentDirectory}\n" +
                 $"Commandline: {Environment.CommandLine}\n");
 
-        LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(Program.LoadedSettings, Formatting.Indented)}\n");
+        LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(LoadedSettings, Formatting.Indented)}\n");
         LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
         LogDebug($"{Environment.CurrentDirectory}");
 
@@ -113,91 +113,97 @@ class Program
             }
         });
 
-        if (Program.LoadedSettings.Mod == "datapuller")
+        switch (LoadedSettings.Mod)
         {
-            // Connect to MapData Endpoint of DataPuller's WebSocket
-
-            _ = Task.Run(() =>
+            case "datapuller":
             {
-                var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
+                // Connect to MapData Endpoint of DataPuller's WebSocket
+
+                _ = Task.Run(() =>
                 {
-                    Options =
-                        {
-                            KeepAliveInterval = TimeSpan.FromSeconds(5)
-                        }
-                });
-
-                beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedSettings.BeatSaberUrl}:{Program.LoadedSettings.BeatSaberPort}/BSDataPuller/MapData"), factory)
-                {
-                    ReconnectTimeout = null,
-                    ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
-                };
-
-                beatSaberWebSocket.MessageReceived.Subscribe(msg => { DataPuller.MapDataMessageRecieved(msg.Text); });
-                beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { DataPuller.MapDataReconnected(type); });
-                beatSaberWebSocket.DisconnectionHappened.Subscribe(type => { DataPuller.MapDataDisconnected(type); });
-
-                LogInfo($"[BS-DP1] Connecting..");
-                beatSaberWebSocket.Start().Wait();
-                LogInfo("[BS-DP1] Connected.");
-            });
-
-            // Connect to LiveData Endpoint of DataPuller's WebSocket or HttpStatus' Endpoint
-
-            _ = Task.Run(() =>
-                {
-                    // https://github.com/kOFReadie/BSDataPuller
-
                     var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
                     {
                         Options =
-                                {
-                                    KeepAliveInterval = TimeSpan.FromSeconds(5)
-                                }
+                            {
+                            KeepAliveInterval = TimeSpan.FromSeconds(5)
+                            }
                     });
 
-                    beatSaberWebSocketLiveData = new WebsocketClient(new Uri($"ws://{Program.LoadedSettings.BeatSaberUrl}:{Program.LoadedSettings.BeatSaberPort}/BSDataPuller/LiveData"), factory)
+                    beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{LoadedSettings.BeatSaberUrl}:{LoadedSettings.BeatSaberPort}/BSDataPuller/MapData"), factory)
                     {
                         ReconnectTimeout = null,
                         ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
                     };
 
-                    beatSaberWebSocketLiveData.MessageReceived.Subscribe(msg => { DataPuller.LiveDataMessageRecieved(msg.Text); });
-                    beatSaberWebSocketLiveData.ReconnectionHappened.Subscribe(type => { DataPuller.LiveDataReconnected(type); });
-                    beatSaberWebSocketLiveData.DisconnectionHappened.Subscribe(type => { DataPuller.LiveDataDisconnected(type); });
+                    beatSaberWebSocket.MessageReceived.Subscribe(msg => { DataPuller.MapDataMessageRecieved(msg.Text); });
+                    beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { DataPuller.MapDataReconnected(type); });
+                    beatSaberWebSocket.DisconnectionHappened.Subscribe(type => { DataPuller.MapDataDisconnected(type); });
 
-                    LogDebug($"[BS-DP2] Connecting..");
-                    beatSaberWebSocketLiveData.Start().Wait();
-                    LogDebug("[BS-DP2] Connected.");
+                    LogInfo($"[BS-DP1] Connecting..");
+                    beatSaberWebSocket.Start().Wait();
+                    LogInfo("[BS-DP1] Connected.");
                 });
-        }
-        else if (Program.LoadedSettings.Mod == "http-status")
-        {
-            _ = Task.Run(() =>
+
+                // Connect to LiveData Endpoint of DataPuller's WebSocket or HttpStatus' Endpoint
+
+                _ = Task.Run(() =>
+                    {
+                    // https://github.com/kOFReadie/BSDataPuller
+
+                        var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
+                        {
+                            Options =
+                                    {
+                                    KeepAliveInterval = TimeSpan.FromSeconds(5)
+                                    }
+                        });
+
+                        beatSaberWebSocketLiveData = new WebsocketClient(new Uri($"ws://{LoadedSettings.BeatSaberUrl}:{LoadedSettings.BeatSaberPort}/BSDataPuller/LiveData"), factory)
+                        {
+                            ReconnectTimeout = null,
+                            ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
+                        };
+
+                        beatSaberWebSocketLiveData.MessageReceived.Subscribe(msg => { DataPuller.LiveDataMessageRecieved(msg.Text); });
+                        beatSaberWebSocketLiveData.ReconnectionHappened.Subscribe(type => { DataPuller.LiveDataReconnected(type); });
+                        beatSaberWebSocketLiveData.DisconnectionHappened.Subscribe(type => { DataPuller.LiveDataDisconnected(type); });
+
+                        LogDebug($"[BS-DP2] Connecting..");
+                        beatSaberWebSocketLiveData.Start().Wait();
+                        LogDebug("[BS-DP2] Connected.");
+                    });
+                break;
+            }
+
+            case "http-status":
             {
+                _ = Task.Run(() =>
+                {
                 // https://github.com/opl-/beatsaber-http-status/blob/master/protocol.md
                 // https://github.com/kOFReadie/BSDataPuller
 
-                var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
-                {
-                    Options =
-                        {
+                    var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
+                    {
+                        Options =
+                            {
                             KeepAliveInterval = TimeSpan.FromSeconds(5)
-                        }
+                            }
+                    });
+
+                    beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{LoadedSettings.BeatSaberUrl}:{LoadedSettings.BeatSaberPort}/socket"), factory)
+                    {
+                        ReconnectTimeout = null,
+                        ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
+                    };
+                    beatSaberWebSocket.MessageReceived.Subscribe(msg => { HttpStatus.MessageReceived(msg.Text); });
+                    beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { HttpStatus.Reconnected(type); });
+                    beatSaberWebSocket.DisconnectionHappened.Subscribe(type => { HttpStatus.Disconnected(type); });
+
+                    LogInfo($"[BS-HS] Connecting..");
+                    beatSaberWebSocket.Start().Wait();
                 });
-
-                beatSaberWebSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedSettings.BeatSaberUrl}:{Program.LoadedSettings.BeatSaberPort}/socket"), factory)
-                {
-                    ReconnectTimeout = null,
-                    ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
-                };
-                beatSaberWebSocket.MessageReceived.Subscribe(msg => { HttpStatus.MessageReceived(msg.Text); });
-                beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { HttpStatus.Reconnected(type); });
-                beatSaberWebSocket.DisconnectionHappened.Subscribe(type => { HttpStatus.Disconnected(type); });
-
-                LogInfo($"[BS-HS] Connecting..");
-                beatSaberWebSocket.Start().Wait();
-            });
+                break;
+            }
         }
 
         _ = Task.Run(() =>
@@ -212,7 +218,7 @@ class Program
                         }
             });
 
-            obsWebSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedSettings.OBSUrl}:{Program.LoadedSettings.OBSPort}"), factory)
+            obsWebSocket = new WebsocketClient(new Uri($"ws://{LoadedSettings.OBSUrl}:{LoadedSettings.OBSPort}"), factory)
             {
                 ReconnectTimeout = null,
                 ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -232,15 +238,12 @@ class Program
             SendNotification("Connected to OBS", 1000, MessageType.INFO);
         });
 
-        if (Program.LoadedSettings.DisplayUI)
+        if (LoadedSettings.DisplayUI)
         {
             UIHandler handler = new();
             _ = handler.HandleUI();
         }
 
-        SendNotification("Note: Using Steam Notifications is still experimental. If you run into issues, please make sure to report them on GitHub.", 20000, MessageType.ERROR);
-
-        await Task.Delay(2000);
         NotifcationLoop();
 
         // Don't close the application
@@ -249,7 +252,7 @@ class Program
 
     private static void ResetSettings()
     {
-        Program.LoadedSettings = new();
+        LoadedSettings = new();
 
         if (File.Exists("Settings.json"))
         {
@@ -263,13 +266,13 @@ class Program
             catch { }
         }
 
-        File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.LoadedSettings, Formatting.Indented));
+        File.WriteAllText("Settings.json", JsonConvert.SerializeObject(LoadedSettings, Formatting.Indented));
 
         SendNotification("Your settings were reset due to an error. Please check your desktop.", 10000, MessageType.ERROR);
         LogInfo($"Please configure BeatRecorder using the config file that was just opened. If you're done, save and quit notepad and BeatRecorder will restart for you.");
 
         Objects.SettingsRequired = true;
-        var infoUI = new InfoUI(Program.CurrentVersion, Program.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
+        var infoUI = new InfoUI(CurrentVersion, LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
         infoUI.ShowDialog();
         LogDebug("Settings updated via UI");
         Process.Start(Environment.ProcessPath);
@@ -278,17 +281,12 @@ class Program
         return;
     }
 
-    public static Dictionary<int, NotificationEntry> NotificationList = new();
+    public static List<NotificationEntry> NotificationList = new();
 
     public static void NotifcationLoop()
     {
-        if (Program.LoadedSettings.DisplaySteamNotifications)
+        if (LoadedSettings.DisplaySteamNotifications)
         {
-            LogFatal($"\n\nUsing Steam Notifications is still experimental. Issues might include:\n" +
-                            $"- notifications not dissapearing\n" +
-                            $"- notifications might interrupt your vision during gameplay if you look up while starting/resuming a song\n\n");
-
-
             _ = Task.Run(() =>
             {
                 Bitmap Info_notification_bitmap = new($"{AppDomain.CurrentDomain.BaseDirectory}Resources\\Info.png");
@@ -319,50 +317,50 @@ class Program
                         while (NotificationList.Count == 0)
                             Thread.Sleep(500);
 
-                        Valve.VR.NotificationBitmap_t notification_icon;
+                        NotificationBitmap_t notification_icon;
 
                         foreach (var b in NotificationList.ToList())
                         {
                             BitmapData TextureData = new();
 
-                            if (b.Value.Type == MessageType.INFO)
+                            if (b.Type == MessageType.INFO)
                                 TextureData = Info_notification_bitmap.LockBits(
                                         new Rectangle(0, 0, Info_notification_bitmap.Width, Info_notification_bitmap.Height),
-                                        System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                                        System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                            else if (b.Value.Type == MessageType.ERROR)
+                                        ImageLockMode.ReadOnly,
+                                        PixelFormat.Format32bppArgb);
+                            else if (b.Type == MessageType.ERROR)
                                 TextureData = Error_notification_bitmap.LockBits(
                                         new Rectangle(0, 0, Error_notification_bitmap.Width, Error_notification_bitmap.Height),
-                                        System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                                        System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                                        ImageLockMode.ReadOnly,
+                                        PixelFormat.Format32bppArgb);
 
                             notification_icon.m_pImageData = TextureData.Scan0;
                             notification_icon.m_nWidth = TextureData.Width;
                             notification_icon.m_nHeight = TextureData.Height;
                             notification_icon.m_nBytesPerPixel = 4;
 
-                            var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, Valve.VR.EVRNotificationType.Persistent, b.Value.Message, Valve.VR.EVRNotificationStyle.Application, notification_icon);
-                            LogDebug($"[BR] Displayed Notification {NotificationId}: {b.Value.Message}");
+                            var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, EVRNotificationType.Persistent, b.Message, EVRNotificationStyle.Application, notification_icon);
+                            LogDebug($"[BR] Displayed Notification {NotificationId}: {b.Message}");
 
-                            if (b.Value.Type == MessageType.INFO)
+                            if (b.Type == MessageType.INFO)
                                 Info_notification_bitmap.UnlockBits(TextureData);
-                            else if (b.Value.Type == MessageType.ERROR)
+                            else if (b.Type == MessageType.ERROR)
                                 Error_notification_bitmap.UnlockBits(TextureData);
 
                             if (NotificationId == 0)
                                 return;
 
-                            Thread.Sleep(b.Value.Delay);
+                            Thread.Sleep(b.Delay);
                             EasyOpenVRSingleton.Instance.DismissNotification(NotificationId, out var error);
 
-                            if (error != Valve.VR.EVRNotificationError.OK)
+                            if (error != EVRNotificationError.OK)
                             {
                                 LogError($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
                             }
 
                             LogDebug($"[BR] Dismissed Notification {NotificationId}");
 
-                            NotificationList.Remove(b.Key);
+                            NotificationList.Remove(b);
                         }
                     }
                     catch (Exception ex)
@@ -378,17 +376,6 @@ class Program
 
     public static void SendNotification(string Text, int DisplayTime = 2000, MessageType messageType = MessageType.INFO)
     {
-        int A = 0;
-
-        while (NotificationList.ContainsKey(A))
-            A = new Random().Next();
-
-        NotificationList.Add(A, new NotificationEntry { Message = Text, Delay = DisplayTime, Type = messageType });
+        NotificationList.Add(new NotificationEntry { Message = Text, Delay = DisplayTime, Type = messageType });
     }
-
-    [DllImport("kernel32.dll")]
-    internal static extern IntPtr GetConsoleWindow();
-
-    [DllImport("user32.dll")]
-    internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 }

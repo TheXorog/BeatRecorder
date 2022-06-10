@@ -11,3 +11,6 @@ dotnet_diagnostic.IDE0047.severity = silent
 
 # IDE0078: Use pattern matching
 dotnet_diagnostic.IDE0078.severity = silent
+
+# IDE0060: Remove unused parameter
+dotnet_diagnostic.IDE0060.severity = silent
