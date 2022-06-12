@@ -24,18 +24,18 @@ public class DataPullerStatus
         public bool LevelFinished { get; set; }
         public bool LevelFailed { get; set; }
         public bool LevelQuit { get; set; }
-        public object Hash { get; set; }
+        public string Hash { get; set; }
         public string SongName { get; set; }
         public string SongSubName { get; set; }
         public string SongAuthor { get; set; }
         public string Mapper { get; set; }
         public object BSRKey { get; set; }
-        public object coverImage { get; set; }
+        public string coverImage { get; set; }
         public int Length { get; set; }
         public float TimeScale { get; set; }
         public string MapType { get; set; }
         public string Difficulty { get; set; }
-        public object CustomDifficultyLabel { get; set; }
+        public string CustomDifficultyLabel { get; set; }
         public int BPM { get; set; }
         public float NJS { get; set; }
         public Modifiers Modifiers { get; set; }

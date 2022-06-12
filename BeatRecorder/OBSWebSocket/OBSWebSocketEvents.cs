@@ -202,7 +202,7 @@ class OBSWebSocketEvents
         {
             LogInfo($"[OBS] Reconnected: {msg.Type}");
 
-            Objects.LastOBSWarning = ConnectionTypeWarning.CONNECTED;
+            Objects.LastOBSWarning = ConnectionTypeWarning.Connected;
 
             Program.obsWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
         }
@@ -216,12 +216,12 @@ class OBSWebSocketEvents
 
             if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("obs64") || x.ProcessName.ToLower().StartsWith("obs32")))
             {
-                if (Objects.LastOBSWarning != ConnectionTypeWarning.NO_PROCESS)
+                if (Objects.LastOBSWarning != ConnectionTypeWarning.NoProcess)
                 {
                     Program.SendNotification("Couldn't connect to OBS, is it even running?", 10000, MessageType.ERROR);
                     LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({msg.Type})");
                 }
-                Objects.LastOBSWarning = ConnectionTypeWarning.NO_PROCESS;
+                Objects.LastOBSWarning = ConnectionTypeWarning.NoProcess;
             }
             else
             {
@@ -244,21 +244,21 @@ class OBSWebSocketEvents
 
                 if (FoundWebSocketDll)
                 {
-                    if (Objects.LastOBSWarning != ConnectionTypeWarning.MOD_INSTALLED)
+                    if (Objects.LastOBSWarning != ConnectionTypeWarning.ModInstalled)
                     {
                         LogFatal($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to OBS. Please make sure obs-websocket is enabled.", 10000, MessageType.ERROR);
                     }
-                    Objects.LastOBSWarning = ConnectionTypeWarning.MOD_INSTALLED;
+                    Objects.LastOBSWarning = ConnectionTypeWarning.ModInstalled;
                 }
                 else
                 {
-                    if (Objects.LastOBSWarning != ConnectionTypeWarning.MOD_NOT_INSTALLED)
+                    if (Objects.LastOBSWarning != ConnectionTypeWarning.ModNotInstalled)
                     {
                         LogFatal($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to OBS. Please make sure obs-websocket is installed.", 10000, MessageType.ERROR);
                     }
-                    Objects.LastOBSWarning = ConnectionTypeWarning.MOD_NOT_INSTALLED;
+                    Objects.LastOBSWarning = ConnectionTypeWarning.ModNotInstalled;
                 }
             }
         }

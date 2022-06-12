@@ -33,26 +33,24 @@ internal class GameState
         this.Performance = new()
         {
             Score = status.performance.score,
+            Accuracy = (double)Math.Round((float)(((float)status.performance.score * (float)100) / (float)status.performance.currentMaxScore), 2),
             Combo = status.performance.combo,
             CurrentMaxScore = status.performance.currentMaxScore,
-            FailedNotes = status.performance.passedNotes,
-            HitBombs = status.performance.hitBombs,
+            Misses = status.performance.passedNotes + status.performance.hitBombs + status.performance.missedNotes,
             MaxCombo = status.performance.maxCombo,
-            MissedNotes = status.performance.missedNotes,
-            PassedBombs = status.performance.passedBombs,
             Rank = status.performance.rank,
             RawScore = status.performance.rawScore,
             SoftFailed = status.performance.softFailed
         };
     }
 
-    public GameState(DataPullerStatus.DataPullerMain status)
+    public GameState(DataPullerStatus.DataPullerMain beatmap, DataPullerStatus.DataPullerData performance, long MaxCombo)
     {
-        if (!DataPullerStatus.DataPullerInLevel && status.InLevel)
+        if (!DataPullerStatus.DataPullerInLevel && beatmap.InLevel)
         {
             this.GameEnvironment = GameEnvironment.Ingame;
         }
-        else if (DataPullerStatus.DataPullerInLevel && !status.InLevel)
+        else if (DataPullerStatus.DataPullerInLevel && !beatmap.InLevel)
         {
             this.GameEnvironment = GameEnvironment.Menu;
         }
@@ -60,40 +58,38 @@ internal class GameState
         this.Game = new()
         {
             Mod = Mod.DataPuller,
-            GameVersion = status.GameVersion,
-            ModVersion = status.PluginVersion
+            GameVersion = beatmap.GameVersion,
+            ModVersion = beatmap.PluginVersion
         };
 
         this.Beatmap = new()
         {
-            SongName = status.beatmap.songName,
-            SongSubName = status.beatmap.songSubName,
-            SongAuthorName = status.beatmap.songAuthorName,
-            SongCoverArt = new(CoverArtType.Base64, status.beatmap.songCover),
-            LevelAuthorName = status.beatmap.levelAuthorName,
-            Difficulty = status.beatmap.difficulty,
-            CustomDifficulty = null,
-            LevelIdOrHash = status.beatmap.levelId,
-            NotesCount = status.beatmap.notesCount,
-            BombsCount = status.beatmap.bombsCount,
-            WallsCount = status.beatmap.obstaclesCount,
-            MaxScore = status.beatmap.maxScore,
-            LevelLength = TimeSpan.FromMilliseconds(status.beatmap.length)
+            SongName = beatmap.SongName,
+            SongSubName = beatmap.SongSubName,
+            SongAuthorName = beatmap.SongAuthor,
+            SongCoverArt = new(CoverArtType.Url, beatmap.coverImage),
+            LevelAuthorName = beatmap.Mapper,
+            Difficulty = beatmap.Difficulty,
+            CustomDifficulty = beatmap.CustomDifficultyLabel,
+            LevelIdOrHash = beatmap.Hash,
+            NotesCount = 0,
+            BombsCount = 0,
+            WallsCount = 0,
+            MaxScore = 0,
+            LevelLength = TimeSpan.FromSeconds(beatmap.Length)
         };
 
         this.Performance = new()
         {
-            Score = status.performance.score,
-            Combo = status.performance.combo,
-            CurrentMaxScore = status.performance.currentMaxScore,
-            FailedNotes = status.performance.passedNotes,
-            HitBombs = status.performance.hitBombs,
-            MaxCombo = status.performance.maxCombo,
-            MissedNotes = status.performance.missedNotes,
-            PassedBombs = status.performance.passedBombs,
-            Rank = status.performance.rank,
-            RawScore = status.performance.rawScore,
-            SoftFailed = status.performance.softFailed
+            Score = performance.ScoreWithMultipliers,
+            Accuracy = Convert.ToDouble(performance.Accuracy),
+            Combo = performance.Combo,
+            CurrentMaxScore = performance.MaxScore,
+            Misses = performance.Misses,
+            MaxCombo = MaxCombo,
+            Rank = performance.Rank,
+            RawScore = performance.Score,
+            SoftFailed = ((beatmap.LevelFailed || performance.PlayerHealth <= 0) && beatmap.Modifiers.noFailOn0Energy)
         };
     }
 
@@ -271,6 +267,11 @@ internal class GameState
         public long Score { get; set; }
 
         /// <summary>
+        /// The accuracy.
+        /// </summary>
+        public double Accuracy { get; set; }
+
+        /// <summary>
         /// The current maximum amount of score achievable
         /// </summary>
         public long CurrentMaxScore { get; set; }
@@ -281,24 +282,9 @@ internal class GameState
         public string Rank { get; set; }
 
         /// <summary>
-        /// How many notes have been missed
+        /// How many notes have been missed and bombs hit
         /// </summary>
-        public long MissedNotes { get; set; }
-
-        /// <summary>
-        /// How many notes have been hit incorrectly
-        /// </summary>
-        public long FailedNotes { get; set; }
-
-        /// <summary>
-        /// How many bombs have been hit
-        /// </summary>
-        public long HitBombs { get; set; }
-
-        /// <summary>
-        /// How many bombs have been missed
-        /// </summary>
-        public long PassedBombs { get; set; }
+        public long Misses { get; set; }
 
         /// <summary>
         /// The current combo
