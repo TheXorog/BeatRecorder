@@ -21,9 +21,13 @@ global using BeatRecorder.Entities;
 global using BeatRecorder.Enums;
 global using BeatRecorder.Util;
 
+global using static BeatRecorder.Log;
+
 global using Xorog.Logger;
+global using Xorog.Logger.Entities;
+global using Xorog.Logger.Enums;
 global using static Xorog.Logger.Logger;
-global using static Xorog.Logger.LoggerObjects;
+global using LogLevel = Xorog.Logger.Enums.LogLevel;
 global using System.Runtime.InteropServices;
 global using BeatRecorderUI;
 

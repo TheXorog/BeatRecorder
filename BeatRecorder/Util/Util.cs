@@ -14,7 +14,7 @@ internal class Util
             {
                 if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.NoProcess)
                 {
-                    LogWarn($"Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                    _logger.LogWarn($"Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
                     Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, MessageType.ERROR);
                 }
                 Objects.LastHttpStatusWarning = ConnectionTypeWarning.NoProcess;
@@ -28,7 +28,7 @@ internal class Util
             {
                 if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.NotModded)
                 {
-                    LogFatal($"Beat Saber seems to be running but the {humanReadableName} modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install {humanReadableName}: https://bit.ly/3HdIvqg) ({msg.Type})");
+                    _logger.LogFatal($"Beat Saber seems to be running but the {humanReadableName} modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install {humanReadableName}: https://bit.ly/3HdIvqg) ({msg.Type})");
                     Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, MessageType.ERROR);
                 }
                 Objects.LastHttpStatusWarning = ConnectionTypeWarning.NotModded;
@@ -39,7 +39,7 @@ internal class Util
             {
                 if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.ModInstalled)
                 {
-                    LogFatal($"Beat Saber seems to be running and the {humanReadableName} modifaction seems to be installed. Please make sure you put in the right port and you installed all of {humanReadableName}' dependiencies! (If not installed, please install it: https://bit.ly/3HdIvqg) ({msg.Type})");
+                    _logger.LogFatal($"Beat Saber seems to be running and the {humanReadableName} modifaction seems to be installed. Please make sure you put in the right port and you installed all of {humanReadableName}' dependiencies! (If not installed, please install it: https://bit.ly/3HdIvqg) ({msg.Type})");
                     Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, MessageType.ERROR);
                 }
                 Objects.LastHttpStatusWarning = ConnectionTypeWarning.ModInstalled;
@@ -48,14 +48,14 @@ internal class Util
 
             if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.ModNotInstalled)
             {
-                LogFatal($"Beat Saber seems to be running but the {humanReadableName} modifaction doesn't seem to be installed. Please make sure to install {humanReadableName}! (If not installed, please install it: https://bit.ly/3HdIvqg) ({msg.Type})");
+                _logger.LogFatal($"Beat Saber seems to be running but the {humanReadableName} modifaction doesn't seem to be installed. Please make sure to install {humanReadableName}! (If not installed, please install it: https://bit.ly/3HdIvqg) ({msg.Type})");
                 Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, MessageType.ERROR);
             }
             Objects.LastHttpStatusWarning = ConnectionTypeWarning.ModNotInstalled;
         }
         catch (Exception ex)
         {
-            LogError($"Failed to check if {humanReadableName} is installed. (Disconnect Reason: {msg.Type})", ex);
+            _logger.LogError($"Failed to check if {humanReadableName} is installed. (Disconnect Reason: {msg.Type})", ex);
         }
     }
 }

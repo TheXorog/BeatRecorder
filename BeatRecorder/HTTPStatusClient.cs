@@ -26,9 +26,9 @@ internal class HTTPStatusClient
         WebSocket.ReconnectionHappened.Subscribe(type => { Reconnected(type); });
         WebSocket.DisconnectionHappened.Subscribe(type => { Disconnected(type); });
 
-        LogInfo($"Connecting to BeatSaber via HttpStatus..");
+        _logger.LogInfo($"Connecting to BeatSaber via HttpStatus..");
         await WebSocket.Start();
-        LogInfo($"Connected to BeatSaber via HttpStatus.");
+        _logger.LogInfo($"Connected to BeatSaber via HttpStatus.");
 
         return new HTTPStatusClient();
     }
@@ -43,7 +43,7 @@ internal class HTTPStatusClient
         }
         catch (Exception ex)
         {
-            LogFatal($"Unable to parse the HttpStatus Event", ex);
+            _logger.LogFatal($"Unable to parse the HttpStatus Event", ex);
             return;
         }
 
@@ -61,16 +61,16 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
-                LogInfo("[BS-HS] Connected.");
+                _logger.LogInfo("[BS-HS] Connected.");
                 break;
 
             case "songStart":
-                LogDebug("[BS-HS] Song started.");
-                LogInfo($"[BS-HS] Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
+                _logger.LogDebug("[BS-HS] Song started.");
+                _logger.LogInfo($"[BS-HS] Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
 
                 HttpStatusStatus.FailedCurrentSong = false;
                 HttpStatusStatus.FinishedCurrentSong = false;
@@ -84,7 +84,7 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
@@ -94,13 +94,13 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "finished":
-                LogInfo("[BS-HS] Song finished.");
+                _logger.LogInfo("[BS-HS] Song finished.");
 
                 HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
                 HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
@@ -113,13 +113,13 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "failed":
-                LogInfo("[BS-HS] Song failed.");
+                _logger.LogInfo("[BS-HS] Song failed.");
 
                 HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
                 HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
@@ -132,13 +132,13 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "pause":
-                LogInfo("[BS-HS] Song paused.");
+                _logger.LogInfo("[BS-HS] Song paused.");
 
                 try
                 {
@@ -148,7 +148,7 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
@@ -159,13 +159,13 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "resume":
-                LogInfo("[BS-HS] Song resumed.");
+                _logger.LogInfo("[BS-HS] Song resumed.");
 
                 try
                 {
@@ -175,7 +175,7 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
@@ -186,14 +186,14 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "menu":
-                LogDebug("[BS-HS] Menu entered.");
-                LogInfo($"[BS-HS] Stopped playing \"{_status?.status?.beatmap?.songName}\" by \"{_status?.status?.beatmap?.songAuthorName}\"");
+                _logger.LogDebug("[BS-HS] Menu entered.");
+                _logger.LogInfo($"[BS-HS] Stopped playing \"{_status?.status?.beatmap?.songName}\" by \"{_status?.status?.beatmap?.songAuthorName}\"");
 
                 try
                 {
@@ -206,7 +206,7 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
@@ -217,7 +217,7 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
@@ -231,7 +231,7 @@ internal class HTTPStatusClient
     internal static void Reconnected(ReconnectionInfo msg)
     {
         if (msg.Type != ReconnectionType.Initial)
-            LogWarn($"Reconnected to BeatSaber: {msg.Type}");
+            _logger.LogWarn($"Reconnected to BeatSaber: {msg.Type}");
 
         Objects.LastHttpStatusWarning = ConnectionTypeWarning.Connected;
         Program.SendNotification("Connected to Beat Saber", 1000, MessageType.INFO);
