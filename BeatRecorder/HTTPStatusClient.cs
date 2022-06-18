@@ -4,10 +4,15 @@ internal class HTTPStatusClient
 {
     private HTTPStatusClient() { }
 
-    internal static WebsocketClient WebSocket { get; set; }
+    private GameState CurrentGameState { get; set; }
+    internal GameState LastFinishedGameState { get; private set; }
+
+    internal WebsocketClient WebSocket { get; private set; }
 
     internal static async Task<HTTPStatusClient> InitializeClient(Settings LoadedSettings)
     {
+        var client = new HTTPStatusClient();
+
         var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
         {
             Options =
@@ -16,24 +21,24 @@ internal class HTTPStatusClient
             }
         });
 
-        WebSocket = new WebsocketClient(new Uri($"ws://{LoadedSettings.BeatSaberUrl}:{LoadedSettings.BeatSaberPort}/socket"), factory)
+        client.WebSocket = new WebsocketClient(new Uri($"ws://{LoadedSettings.BeatSaberUrl}:{LoadedSettings.BeatSaberPort}/socket"), factory)
         {
             ReconnectTimeout = null,
             ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
         };
 
-        WebSocket.MessageReceived.Subscribe(msg => { MessageReceived(msg.Text); });
-        WebSocket.ReconnectionHappened.Subscribe(type => { Reconnected(type); });
-        WebSocket.DisconnectionHappened.Subscribe(type => { Disconnected(type); });
+        client.WebSocket.MessageReceived.Subscribe(msg => { client.MessageReceived(msg.Text); });
+        client.WebSocket.ReconnectionHappened.Subscribe(type => { client.Reconnected(type); });
+        client.WebSocket.DisconnectionHappened.Subscribe(type => { client.Disconnected(type); });
 
         _logger.LogInfo($"Connecting to BeatSaber via HttpStatus..");
-        await WebSocket.Start();
+        await client.WebSocket.Start();
         _logger.LogInfo($"Connected to BeatSaber via HttpStatus.");
 
-        return new HTTPStatusClient();
+        return client;
     }
 
-    private static void MessageReceived(string e)
+    private void MessageReceived(string e)
     {
         HttpStatusStatus.BeatSaberEvent _status;
 
@@ -51,40 +56,35 @@ internal class HTTPStatusClient
         {
             case "hello":
 
-                try { HttpStatusStatus.HttpStatusCurrentBeatmap = _status.status.beatmap; } catch { }
-                try { HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance; } catch { }
+                CurrentGameState.UpdateGameState(_status.status, GameEnvironment.Menu, false, false);
 
                 try
                 {
                     if (Program.LoadedSettings.OBSMenuScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                        OBSWebSocket.SetCurrentScene(Program.LoadedSettings.OBSMenuScene);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BS-HS] {ex}");
+                    _logger.LogError("Failed to set current scene", ex);
                     return;
                 }
 
-                _logger.LogInfo("[BS-HS] Connected.");
+                _logger.LogDebug("Recveived hello object");
                 break;
 
             case "songStart":
-                _logger.LogDebug("[BS-HS] Song started.");
-                _logger.LogInfo($"[BS-HS] Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
+                _logger.LogInfo($"Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
 
-                HttpStatusStatus.FailedCurrentSong = false;
-                HttpStatusStatus.FinishedCurrentSong = false;
-                HttpStatusStatus.HttpStatusCurrentBeatmap = _status.status.beatmap;
-                HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
+                CurrentGameState.UpdateGameState(_status.status, GameEnvironment.Ingame, false, false);
 
                 try
                 {
                     if (Program.LoadedSettings.OBSIngameScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                        OBSWebSocket.SetCurrentScene(Program.LoadedSettings.OBSIngameScene);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BS-HS] {ex}");
+                    _logger.LogError("Failed to set current scene", ex);
                     return;
                 }
 
@@ -94,72 +94,70 @@ internal class HTTPStatusClient
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"Failed to start recording", ex);
                     return;
                 }
                 break;
 
             case "finished":
-                _logger.LogInfo("[BS-HS] Song finished.");
+                _logger.LogInfo("Song finished.");
 
-                HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
-                HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
-                HttpStatusStatus.FinishedCurrentSong = true;
+                CurrentGameState.UpdateGameState(_status.status, GameEnvironment.Ingame, false, true);
 
                 try
                 {
                     if (Program.LoadedSettings.OBSMenuScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                        OBSWebSocket.SetCurrentScene(Program.LoadedSettings.OBSMenuScene);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BS-HS] {ex}");
+                    _logger.LogError("Failed to set current scene", ex);
                     return;
                 }
                 break;
 
             case "failed":
-                _logger.LogInfo("[BS-HS] Song failed.");
+                _logger.LogInfo("Song failed.");
 
-                HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
-                HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
-                HttpStatusStatus.FailedCurrentSong = true;
+                CurrentGameState.UpdateGameState(_status.status, GameEnvironment.Ingame, true, false);
 
                 try
                 {
                     if (Program.LoadedSettings.OBSMenuScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                        OBSWebSocket.SetCurrentScene(Program.LoadedSettings.OBSMenuScene);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BS-HS] {ex}");
+                    _logger.LogError("Failed to set current scene", ex);
                     return;
                 }
                 break;
 
             case "pause":
-                _logger.LogInfo("[BS-HS] Song paused.");
+                _logger.LogInfo("Song paused.");
+
+                CurrentGameState.UpdateGameState(GameEnvironment.Paused);
 
                 try
                 {
                     if (Program.LoadedSettings.PauseRecordingOnIngamePause)
                         if (Program.obsWebSocket.IsStarted)
-                            Program.obsWebSocket.Send($"{{\"request-type\":\"PauseRecording\", \"message-id\":\"PauseRecording\"}}");
+                            OBSWebSocket.PauseRecording();
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BS-HS] {ex}");
+                    _logger.LogError("Failed to set current scene", ex);
                     return;
                 }
 
                 try
                 {
                     if (Program.LoadedSettings.OBSPauseScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSPauseScene}\", \"message-id\":\"PauseRecording\"}}");
+                        OBSWebSocket.SetCurrentScene(Program.LoadedSettings.OBSPauseScene);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BS-HS] {ex}");
+                    _logger.LogError("Failed to set current scene", ex);
                     return;
                 }
                 break;
@@ -167,11 +165,13 @@ internal class HTTPStatusClient
             case "resume":
                 _logger.LogInfo("[BS-HS] Song resumed.");
 
+                CurrentGameState.UpdateGameState(GameEnvironment.Ingame);
+
                 try
                 {
                     if (Program.LoadedSettings.PauseRecordingOnIngamePause)
                         if (Program.obsWebSocket.IsStarted)
-                            Program.obsWebSocket.Send($"{{\"request-type\":\"ResumeRecording\", \"message-id\":\"ResumeRecording\"}}");
+                            OBSWebSocket.ResumeRecording();
                 }
                 catch (Exception ex)
                 {
@@ -182,11 +182,11 @@ internal class HTTPStatusClient
                 try
                 {
                     if (Program.LoadedSettings.OBSIngameScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSIngameScene}\", \"message-id\":\"PauseRecording\"}}");
+                        OBSWebSocket.SetCurrentScene(Program.LoadedSettings.OBSIngameScene);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BS-HS] {ex}");
+                    _logger.LogError("Failed to set current scene", ex);
                     return;
                 }
                 break;
@@ -195,49 +195,41 @@ internal class HTTPStatusClient
                 _logger.LogDebug("[BS-HS] Menu entered.");
                 _logger.LogInfo($"[BS-HS] Stopped playing \"{_status?.status?.beatmap?.songName}\" by \"{_status?.status?.beatmap?.songAuthorName}\"");
 
-                try
-                {
-                    HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
-                    HttpStatusStatus.HttpStatusLastBeatmap = HttpStatusStatus.HttpStatusCurrentBeatmap;
+                CurrentGameState.UpdateGameState(GameEnvironment.Menu);
+                LastFinishedGameState = CurrentGameState.Clone();
 
-                    HttpStatusStatus.FinishedLastSong = HttpStatusStatus.FinishedCurrentSong;
-                    HttpStatusStatus.FailedLastSong = HttpStatusStatus.FailedCurrentSong;
-                    _ = OBSWebSocket.StopRecording(OBSWebSocketStatus.CancelStopRecordingDelay.Token);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"[BS-HS] {ex}");
-                    return;
-                }
+                _ = OBSWebSocket.StopRecording(OBSWebSocketStatus.CancelStopRecordingDelay.Token);
 
                 try
                 {
                     if (Program.LoadedSettings.OBSMenuScene != "")
-                        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{Program.LoadedSettings.OBSMenuScene}\", \"message-id\":\"PauseRecording\"}}");
+                        OBSWebSocket.SetCurrentScene(Program.LoadedSettings.OBSMenuScene);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"[BS-HS] {ex}");
+                    _logger.LogError("Failed to set current scene", ex);
                     return;
                 }
                 break;
 
             case "scoreChanged":
-                HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
+                CurrentGameState.UpdateGameState(_status.status.performance, CurrentGameState.Performance.Failed, CurrentGameState.Performance.Finished);
                 break;
         }
     }
 
-    internal static void Reconnected(ReconnectionInfo msg)
+    internal void Reconnected(ReconnectionInfo msg)
     {
         if (msg.Type != ReconnectionType.Initial)
             _logger.LogWarn($"Reconnected to BeatSaber: {msg.Type}");
 
-        Objects.LastHttpStatusWarning = ConnectionTypeWarning.Connected;
+        Objects.LastHttpStatusWarning = ConnectionType.Connected;
         Program.SendNotification("Connected to Beat Saber", 1000, MessageType.INFO);
+
+        Program.BeatSaberConnectionType = ConnectionType.Connected;
     }
 
-    internal static void Disconnected(DisconnectionInfo msg)
+    internal void Disconnected(DisconnectionInfo msg)
     {
         Util.Util.CheckForMod(msg, "httpstatus", "Http Status");
     }

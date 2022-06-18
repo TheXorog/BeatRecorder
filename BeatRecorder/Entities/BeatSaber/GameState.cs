@@ -2,95 +2,113 @@
 
 internal class GameState
 {
+    private GameState() { }
+
     public GameState(HttpStatusStatus.Status status, GameEnvironment environment)
     {
-        this.GameEnvironment = environment;
+        this.Game = new();
+        this.Beatmap = new();
+        this.Performance = new();
 
-        this.Game = new()
-        {
-            Mod = Mod.HttpStatus,
-            GameVersion = status.game.gameVersion,
-            ModVersion = status.game.pluginVersion
-        };
+        this.Game.Mod = Mod.HttpStatus;
+        this.Game.GameVersion = status.game.gameVersion;
+        this.Game.ModVersion = status.game.pluginVersion;
 
-        this.Beatmap = new()
-        {
-            SongName = status.beatmap.songName,
-            SongSubName = status.beatmap.songSubName,
-            SongAuthorName = status.beatmap.songAuthorName,
-            SongCoverArt = new(CoverArtType.Base64, status.beatmap.songCover),
-            LevelAuthorName = status.beatmap.levelAuthorName,
-            Difficulty = status.beatmap.difficulty,
-            CustomDifficulty = null,
-            LevelIdOrHash = status.beatmap.levelId,
-            NotesCount = status.beatmap.notesCount,
-            BombsCount = status.beatmap.bombsCount,
-            WallsCount = status.beatmap.obstaclesCount,
-            MaxScore = status.beatmap.maxScore,
-            LevelLength = TimeSpan.FromMilliseconds(status.beatmap.length)
-        };
-
-        this.Performance = new()
-        {
-            Score = status.performance.score,
-            Accuracy = (double)Math.Round((float)(((float)status.performance.score * (float)100) / (float)status.performance.currentMaxScore), 2),
-            Combo = status.performance.combo,
-            CurrentMaxScore = status.performance.currentMaxScore,
-            Misses = status.performance.passedNotes + status.performance.hitBombs + status.performance.missedNotes,
-            MaxCombo = status.performance.maxCombo,
-            Rank = status.performance.rank,
-            RawScore = status.performance.rawScore,
-            SoftFailed = status.performance.softFailed
-        };
+        UpdateGameState(status, environment, false, false);
     }
 
     public GameState(DataPullerStatus.DataPullerMain beatmap, DataPullerStatus.DataPullerData performance, long MaxCombo)
     {
+        this.Game = new();
+        this.Beatmap = new();
+        this.Performance = new();
+
+        this.Game.Mod = Mod.DataPuller;
+        this.Game.GameVersion = beatmap.GameVersion;
+        this.Game.ModVersion = beatmap.PluginVersion;
+
+        UpdateGameState(beatmap, performance, MaxCombo);
+    }
+
+    public void UpdateGameState(GameEnvironment environment)
+    {
+        this.GameEnvironment = environment;
+    }
+
+    public void UpdateGameState(HttpStatusStatus.Beatmap beatmap)
+    {
+        this.Beatmap.SongName = beatmap.songName;
+        this.Beatmap.SongSubName = beatmap.songSubName;
+        this.Beatmap.SongAuthorName = beatmap.songAuthorName;
+        this.Beatmap.SongCoverArt = new(CoverArtType.Base64, beatmap.songCover);
+        this.Beatmap.LevelAuthorName = beatmap.levelAuthorName;
+        this.Beatmap.Difficulty = beatmap.difficulty;
+        this.Beatmap.CustomDifficulty = null;
+        this.Beatmap.LevelIdOrHash = beatmap.levelId;
+        this.Beatmap.NotesCount = beatmap.notesCount;
+        this.Beatmap.BombsCount = beatmap.bombsCount;
+        this.Beatmap.WallsCount = beatmap.obstaclesCount;
+        this.Beatmap.MaxScore = beatmap.maxScore;
+        this.Beatmap.LevelLength = TimeSpan.FromMilliseconds(beatmap.length);
+    }
+
+    public void UpdateGameState(HttpStatusStatus.Performance performance, bool Failed, bool Finished)
+    {
+        this.Performance.Score = performance.score;
+        this.Performance.Accuracy = (double)Math.Round((float)(((float)performance.score * (float)100) / (float)performance.currentMaxScore), 2);
+        this.Performance.Combo = performance.combo;
+        this.Performance.CurrentMaxScore = performance.currentMaxScore;
+        this.Performance.Misses = performance.passedNotes + performance.hitBombs + performance.missedNotes;
+        this.Performance.MaxCombo = performance.maxCombo;
+        this.Performance.Rank = performance.rank;
+        this.Performance.RawScore = performance.rawScore;
+        this.Performance.SoftFailed = performance.softFailed;
+        this.Performance.Failed = Failed;
+        this.Performance.Finished = Finished;
+    }
+
+    public void UpdateGameState(HttpStatusStatus.Status status, GameEnvironment environment, bool Failed, bool Finished)
+    {
+        UpdateGameState(environment);
+        UpdateGameState(status.beatmap);
+        UpdateGameState(status.performance, Failed, Finished);
+    }
+
+    public void UpdateGameState(DataPullerStatus.DataPullerMain beatmap, DataPullerStatus.DataPullerData performance, long MaxCombo)
+    {
         if (!DataPullerStatus.DataPullerInLevel && beatmap.InLevel)
-        {
             this.GameEnvironment = GameEnvironment.Ingame;
-        }
         else if (DataPullerStatus.DataPullerInLevel && !beatmap.InLevel)
-        {
             this.GameEnvironment = GameEnvironment.Menu;
-        }
+
+        if (beatmap.LevelPaused)
+            this.GameEnvironment = GameEnvironment.Paused;
+
         
-        this.Game = new()
-        {
-            Mod = Mod.DataPuller,
-            GameVersion = beatmap.GameVersion,
-            ModVersion = beatmap.PluginVersion
-        };
 
-        this.Beatmap = new()
-        {
-            SongName = beatmap.SongName,
-            SongSubName = beatmap.SongSubName,
-            SongAuthorName = beatmap.SongAuthor,
-            SongCoverArt = new(CoverArtType.Url, beatmap.coverImage),
-            LevelAuthorName = beatmap.Mapper,
-            Difficulty = beatmap.Difficulty,
-            CustomDifficulty = beatmap.CustomDifficultyLabel,
-            LevelIdOrHash = beatmap.Hash,
-            NotesCount = 0,
-            BombsCount = 0,
-            WallsCount = 0,
-            MaxScore = 0,
-            LevelLength = TimeSpan.FromSeconds(beatmap.Length)
-        };
+        this.Beatmap.SongName = beatmap.SongName;
+        this.Beatmap.SongSubName = beatmap.SongSubName;
+        this.Beatmap.SongAuthorName = beatmap.SongAuthor;
+        this.Beatmap.SongCoverArt = new(CoverArtType.Url, beatmap.coverImage);
+        this.Beatmap.LevelAuthorName = beatmap.Mapper;
+        this.Beatmap.Difficulty = beatmap.Difficulty;
+        this.Beatmap.CustomDifficulty = beatmap.CustomDifficultyLabel;
+        this.Beatmap.LevelIdOrHash = beatmap.Hash;
+        this.Beatmap.NotesCount = 0;
+        this.Beatmap.BombsCount = 0;
+        this.Beatmap.WallsCount = 0;
+        this.Beatmap.MaxScore = 0;
+        this.Beatmap.LevelLength = TimeSpan.FromSeconds(beatmap.Length);
 
-        this.Performance = new()
-        {
-            Score = performance.ScoreWithMultipliers,
-            Accuracy = Convert.ToDouble(performance.Accuracy),
-            Combo = performance.Combo,
-            CurrentMaxScore = performance.MaxScore,
-            Misses = performance.Misses,
-            MaxCombo = MaxCombo,
-            Rank = performance.Rank,
-            RawScore = performance.Score,
-            SoftFailed = ((beatmap.LevelFailed || performance.PlayerHealth <= 0) && beatmap.Modifiers.noFailOn0Energy)
-        };
+        this.Performance.Score = performance.ScoreWithMultipliers;
+        this.Performance.Accuracy = Convert.ToDouble(performance.Accuracy);
+        this.Performance.Combo = performance.Combo;
+        this.Performance.CurrentMaxScore = performance.MaxScore;
+        this.Performance.Misses = performance.Misses;
+        this.Performance.MaxCombo = MaxCombo;
+        this.Performance.Rank = performance.Rank;
+        this.Performance.RawScore = performance.Score;
+        this.Performance.SoftFailed = ((beatmap.LevelFailed || performance.PlayerHealth <= 0) && beatmap.Modifiers.noFailOn0Energy);
     }
 
     /// <summary>
@@ -199,6 +217,8 @@ internal class GameState
 
         public class SongCoverArtInfo
         {
+            internal SongCoverArtInfo() { }
+
             /// <summary>
             /// Constructs a new covert art object
             /// </summary>
@@ -297,8 +317,72 @@ internal class GameState
         public long MaxCombo { get; set; }
 
         /// <summary>
+        /// The map was failed
+        /// </summary>
+        public bool Failed { get; set; }
+
+        /// <summary>
+        /// The map was played to the end
+        /// </summary>
+        public bool Finished { get; set; }
+
+        /// <summary>
         /// Energy dropped to 0 while NoFail is turned on
         /// </summary>
         public bool SoftFailed { get; set; }
+    }
+
+    public GameState Clone()
+    {
+        return new GameState
+        {
+            Beatmap = new()
+            {
+                LevelAuthorName = this.Beatmap.LevelAuthorName,
+                SongAuthorName = this.Beatmap.SongAuthorName,
+                SongCoverArt = new()
+                {
+                    CoverArtType = this.Beatmap.SongCoverArt.CoverArtType,
+                    SongCoverArtBase64 = this.Beatmap.SongCoverArt.SongCoverArtBase64,
+                    SongCoverArtUrl = this.Beatmap.SongCoverArt.SongCoverArtUrl
+                },
+                BombsCount = this.Beatmap.BombsCount,
+                CustomDifficulty = this.Beatmap.CustomDifficulty,
+                Difficulty = this.Beatmap.Difficulty,
+                LevelIdOrHash = this.Beatmap.LevelIdOrHash,
+                LevelLength = this.Beatmap.LevelLength,
+                MaxScore = this.Beatmap.MaxScore,
+                NotesCount = this.Beatmap.NotesCount,
+                SongName = this.Beatmap.SongName,
+                SongSubName = this.Beatmap.SongSubName,
+                WallsCount = this.Beatmap.WallsCount
+            },
+            Game = new()
+            {
+                GameVersion = this.Game.GameVersion,
+                Mod = this.Game.Mod,
+                ModVersion = this.Game.ModVersion
+            },
+            GameEnvironment = this.GameEnvironment,
+            Performance = new()
+            {
+                Accuracy = this.Performance.Accuracy,
+                Combo = this.Performance.Combo,
+                CurrentMaxScore = this.Performance.CurrentMaxScore,
+                Failed = this.Performance.Failed,
+                Finished = this.Performance.Finished,
+                MaxCombo = this.Performance.MaxCombo,
+                Misses = this.Performance.Misses,
+                Rank = this.Performance.Rank,
+                RawScore = this.Performance.RawScore,
+                Score = this.Performance.Score,
+                SoftFailed = this.Performance.SoftFailed
+            },
+            State = new()
+            {
+                SecondsElapsed = this.State.SecondsElapsed,
+                StartTime = this.State.StartTime
+            }
+        };
     }
 }

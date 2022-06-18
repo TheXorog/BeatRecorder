@@ -6,6 +6,7 @@ internal class UIHandler
 
     internal async Task HandleUI()
     {
+        return; // Currently dont need the ui
         await Task.Delay(500);
 
         bool DisplayedUpdateNotice = false;

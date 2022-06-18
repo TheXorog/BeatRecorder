@@ -6,6 +6,9 @@ class Program
 
     public static Settings LoadedSettings = null;
 
+    internal static ConnectionType BeatSaberConnectionType { get; set; } = ConnectionType.NoProcess;
+    internal static ConnectionType OBSConnectionType { get; set; } = ConnectionType.NoProcess;
+
     internal static WebsocketClient beatSaberWebSocket { get; set; }
     internal static WebsocketClient beatSaberWebSocketLiveData { get; set; }
     internal static WebsocketClient obsWebSocket { get; set; }
@@ -166,6 +169,12 @@ class Program
                         beatSaberWebSocketLiveData.Start().Wait();
                         _logger.LogDebug("[BS-DP2] Connected.");
                     });
+                break;
+            }
+
+            case "http-status":
+            {
+                await HTTPStatusClient.InitializeClient(LoadedSettings);
                 break;
             }
         }

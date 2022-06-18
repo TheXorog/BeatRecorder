@@ -176,7 +176,7 @@ class DataPuller
         if (msg.Type != ReconnectionType.Initial)
         {
             _logger.LogWarn($"[BS-DP1] Reconnected: {msg.Type}");
-            Objects.LastDP1Warning = ConnectionTypeWarning.Connected;
+            Objects.LastDP1Warning = ConnectionType.Connected;
         }
     }
 
@@ -196,12 +196,12 @@ class DataPuller
 
             if (!processCollection.Any(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")))
             {
-                if (Objects.LastDP1Warning != ConnectionTypeWarning.NoProcess)
+                if (Objects.LastDP1Warning != ConnectionType.NoProcess)
                 {
                     _logger.LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
                     Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, MessageType.ERROR);
                 }
-                Objects.LastDP1Warning = ConnectionTypeWarning.NoProcess;
+                Objects.LastDP1Warning = ConnectionType.NoProcess;
             }
             else
             {
@@ -219,31 +219,31 @@ class DataPuller
                 }
                 else
                 {
-                    if (Objects.LastDP1Warning != ConnectionTypeWarning.NotModded)
+                    if (Objects.LastDP1Warning != ConnectionType.NotModded)
                     {
                         _logger.LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, MessageType.ERROR);
                     }
-                    Objects.LastDP1Warning = ConnectionTypeWarning.NotModded;
+                    Objects.LastDP1Warning = ConnectionType.NotModded;
                 }
 
                 if (FoundWebSocketDll)
                 {
-                    if (Objects.LastDP1Warning != ConnectionTypeWarning.ModInstalled)
+                    if (Objects.LastDP1Warning != ConnectionType.ModInstalled)
                     {
                         _logger.LogFatal($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, MessageType.ERROR);
                     }
-                    Objects.LastDP1Warning = ConnectionTypeWarning.ModInstalled;
+                    Objects.LastDP1Warning = ConnectionType.ModInstalled;
                 }
                 else
                 {
-                    if (Objects.LastDP1Warning != ConnectionTypeWarning.ModNotInstalled)
+                    if (Objects.LastDP1Warning != ConnectionType.ModNotInstalled)
                     {
                         _logger.LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, MessageType.ERROR);
                     }
-                    Objects.LastDP1Warning = ConnectionTypeWarning.ModNotInstalled;
+                    Objects.LastDP1Warning = ConnectionType.ModNotInstalled;
                 }
             }
         }

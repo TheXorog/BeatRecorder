@@ -1,8 +1,9 @@
 ﻿namespace BeatRecorder.Enums;
 
-public enum ConnectionTypeWarning
+public enum ConnectionType
 {
     Connected,
+    IncompleteConnection,
     ModInstalled,
     ModNotInstalled,
     NotModded,

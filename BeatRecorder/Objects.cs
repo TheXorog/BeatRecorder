@@ -8,7 +8,7 @@ class Objects
 
     public static ulong SteamNotificationId = 0;
 
-    public static ConnectionTypeWarning LastDP1Warning { get; set; }
-    public static ConnectionTypeWarning LastHttpStatusWarning { get; set; }
-    public static ConnectionTypeWarning LastOBSWarning { get; set; }
+    public static ConnectionType LastDP1Warning { get; set; }
+    public static ConnectionType LastHttpStatusWarning { get; set; }
+    public static ConnectionType LastOBSWarning { get; set; }
 }

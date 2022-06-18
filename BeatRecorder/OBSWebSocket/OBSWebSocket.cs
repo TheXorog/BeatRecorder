@@ -73,4 +73,22 @@ class OBSWebSocket
             _logger.LogError("[OBS] The WebSocket isn't connected, no recording can be stopped.");
         }
     }
+
+    internal static void PauseRecording()
+    {
+        _logger.LogDebug($"Pausing recording");
+        Program.obsWebSocket.Send($"{{\"request-type\":\"PauseRecording\", \"message-id\":\"PauseRecording\"}}");
+    }
+    
+    internal static void ResumeRecording()
+    {
+        _logger.LogDebug($"Resuming recording");
+        Program.obsWebSocket.Send($"{{\"request-type\":\"ResumeRecording\", \"message-id\":\"ResumeRecording\"}}");
+    }
+    
+    internal static void SetCurrentScene(string scene)
+    {
+        _logger.LogDebug($"Updating current scene to '{scene}'");
+        Program.obsWebSocket.Send($"{{\"request-type\":\"SetCurrentScene\", \"scene-name\":\"{scene}\", \"message-id\":\"SetCurrentScene\"}}");
+    }
 }
