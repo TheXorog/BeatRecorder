@@ -26,8 +26,10 @@ internal class ObsHandler
     {
         _logger.LogInfo("Initializing Connection to OBS..");
 
-        ObsHandler obsHandler = new();
-        obsHandler.LoadedConfig = config;
+        ObsHandler obsHandler = new()
+        {
+            LoadedConfig = config
+        };
 
         var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
         {

@@ -7,39 +7,39 @@ internal class SharedStatus
         GameInfo = new()
         {
             ModUsed = Mod.HttpStatus,
-            ModVersion = status.game.gameVersion,
-            GameVersion = status.game.pluginVersion
+            ModVersion = status.game?.gameVersion,
+            GameVersion = status.game?.pluginVersion
         };
 
         BeatmapInfo = new()
         {
-            Name = status.beatmap.songName,
-            SubName = status.beatmap.songSubName,
-            Author = status.beatmap.songAuthorName,
-            Creator = status.beatmap.levelAuthorName,
-            Cover = (Bitmap)Bitmap.FromStream(new MemoryStream(Convert.FromBase64String(status.beatmap.songCover))),
-            IdOrHash = status.beatmap.levelId,
-            Bpm = status.beatmap.songBPM,
-            NoteJumpSpeed = status.beatmap.noteJumpSpeed,
-            Difficulty = status.beatmap.difficulty,
-            BombCount = status.beatmap.bombsCount,
-            NoteCount = status.beatmap.notesCount,
-            WallCount = status.beatmap.obstaclesCount
+            Name = status.beatmap?.songName,
+            SubName = status.beatmap?.songSubName,
+            Author = status.beatmap?.songAuthorName,
+            Creator = status.beatmap?.levelAuthorName,
+            Cover = (Bitmap)Bitmap.FromStream(new MemoryStream(Convert.FromBase64String(status.beatmap?.songCover))),
+            IdOrHash = status.beatmap?.levelId,
+            Bpm = status.beatmap?.songBPM,
+            NoteJumpSpeed = status.beatmap?.noteJumpSpeed,
+            Difficulty = status.beatmap?.difficulty,
+            BombCount = status.beatmap?.bombsCount,
+            NoteCount = status.beatmap?.notesCount,
+            WallCount = status.beatmap?.obstaclesCount
         };
 
         PerformanceInfo = new()
         {
-            RawScore = status.performance.rawScore,
-            Score = status.performance.score,
-            Accuracy = Math.Round((double)((status.performance.score * 100) / status.beatmap.maxScore), 2),
-            Rank = status.performance.rank,
-            MissedNoteCount = status.performance.passedNotes,
-            BadCutCount = status.performance.missedNotes,
-            BombHitCount = status.performance.hitBombs,
-            Failed = status.performance.failed,
-            Finished = status.performance.finished,
-            MaxCombo = status.performance.maxCombo,
-            SoftFailed = status.performance.softFailed
+            RawScore = status.performance?.rawScore,
+            Score = status.performance?.score,
+            Accuracy = Math.Round((double)((status.performance?.score * 100) / status.beatmap?.maxScore), 2),
+            Rank = status.performance?.rank,
+            MissedNoteCount = status.performance?.passedNotes,
+            BadCutCount = status.performance?.missedNotes,
+            BombHitCount = status.performance?.hitBombs,
+            Failed = status.performance?.failed,
+            Finished = status.performance?.finished,
+            MaxCombo = status.performance?.maxCombo,
+            SoftFailed = status.performance?.softFailed
         };
     }
 
