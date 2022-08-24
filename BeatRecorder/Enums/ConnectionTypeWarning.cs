@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace BeatRecorder.Enums;
 
-namespace BeatRecorder.Enums;
-internal class ConnectionTypeWarning
+public enum ConnectionTypeWarning
 {
+    Connected,
+    ModInstalled,
+    ModNotInstalled,
+    NotModded,
+    NoProcess
 }

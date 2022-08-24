@@ -5,6 +5,7 @@ class Program
     public static readonly string Version = "2.0-alpha_dev";
 
     public Status status { get; set; } = new();
+    public ObsHandler ObsClient { get; set; }
 
     static void Main(string[] args)
     {
@@ -43,6 +44,10 @@ class Program
 
             _logger.ChangeLogLevel(status.LoadedConfig.ConsoleLogLevel);
 
+            #if DEBUG
+            _logger.ChangeLogLevel(LogLevel.TRACE);
+            #endif
+
             if (!string.IsNullOrWhiteSpace(status.LoadedConfig.OBSPassword))
                 _logger.AddBlacklist(status.LoadedConfig.OBSPassword);
 
@@ -52,8 +57,6 @@ class Program
 
             _logger.LogInfo("Settings loaded");
             _logger.LogDebug($"{JsonConvert.SerializeObject(status.LoadedConfig)}");
-            _logger.LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
-            _logger.LogDebug($"{Environment.CurrentDirectory}");
         }
         catch (Exception ex)
         {
@@ -69,7 +72,10 @@ class Program
                          $"OS 64x: {Environment.Is64BitOperatingSystem}\n" +
                          $"Process 64x: {Environment.Is64BitProcess}\n\n" +
                          $"Current Directory: {Environment.CurrentDirectory}\n" +
+                         $"Base Directory: {AppDomain.CurrentDomain.BaseDirectory}\n" +
                          $"Commandline: {Environment.CommandLine}\n");
+
+        ObsClient = ObsHandler.Initialize(status.LoadedConfig);
 
         await Task.Delay(-1);
     }
