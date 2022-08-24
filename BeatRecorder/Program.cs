@@ -5,6 +5,7 @@ class Program
     public static readonly string Version = "2.0-alpha_dev";
 
     public Status status { get; set; } = new();
+
     public ObsHandler ObsClient { get; set; }
 
     static void Main(string[] args)
