@@ -12,7 +12,7 @@ class DataPuller
         }
         catch (Exception ex)
         {
-            LogFatal($"[BS-DP1] Unable to convert BSDataPuller message into an dictionary: {ex}");
+            _logger.LogFatal($"[BS-DP1] Unable to convert BSDataPuller message into an dictionary: {ex}");
             return;
         }
 
@@ -21,8 +21,8 @@ class DataPuller
             if (!DataPullerStatus.DataPullerInLevel && _status.InLevel)
             {
                 DataPullerStatus.DataPullerInLevel = true;
-                LogDebug("[BS-DP1] Song started.");
-                LogInfo($"[BS-DP1] Started playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
+                _logger.LogDebug("[BS-DP1] Song started.");
+                _logger.LogInfo($"[BS-DP1] Started playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
                 DataPullerStatus.DataPullerCurrentBeatmap = _status;
 
@@ -33,7 +33,7 @@ class DataPuller
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-DP1] {ex}");
+                    _logger.LogError($"[BS-DP1] {ex}");
                     return;
                 }
 
@@ -44,7 +44,7 @@ class DataPuller
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-DP1] {ex}");
+                    _logger.LogError($"[BS-DP1] {ex}");
                     return;
                 }
             }
@@ -53,8 +53,8 @@ class DataPuller
                 Thread.Sleep(500);
                 DataPullerStatus.DataPullerInLevel = false;
                 DataPullerStatus.DataPullerPaused = false;
-                LogDebug("[BS-DP1] Menu entered.");
-                LogInfo($"[BS-DP1] Stopped playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
+                _logger.LogDebug("[BS-DP1] Menu entered.");
+                _logger.LogInfo($"[BS-DP1] Stopped playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
                 try
                 {
@@ -68,7 +68,7 @@ class DataPuller
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-DP1] {ex}");
+                    _logger.LogError($"[BS-DP1] {ex}");
                     return;
                 }
 
@@ -79,7 +79,7 @@ class DataPuller
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-DP1] {ex}");
+                    _logger.LogError($"[BS-DP1] {ex}");
                     return;
                 }
             }
@@ -92,7 +92,7 @@ class DataPuller
                 if (!DataPullerStatus.DataPullerPaused && _status.LevelPaused)
                 {
                     DataPullerStatus.DataPullerPaused = true;
-                    LogInfo("[BS-DP1] Song paused.");
+                    _logger.LogInfo("[BS-DP1] Song paused.");
 
                     try
                     {
@@ -102,7 +102,7 @@ class DataPuller
                     }
                     catch (Exception ex)
                     {
-                        LogError($"[BS-DP1] {ex}");
+                        _logger.LogError($"[BS-DP1] {ex}");
                         return;
                     }
 
@@ -113,14 +113,14 @@ class DataPuller
                     }
                     catch (Exception ex)
                     {
-                        LogError($"[BS-DP1] {ex}");
+                        _logger.LogError($"[BS-DP1] {ex}");
                         return;
                     }
                 }
                 else if (DataPullerStatus.DataPullerPaused && !_status.LevelPaused)
                 {
                     DataPullerStatus.DataPullerPaused = false;
-                    LogInfo("[BS-DP1] Song resumed.");
+                    _logger.LogInfo("[BS-DP1] Song resumed.");
 
                     try
                     {
@@ -130,7 +130,7 @@ class DataPuller
                     }
                     catch (Exception ex)
                     {
-                        LogError($"[BS-DP1] {ex}");
+                        _logger.LogError($"[BS-DP1] {ex}");
                         return;
                     }
 
@@ -141,7 +141,7 @@ class DataPuller
                     }
                     catch (Exception ex)
                     {
-                        LogError($"[BS-DP1] {ex}");
+                        _logger.LogError($"[BS-DP1] {ex}");
                         return;
                     }
                 }
@@ -159,7 +159,7 @@ class DataPuller
         }
         catch (Exception ex)
         {
-            LogFatal($"[BS-DP2] Unable to convert BSDataPuller message into an dictionary: {ex}");
+            _logger.LogFatal($"[BS-DP2] Unable to convert BSDataPuller message into an dictionary: {ex}");
             return;
         }
 
@@ -175,7 +175,7 @@ class DataPuller
         Program.SendNotification("Connected to Beat Saber", 1000, MessageType.INFO);
         if (msg.Type != ReconnectionType.Initial)
         {
-            LogWarn($"[BS-DP1] Reconnected: {msg.Type}");
+            _logger.LogWarn($"[BS-DP1] Reconnected: {msg.Type}");
             Objects.LastDP1Warning = ConnectionTypeWarning.CONNECTED;
         }
     }
@@ -184,7 +184,7 @@ class DataPuller
     {
         if (msg.Type != ReconnectionType.Initial)
         {
-            LogWarn($"[BS-DP2] Reconnected: {msg.Type}");
+            _logger.LogWarn($"[BS-DP2] Reconnected: {msg.Type}");
         }
     }
 
@@ -198,7 +198,7 @@ class DataPuller
             {
                 if (Objects.LastDP1Warning != ConnectionTypeWarning.NO_PROCESS)
                 {
-                    LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                    _logger.LogWarn($"[BS-DP1] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
                     Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, MessageType.ERROR);
                 }
                 Objects.LastDP1Warning = ConnectionTypeWarning.NO_PROCESS;
@@ -221,7 +221,7 @@ class DataPuller
                 {
                     if (Objects.LastDP1Warning != ConnectionTypeWarning.NOT_MODDED)
                     {
-                        LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
+                        _logger.LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, MessageType.ERROR);
                     }
                     Objects.LastDP1Warning = ConnectionTypeWarning.NOT_MODDED;
@@ -231,7 +231,7 @@ class DataPuller
                 {
                     if (Objects.LastDP1Warning != ConnectionTypeWarning.MOD_INSTALLED)
                     {
-                        LogFatal($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                        _logger.LogFatal($"[BS-DP1] Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, MessageType.ERROR);
                     }
                     Objects.LastDP1Warning = ConnectionTypeWarning.MOD_INSTALLED;
@@ -240,7 +240,7 @@ class DataPuller
                 {
                     if (Objects.LastDP1Warning != ConnectionTypeWarning.MOD_NOT_INSTALLED)
                     {
-                        LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
+                        _logger.LogFatal($"[BS-DP1] Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, MessageType.ERROR);
                     }
                     Objects.LastDP1Warning = ConnectionTypeWarning.MOD_NOT_INSTALLED;
@@ -249,26 +249,26 @@ class DataPuller
         }
         catch (Exception ex)
         {
-            LogError($"[BS-DP1] Failed to check if BSDataPuller is installed: (Disconnect Reason: {msg.Type}) {ex}");
+            _logger.LogError($"[BS-DP1] Failed to check if BSDataPuller is installed: (Disconnect Reason: {msg.Type}) {ex}");
         }
     }
 
     internal static void LiveDataDisconnected(DisconnectionInfo msg)
     {
         if (Program.beatSaberWebSocket.IsRunning)
-            LogError($"[BS-DP2] Disconnected: {msg.Type}");
+            _logger.LogError($"[BS-DP2] Disconnected: {msg.Type}");
         else
-            LogDebug($"[BS-DP2] Disconnected: {msg.Type}");
+            _logger.LogDebug($"[BS-DP2] Disconnected: {msg.Type}");
     }
 
     internal static void HandleFile(DataPullerStatus.DataPullerMain BeatmapInfo, DataPullerStatus.DataPullerData PerformanceInfo, string OldFileName, int HighestCombo)
     {
         if (BeatmapInfo != null)
         {
-            LogDebug($"[BR] BeatmapInfo: {JsonConvert.SerializeObject(BeatmapInfo)}");
-            LogDebug($"[BR] PerformanceInfo: {JsonConvert.SerializeObject(PerformanceInfo)}");
-            LogDebug($"[BR] OldFileName: {OldFileName}");
-            LogDebug($"[BR] HighestCombo: {HighestCombo}");
+            _logger.LogDebug($"[BR] BeatmapInfo: {JsonConvert.SerializeObject(BeatmapInfo)}");
+            _logger.LogDebug($"[BR] PerformanceInfo: {JsonConvert.SerializeObject(PerformanceInfo)}");
+            _logger.LogDebug($"[BR] OldFileName: {OldFileName}");
+            _logger.LogDebug($"[BR] HighestCombo: {HighestCombo}");
             bool DeleteFile = false;
             string NewName = Program.LoadedSettings.FileFormat;
 
@@ -289,10 +289,10 @@ class DataPuller
 
                     if ((BeatmapInfo.LevelFailed || PerformanceInfo.PlayerHealth <= 0) && BeatmapInfo.Modifiers.noFailOn0Energy)
                     {
-                        LogDebug($"[BR] Soft-Failed.");
+                        _logger.LogDebug($"[BR] Soft-Failed.");
                         if (Program.LoadedSettings.DeleteSoftFailed)
                         {
-                            LogDebug($"[BR] Soft-Failed. Deletion requested.");
+                            _logger.LogDebug($"[BR] Soft-Failed. Deletion requested.");
                             DeleteFile = true;
                         }
 
@@ -301,21 +301,21 @@ class DataPuller
 
                     if (BeatmapInfo.LevelFinished)
                     {
-                        LogDebug($"[BR] Level finished");
+                        _logger.LogDebug($"[BR] Level finished");
                         GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
                     }
                     else if (BeatmapInfo.LevelQuit)
                     {
-                        LogDebug($"[BR] Level quit");
+                        _logger.LogDebug($"[BR] Level quit");
                         if (Program.LoadedSettings.DeleteQuit)
                         {
-                            LogDebug($"[BR] Quit. Deletion requested.");
+                            _logger.LogDebug($"[BR] Quit. Deletion requested.");
                             DeleteFile = true;
 
                             if (GeneratedAccuracy == "NF-")
                                 if (!Program.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                 {
-                                    LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
+                                    _logger.LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
                                     DeleteFile = false;
                                 }
                         }
@@ -324,10 +324,10 @@ class DataPuller
                     }
                     else if (BeatmapInfo.LevelFailed && !BeatmapInfo.Modifiers.noFailOn0Energy)
                     {
-                        LogDebug($"[BR] Level failed.");
+                        _logger.LogDebug($"[BR] Level failed.");
                         if (Program.LoadedSettings.DeleteFailed)
                         {
-                            LogDebug($"[BR] Failed. Deletion requested.");
+                            _logger.LogDebug($"[BR] Failed. Deletion requested.");
                             DeleteFile = true;
                         }
                         else
@@ -339,16 +339,16 @@ class DataPuller
                     {
                         if (!BeatmapInfo.LevelQuit && !BeatmapInfo.LevelFinished)
                         {
-                            LogDebug($"[BR] Level restarted");
+                            _logger.LogDebug($"[BR] Level restarted");
                             if (Program.LoadedSettings.DeleteQuit)
                             {
-                                LogDebug($"[BR] Quit. Deletion requested.");
+                                _logger.LogDebug($"[BR] Quit. Deletion requested.");
                                 DeleteFile = true;
 
                                 if (GeneratedAccuracy == "NF-")
                                     if (!Program.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                     {
-                                        LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
+                                        _logger.LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
                                         DeleteFile = false;
                                     }
                             }
@@ -357,12 +357,12 @@ class DataPuller
                         }
                         else
                         {
-                            LogDebug($"[BR] Level finished?");
+                            _logger.LogDebug($"[BR] Level finished?");
                             GeneratedAccuracy += $"{Math.Round(PerformanceInfo.Accuracy, 2)}";
                         }
                     }
 
-                    LogDebug($"[BR] {GeneratedAccuracy}");
+                    _logger.LogDebug($"[BR] {GeneratedAccuracy}");
                     NewName = NewName.Replace("<accuracy>", GeneratedAccuracy);
                 }
 
@@ -403,7 +403,7 @@ class DataPuller
 
             if (Program.LoadedSettings.DeleteIfShorterThan > OBSWebSocketStatus.RecordingSeconds)
             {
-                LogDebug($"[BR] The recording is too short. Deletion requested.");
+                _logger.LogDebug($"[BR] The recording is too short. Deletion requested.");
                 DeleteFile = true;
             }
 
@@ -480,32 +480,32 @@ class DataPuller
                 {
                     if (!DeleteFile)
                     {
-                        LogInfo($"[BR] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
+                        _logger.LogInfo($"[BR] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                         File.Move(OldFileName, NewFileName);
-                        LogInfo($"[BR] Successfully renamed.");
+                        _logger.LogInfo($"[BR] Successfully renamed.");
                         Program.SendNotification("Recording renamed.", 1000, MessageType.INFO);
                     }
                     else
                     {
-                        LogInfo($"[BR] Deleting \"{fileInfo.Name}\"..");
+                        _logger.LogInfo($"[BR] Deleting \"{fileInfo.Name}\"..");
                         File.Delete(OldFileName);
-                        LogInfo($"[BR] Successfully deleted.");
+                        _logger.LogInfo($"[BR] Successfully deleted.");
                         Program.SendNotification("Recording deleted.", 1000, MessageType.INFO);
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BR] {ex}.");
+                    _logger.LogError($"[BR] {ex}.");
                 }
             }
             else
             {
-                LogError($"[BR] {OldFileName} doesn't exist.");
+                _logger.LogError($"[BR] {OldFileName} doesn't exist.");
             }
         }
         else
         {
-            LogError($"[BR] Last recorded file can't be renamed.");
+            _logger.LogError($"[BR] Last recorded file can't be renamed.");
         }
     }
 }

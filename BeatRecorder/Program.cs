@@ -26,9 +26,9 @@ class Program
         if (!Directory.Exists("logs"))
             Directory.CreateDirectory("logs");
 
-        StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.DEBUG, DateTime.UtcNow.AddDays(-3), false);
+        _logger = StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", Xorog.Logger.Enums.LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
 
-        LogInfo("[BR] Loading settings..");
+        _logger.LogInfo("[BR] Loading settings..");
 
         _ = Task.Run(async () =>
         {
@@ -36,8 +36,8 @@ class Program
 
             if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
             {
-                LogError("Only one instance of this application is allowed");
-                Environment.Exit(0);
+                _logger.LogError("Only one instance of this application is allowed");
+                Environment.Exit(1);
                 return;
             }
         });
@@ -49,7 +49,7 @@ class Program
                 LoadedSettings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("Settings.json"));
                 File.WriteAllText("Settings.json", JsonConvert.SerializeObject(LoadedSettings, Formatting.Indented));
 
-                ChangeLogLevel(LoadedSettings.ConsoleLogLevel);
+                _logger.ChangeLogLevel(LoadedSettings.ConsoleLogLevel);
 
                 if (LoadedSettings.Mod != "http-status" && LoadedSettings.Mod != "datapuller")
                 {
@@ -57,16 +57,16 @@ class Program
                 }
 
                 if (!string.IsNullOrWhiteSpace(LoadedSettings.OBSPassword))
-                    AddBlacklist(LoadedSettings.OBSPassword);
+                    _logger.AddBlacklist(LoadedSettings.OBSPassword);
             }
             catch (Exception ex)
             {
-                LogError($"[BR] Exception occured while loading config: {ex}");
+                _logger.LogError($"[BR] Exception occured while loading config: {ex}");
                 ResetSettings();
                 return;
             }
 
-            LogInfo("[BR] Settings loaded.");
+            _logger.LogInfo("[BR] Settings loaded.");
         }
         else
         {
@@ -74,7 +74,7 @@ class Program
             return;
         }
 
-        LogDebug($"Enviroment Details\n\n" +
+        _logger.LogDebug($"Enviroment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +
                 $"OS & Version: {Environment.OSVersion}\n\n" +
                 $"OS 64x: {Environment.Is64BitOperatingSystem}\n" +
@@ -82,9 +82,9 @@ class Program
                 $"Current Directory: {Environment.CurrentDirectory}\n" +
                 $"Commandline: {Environment.CommandLine}\n");
 
-        LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(LoadedSettings, Formatting.Indented)}\n");
-        LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
-        LogDebug($"{Environment.CurrentDirectory}");
+        _logger.LogDebug($"Loaded settings:\n\n{JsonConvert.SerializeObject(LoadedSettings, Formatting.Indented)}\n");
+        _logger.LogDebug($"{AppDomain.CurrentDomain.BaseDirectory}");
+        _logger.LogDebug($"{Environment.CurrentDirectory}");
 
         OBSWebSocketStatus.CancelStopRecordingDelay = new CancellationTokenSource();
 
@@ -95,11 +95,11 @@ class Program
                 var github = new GitHubClient(new ProductHeaderValue("BeatRecorderUpdateCheck"));
                 var repo = await github.Repository.Release.GetLatest("TheXorog", "BeatRecorder");
 
-                LogInfo($"[BR] Current latest release is \"{repo.TagName}\". You're currently running: \"{CurrentVersion}\"");
+                _logger.LogInfo($"[BR] Current latest release is \"{repo.TagName}\". You're currently running: \"{CurrentVersion}\"");
 
                 if (repo.TagName != CurrentVersion)
                 {
-                    LogFatal($"[BR] You're running an outdated version of BeatRecorder, please update at https://github.com/TheXorog/BeatRecorder/releases/latest." +
+                    _logger.LogFatal($"[BR] You're running an outdated version of BeatRecorder, please update at https://github.com/TheXorog/BeatRecorder/releases/latest." +
                             $"\n\nWhat changed in the new version:\n\n" +
                             $"{repo.Body}\n");
 
@@ -109,7 +109,7 @@ class Program
             }
             catch (Exception ex)
             {
-                LogError($"[BR] Unable to get latest version: {ex}");
+                _logger.LogError($"[BR] Unable to get latest version: {ex}");
             }
         });
 
@@ -139,9 +139,9 @@ class Program
                     beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { DataPuller.MapDataReconnected(type); });
                     beatSaberWebSocket.DisconnectionHappened.Subscribe(type => { DataPuller.MapDataDisconnected(type); });
 
-                    LogInfo($"[BS-DP1] Connecting..");
+                    _logger.LogInfo($"[BS-DP1] Connecting..");
                     beatSaberWebSocket.Start().Wait();
-                    LogInfo("[BS-DP1] Connected.");
+                    _logger.LogInfo("[BS-DP1] Connected.");
                 });
 
                 // Connect to LiveData Endpoint of DataPuller's WebSocket or HttpStatus' Endpoint
@@ -168,9 +168,9 @@ class Program
                         beatSaberWebSocketLiveData.ReconnectionHappened.Subscribe(type => { DataPuller.LiveDataReconnected(type); });
                         beatSaberWebSocketLiveData.DisconnectionHappened.Subscribe(type => { DataPuller.LiveDataDisconnected(type); });
 
-                        LogDebug($"[BS-DP2] Connecting..");
+                        _logger.LogDebug($"[BS-DP2] Connecting..");
                         beatSaberWebSocketLiveData.Start().Wait();
-                        LogDebug("[BS-DP2] Connected.");
+                        _logger.LogDebug("[BS-DP2] Connected.");
                     });
                 break;
             }
@@ -199,7 +199,7 @@ class Program
                     beatSaberWebSocket.ReconnectionHappened.Subscribe(type => { HttpStatus.Reconnected(type); });
                     beatSaberWebSocket.DisconnectionHappened.Subscribe(type => { HttpStatus.Disconnected(type); });
 
-                    LogInfo($"[BS-HS] Connecting..");
+                    _logger.LogInfo($"[BS-HS] Connecting..");
                     beatSaberWebSocket.Start().Wait();
                 });
                 break;
@@ -228,12 +228,12 @@ class Program
             obsWebSocket.ReconnectionHappened.Subscribe(type => { OBSWebSocketEvents.Reconnected(type); });
             obsWebSocket.DisconnectionHappened.Subscribe(type => { OBSWebSocketEvents.Disconnected(type); });
 
-            LogInfo($"[OBS] Connecting..");
+            _logger.LogInfo($"[OBS] Connecting..");
             obsWebSocket.Start().Wait();
 
             obsWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{OBSWebSocketEvents.RequiredAuthenticationGuid}\"}}");
 
-            LogInfo($"[OBS] Connected.");
+            _logger.LogInfo($"[OBS] Connected.");
 
             SendNotification("Connected to OBS", 1000, MessageType.INFO);
         });
@@ -269,12 +269,12 @@ class Program
         File.WriteAllText("Settings.json", JsonConvert.SerializeObject(LoadedSettings, Formatting.Indented));
 
         SendNotification("Your settings were reset due to an error. Please check your desktop.", 10000, MessageType.ERROR);
-        LogInfo($"Please configure BeatRecorder using the config file that was just opened. If you're done, save and quit notepad and BeatRecorder will restart for you.");
+        _logger.LogInfo($"Please configure BeatRecorder using the config file that was just opened. If you're done, save and quit notepad and BeatRecorder will restart for you.");
 
         Objects.SettingsRequired = true;
         var infoUI = new InfoUI(CurrentVersion, LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
         infoUI.ShowDialog();
-        LogDebug("Settings updated via UI");
+        _logger.LogDebug("Settings updated via UI");
         Process.Start(Environment.ProcessPath);
         Thread.Sleep(2000);
         Environment.Exit(0);
@@ -289,7 +289,7 @@ class Program
         {
             _ = Task.Run(() =>
             {
-                LogInfo("Loading Notification Assets..");
+                _logger.LogInfo("Loading Notification Assets..");
                 Bitmap InfoIcon;
                 Bitmap ErrorIcon;
 
@@ -300,7 +300,7 @@ class Program
                 }
                 catch (Exception ex)
                 {
-                    LogFatal("Failed load Notifaction Assets", ex);
+                    _logger.LogFatal("Failed load Notifaction Assets", ex);
                     return;
                 }
 
@@ -310,7 +310,7 @@ class Program
                     {
                         if (Objects.SteamNotificationId == 0)
                         {
-                            LogDebug($"[BR] Initializing OpenVR..");
+                            _logger.LogDebug($"[BR] Initializing OpenVR..");
                             bool Initialized = false;
 
                             while (!Initialized)
@@ -319,11 +319,11 @@ class Program
                                 Thread.Sleep(500);
                             }
 
-                            LogDebug($"[BR] Initialized OpenVR.");
+                            _logger.LogDebug($"[BR] Initialized OpenVR.");
 
-                            LogDebug($"[BR] Initializing NotificationOverlay..");
+                            _logger.LogDebug($"[BR] Initializing NotificationOverlay..");
                             Objects.SteamNotificationId = EasyOpenVRSingleton.Instance.InitNotificationOverlay("BeatRecorder");
-                            LogDebug($"[BR] Initialized NotificationOverlay: {Objects.SteamNotificationId}");
+                            _logger.LogDebug($"[BR] Initialized NotificationOverlay: {Objects.SteamNotificationId}");
                         }
 
                         while (NotificationList.Count == 0)
@@ -346,7 +346,7 @@ class Program
                             NotifactionIcon.m_nBytesPerPixel = 4;
 
                             var NotificationId = EasyOpenVRSingleton.Instance.EnqueueNotification(Objects.SteamNotificationId, EVRNotificationType.Persistent, b.Message, EVRNotificationStyle.Application, NotifactionIcon);
-                            LogDebug($"[BR] Displayed Notification {NotificationId}: {b.Message}");
+                            _logger.LogDebug($"[BR] Displayed Notification {NotificationId}: {b.Message}");
 
                             if (b.Type == MessageType.INFO)
                                 InfoIcon.UnlockBits(TextureData);
@@ -361,17 +361,17 @@ class Program
 
                             if (error != EVRNotificationError.OK)
                             {
-                                LogFatal($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
+                                _logger.LogFatal($"Failed to dismiss notification {Objects.SteamNotificationId}: {error}");
                             }
 
-                            LogDebug($"[BR] Dismissed Notification {NotificationId}");
+                            _logger.LogDebug($"[BR] Dismissed Notification {NotificationId}");
 
                             NotificationList.Remove(b);
                         }
                     }
                     catch (Exception ex)
                     {
-                        LogError(ex.ToString());
+                        _logger.LogError(ex.ToString());
                         Thread.Sleep(5000);
                         continue;
                     }

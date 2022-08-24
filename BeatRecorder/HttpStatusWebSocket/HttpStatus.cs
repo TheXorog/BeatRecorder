@@ -12,7 +12,7 @@ class HttpStatus
         }
         catch (Exception ex)
         {
-            LogFatal($"[BS-HS] Unable to convert beatsaber-http-status message into an dictionary: {ex}");
+            _logger.LogFatal($"[BS-HS] Unable to convert beatsaber-http-status message into an dictionary: {ex}");
             return;
         }
 
@@ -30,16 +30,16 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
-                LogInfo("[BS-HS] Connected.");
+                _logger.LogInfo("[BS-HS] Connected.");
                 break;
 
             case "songStart":
-                LogDebug("[BS-HS] Song started.");
-                LogInfo($"[BS-HS] Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
+                _logger.LogDebug("[BS-HS] Song started.");
+                _logger.LogInfo($"[BS-HS] Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
 
                 HttpStatusStatus.FailedCurrentSong = false;
                 HttpStatusStatus.FinishedCurrentSong = false;
@@ -53,7 +53,7 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
@@ -63,13 +63,13 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "finished":
-                LogInfo("[BS-HS] Song finished.");
+                _logger.LogInfo("[BS-HS] Song finished.");
 
                 HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
                 HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
@@ -82,13 +82,13 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "failed":
-                LogInfo("[BS-HS] Song failed.");
+                _logger.LogInfo("[BS-HS] Song failed.");
 
                 HttpStatusStatus.HttpStatusCurrentPerformance = _status.status.performance;
                 HttpStatusStatus.HttpStatusLastPerformance = HttpStatusStatus.HttpStatusCurrentPerformance;
@@ -101,13 +101,13 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "pause":
-                LogInfo("[BS-HS] Song paused.");
+                _logger.LogInfo("[BS-HS] Song paused.");
 
                 try
                 {
@@ -117,7 +117,7 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
@@ -128,13 +128,13 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "resume":
-                LogInfo("[BS-HS] Song resumed.");
+                _logger.LogInfo("[BS-HS] Song resumed.");
 
                 try
                 {
@@ -144,7 +144,7 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
@@ -155,14 +155,14 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
 
             case "menu":
-                LogDebug("[BS-HS] Menu entered.");
-                LogInfo($"[BS-HS] Stopped playing \"{_status?.status?.beatmap?.songName}\" by \"{_status?.status?.beatmap?.songAuthorName}\"");
+                _logger.LogDebug("[BS-HS] Menu entered.");
+                _logger.LogInfo($"[BS-HS] Stopped playing \"{_status?.status?.beatmap?.songName}\" by \"{_status?.status?.beatmap?.songAuthorName}\"");
 
                 try
                 {
@@ -175,7 +175,7 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
 
@@ -186,7 +186,7 @@ class HttpStatus
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BS-HS] {ex}");
+                    _logger.LogError($"[BS-HS] {ex}");
                     return;
                 }
                 break;
@@ -200,7 +200,7 @@ class HttpStatus
     internal static void Reconnected(ReconnectionInfo msg)
     {
         if (msg.Type != ReconnectionType.Initial)
-            LogWarn($"[BS-HS] Reconnected: {msg.Type}");
+            _logger.LogWarn($"[BS-HS] Reconnected: {msg.Type}");
 
         Objects.LastHttpStatusWarning = ConnectionTypeWarning.CONNECTED;
         Program.SendNotification("Connected to Beat Saber", 1000, MessageType.INFO);
@@ -216,7 +216,7 @@ class HttpStatus
             {
                 if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.NO_PROCESS)
                 {
-                    LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                    _logger.LogWarn($"[BS-HS] Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
                     Program.SendNotification("Couldn't connect to BeatSaber, is it even running?", 5000, MessageType.ERROR);
                 }
                 Objects.LastHttpStatusWarning = ConnectionTypeWarning.NO_PROCESS;
@@ -239,7 +239,7 @@ class HttpStatus
                 {
                     if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.NOT_MODDED)
                     {
-                        LogFatal($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        _logger.LogFatal($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to Beat Saber. Have you modded your game?", 10000, MessageType.ERROR);
                     }
                     Objects.LastHttpStatusWarning = ConnectionTypeWarning.NOT_MODDED;
@@ -249,7 +249,7 @@ class HttpStatus
                 {
                     if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.MOD_INSTALLED)
                     {
-                        LogFatal($"[BS-HS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        _logger.LogFatal($"[BS-HS] Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to Beat Saber. Please make sure you selected the right port.", 10000, MessageType.ERROR);
                     }
                     Objects.LastHttpStatusWarning = ConnectionTypeWarning.MOD_INSTALLED;
@@ -258,7 +258,7 @@ class HttpStatus
                 {
                     if (Objects.LastHttpStatusWarning != ConnectionTypeWarning.MOD_NOT_INSTALLED)
                     {
-                        LogFatal($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        _logger.LogFatal($"[BS-HS] Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to Beat Saber. Please make sure DataPuller is installed.", 10000, MessageType.ERROR);
                     }
                     Objects.LastHttpStatusWarning = ConnectionTypeWarning.MOD_NOT_INSTALLED;
@@ -267,7 +267,7 @@ class HttpStatus
         }
         catch (Exception ex)
         {
-            LogError($"[BS-HS] Failed to check if beatsaber-http-status is installed: (Disconnect Reason: {msg.Type}) {ex}");
+            _logger.LogError($"[BS-HS] Failed to check if beatsaber-http-status is installed: (Disconnect Reason: {msg.Type}) {ex}");
         }
     }
 
@@ -293,7 +293,7 @@ class HttpStatus
                     {
                         if (Program.LoadedSettings.DeleteSoftFailed)
                         {
-                            LogDebug($"[BR] Soft-Failed. Deletion requested.");
+                            _logger.LogDebug($"[BR] Soft-Failed. Deletion requested.");
                             DeleteFile = true;
                         }
 
@@ -306,13 +306,13 @@ class HttpStatus
                     {
                         if (Program.LoadedSettings.DeleteQuit)
                         {
-                            LogDebug($"[BR] Quit. Deletion requested.");
+                            _logger.LogDebug($"[BR] Quit. Deletion requested.");
                             DeleteFile = true;
 
                             if (GeneratedAccuracy == "NF-")
                                 if (!Program.LoadedSettings.DeleteIfQuitAfterSoftFailed)
                                 {
-                                    LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
+                                    _logger.LogDebug($"[BR] Soft-Failed but quit, deletion request reverted.");
                                     DeleteFile = false;
                                 }
                         }
@@ -324,7 +324,7 @@ class HttpStatus
                     {
                         if (Program.LoadedSettings.DeleteFailed)
                         {
-                            LogDebug($"[BR] Failed. Deletion requested.");
+                            _logger.LogDebug($"[BR] Failed. Deletion requested.");
                             DeleteFile = true;
                         }
                         else
@@ -373,7 +373,7 @@ class HttpStatus
 
             if (Program.LoadedSettings.DeleteIfShorterThan > OBSWebSocketStatus.RecordingSeconds)
             {
-                LogDebug($"[BR] The recording is too short. Deletion requested.");
+                _logger.LogDebug($"[BR] The recording is too short. Deletion requested.");
                 DeleteFile = true;
             }
 
@@ -400,32 +400,21 @@ class HttpStatus
 
             if (NewName.Contains("<difficulty>"))
             {
-                switch (BeatmapInfo.difficulty.ToLower())
+                NewName = BeatmapInfo.difficulty.ToLower() switch
                 {
-                    case "expertplus":
-                        NewName = NewName.Replace("<difficulty>", "Expert+");
-                        break;
-                    default:
-                        NewName = NewName.Replace("<difficulty>", BeatmapInfo.difficulty);
-                        break;
-                }
+                    "expertplus" => NewName.Replace("<difficulty>", "Expert+"),
+                    _ => NewName.Replace("<difficulty>", BeatmapInfo.difficulty),
+                };
             }
 
             if (NewName.Contains("<short-difficulty>"))
             {
-                switch (BeatmapInfo.difficulty.ToLower())
+                NewName = BeatmapInfo.difficulty.ToLower() switch
                 {
-                    case "expert":
-                        NewName = NewName.Replace("<short-difficulty>", "EX");
-                        break;
-                    case "expert+":
-                    case "expertplus":
-                        NewName = NewName.Replace("<short-difficulty>", "EX+");
-                        break;
-                    default:
-                        NewName = NewName.Replace("<short-difficulty>", BeatmapInfo.difficulty.Remove(1, BeatmapInfo.difficulty.Length - 1));
-                        break;
-                }
+                    "expert" => NewName.Replace("<short-difficulty>", "EX"),
+                    "expert+" or "expertplus" => NewName.Replace("<short-difficulty>", "EX+"),
+                    _ => NewName.Replace("<short-difficulty>", BeatmapInfo.difficulty.Remove(1, BeatmapInfo.difficulty.Length - 1)),
+                };
             }
 
             if (File.Exists($"{OldFileName}"))
@@ -461,32 +450,32 @@ class HttpStatus
                 {
                     if (!DeleteFile)
                     {
-                        LogInfo($"[BR] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
+                        _logger.LogInfo($"[BR] Renaming \"{fileInfo.Name}\" to \"{NewName}{FileExists}{fileInfo.Extension}\"..");
                         File.Move(OldFileName, NewFileName);
-                        LogInfo($"[BR] Successfully renamed.");
+                        _logger.LogInfo($"[BR] Successfully renamed.");
                         Program.SendNotification("Recording renamed.", 1000, MessageType.INFO);
                     }
                     else
                     {
-                        LogInfo($"[BR] Deleting \"{fileInfo.Name}\"..");
+                        _logger.LogInfo($"[BR] Deleting \"{fileInfo.Name}\"..");
                         File.Delete(OldFileName);
-                        LogInfo($"[BR] Successfully deleted.");
+                        _logger.LogInfo($"[BR] Successfully deleted.");
                         Program.SendNotification("Recording deleted.", 1000, MessageType.INFO);
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogError($"[BR] {ex}.");
+                    _logger.LogError($"[BR] {ex}.");
                 }
             }
             else
             {
-                LogError($"[BR] {OldFileName} doesn't exist.");
+                _logger.LogError($"[BR] {OldFileName} doesn't exist.");
             }
         }
         else
         {
-            LogError($"[BR] Last recorded file can't be renamed.");
+            _logger.LogError($"[BR] Last recorded file can't be renamed.");
         }
     }
 }

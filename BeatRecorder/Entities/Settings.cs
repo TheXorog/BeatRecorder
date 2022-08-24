@@ -10,7 +10,7 @@ internal class Settings
     /// <summary>
     /// The current log level
     /// </summary>
-    public LogLevel ConsoleLogLevel { get; set; } = LogLevel.INFO;
+    public Xorog.Logger.Enums.LogLevel ConsoleLogLevel { get; set; } = Xorog.Logger.Enums.LogLevel.INFO;
 
     /// <summary>
     /// What mod to connect to

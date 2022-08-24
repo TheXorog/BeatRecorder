@@ -23,7 +23,6 @@ global using BeatRecorder.Util;
 
 global using Xorog.Logger;
 global using static Xorog.Logger.Logger;
-global using static Xorog.Logger.LoggerObjects;
 global using System.Runtime.InteropServices;
 global using BeatRecorderUI;
 
@@ -31,3 +30,5 @@ global using BeatRecorder;
 global using Valve.VR;
 global using Websocket.Client.Models;
 global using System.ComponentModel;
+
+global using static BeatRecorder.Log;

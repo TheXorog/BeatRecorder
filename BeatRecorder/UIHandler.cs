@@ -15,7 +15,7 @@ internal class UIHandler
         else
             ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 0);
 
-        LogDebug($"Displaying InfoUI");
+        _logger.LogDebug($"Displaying InfoUI");
 
         var infoUI = new InfoUI(Program.CurrentVersion, Program.LoadedSettings.DisplayUITopmost, Objects.SettingsRequired);
 
@@ -31,7 +31,7 @@ internal class UIHandler
                     if (OBSPasswordRequired)
                     {
                         Thread.Sleep(3000);
-                        LogDebug($"Trying to display password prompt");
+                        _logger.LogDebug($"Trying to display password prompt");
                         infoUI.Hide();
 
                         MessageBox.Show($"A password is required to log into the obs websocket.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -119,7 +119,7 @@ internal class UIHandler
                                 {
                                     if (lastCover != HttpStatusStatus.HttpStatusCurrentBeatmap?.songCover)
                                     {
-                                        LogDebug($"Generating cover art from base64 string..");
+                                        _logger.LogDebug($"Generating cover art from base64 string..");
 
                                         lastCover = HttpStatusStatus.HttpStatusCurrentBeatmap?.songCover;
 
@@ -140,8 +140,8 @@ internal class UIHandler
                                         Stopwatch sc = new();
                                         sc.Start();
 
-                                        LogWarn($"Failed to get cover art from song.");
-                                        LogDebug($"Downloading default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg'..");
+                                        _logger.LogWarn($"Failed to get cover art from song.");
+                                        _logger.LogDebug($"Downloading default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg'..");
 
                                         lastCover = "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg";
 
@@ -151,13 +151,13 @@ internal class UIHandler
 
                                             if (!t.IsCompletedSuccessfully)
                                             {
-                                                LogError($"Failed to download default cover art", t.Exception);
+                                                _logger.LogError($"Failed to download default cover art", t.Exception);
                                                 return;
                                             }
 
                                             coverArt = Bitmap.FromStream(t.Result);
 
-                                            LogDebug($"Downloaded default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
+                                            _logger.LogDebug($"Downloaded default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
                                         });
                                     }
                                 }
@@ -195,14 +195,14 @@ internal class UIHandler
                                         Stopwatch sc = new();
                                         sc.Start();
 
-                                        LogDebug($"Downloading cover art from '{DataPullerStatus.DataPullerCurrentBeatmap.coverImage}'..");
+                                        _logger.LogDebug($"Downloading cover art from '{DataPullerStatus.DataPullerCurrentBeatmap.coverImage}'..");
 
                                         lastCover = DataPullerStatus.DataPullerCurrentBeatmap.coverImage.ToString();
 
                                         new HttpClient().GetStreamAsync(DataPullerStatus.DataPullerCurrentBeatmap.coverImage.ToString()).ContinueWith(t =>
                                         {
                                             coverArt = Bitmap.FromStream(t.Result);
-                                            LogDebug($"Downloaded cover art from '{DataPullerStatus.DataPullerCurrentBeatmap.coverImage}' in {sc.ElapsedMilliseconds}ms");
+                                            _logger.LogDebug($"Downloaded cover art from '{DataPullerStatus.DataPullerCurrentBeatmap.coverImage}' in {sc.ElapsedMilliseconds}ms");
 
                                             sc.Stop();
                                         });
@@ -217,8 +217,8 @@ internal class UIHandler
                                         Stopwatch sc = new();
                                         sc.Start();
 
-                                        LogWarn($"Failed to get cover art from song.");
-                                        LogDebug($"Downloading default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg'..");
+                                        _logger.LogWarn($"Failed to get cover art from song.");
+                                        _logger.LogDebug($"Downloading default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg'..");
 
                                         lastCover = "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg";
 
@@ -228,13 +228,13 @@ internal class UIHandler
 
                                             if (!t.IsCompletedSuccessfully)
                                             {
-                                                LogError($"Failed to download default cover art", t.Exception);
+                                                _logger.LogError($"Failed to download default cover art", t.Exception);
                                                 return;
                                             }
 
                                             coverArt = Bitmap.FromStream(t.Result);
 
-                                            LogDebug($"Downloaded default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
+                                            _logger.LogDebug($"Downloaded default cover art from 'https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg' in {sc.ElapsedMilliseconds}ms");
                                         });
                                     }
                                 }
@@ -299,13 +299,13 @@ internal class UIHandler
 
         if (infoUI.SettingsUpdated)
         {
-            LogDebug("Settings updated via UI");
+            _logger.LogDebug("Settings updated via UI");
             Process.Start(Environment.ProcessPath);
             await Task.Delay(5000);
             Environment.Exit(0);
             return;
         }
-        LogDebug("InfoUI closed");
+        _logger.LogDebug("InfoUI closed");
         Environment.Exit(0);
     }
 }

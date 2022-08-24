@@ -26,7 +26,7 @@ class OBSWebSocket
                 Thread.Sleep(Program.LoadedSettings.MininumWaitUntilRecordingCanStart);
             else
             {
-                LogError("The MininumWaitUntilRecordingCanStart has to be between 200ms and 2000ms. Defaulting to a wait time of 800ms.");
+                _logger.LogError("The MininumWaitUntilRecordingCanStart has to be between 200ms and 2000ms. Defaulting to a wait time of 800ms.");
                 Thread.Sleep(800);
             }
 
@@ -34,7 +34,7 @@ class OBSWebSocket
         }
         else
         {
-            LogError("[OBS] The WebSocket isn't connected, no recording can be started.");
+            _logger.LogError("[OBS] The WebSocket isn't connected, no recording can be started.");
         }
     }
 
@@ -61,7 +61,7 @@ class OBSWebSocket
                         }
                     }
                     else
-                        LogError("[OBS] The specified delay is not in between 1 and 20 seconds. The delay will be skipped.");
+                        _logger.LogError("[OBS] The specified delay is not in between 1 and 20 seconds. The delay will be skipped.");
                 }
 
                 Program.obsWebSocket.Send($"{{\"request-type\":\"StopRecording\", \"message-id\":\"StopRecording\"}}");
@@ -70,7 +70,7 @@ class OBSWebSocket
         }
         else
         {
-            LogError("[OBS] The WebSocket isn't connected, no recording can be stopped.");
+            _logger.LogError("[OBS] The WebSocket isn't connected, no recording can be stopped.");
         }
     }
 }

@@ -14,14 +14,14 @@ class OBSWebSocketEvents
 
             if (required.authRequired)
             {
-                LogInfo("[OBS] Authenticating..");
+                _logger.LogInfo("[OBS] Authenticating..");
 
                 if (Program.LoadedSettings.OBSPassword == "")
                 {
                     UIHandler.OBSPasswordRequired = true;
 
                     await Task.Delay(1000);
-                    LogInfo("[OBS] A password is required to log into your obs websocket.");
+                    _logger.LogInfo("[OBS] A password is required to log into your obs websocket.");
                     await Task.Delay(1000);
                     Console.Write("> ");
 
@@ -48,7 +48,7 @@ class OBSWebSocketEvents
                         }
                         else if (key == ConsoleKey.Escape)
                         {
-                            LogInfo("[OBS] Cancelled. Press any key to exit.");
+                            _logger.LogInfo("[OBS] Cancelled. Press any key to exit.");
                             Console.ReadKey();
                             Environment.Exit(0);
                             return;
@@ -66,7 +66,7 @@ class OBSWebSocketEvents
                         {
                             key = ConsoleKey.A;
 
-                            LogWarn("[OBS] Do you want to save this password in the config? (THIS WILL STORE THE PASSWORD IN PLAIN-TEXT, THIS CAN BE ACCESSED BY ANYONE WITH ACCESS TO YOUR FILES. THIS IS NOT RECOMMENDED!)");
+                            _logger.LogWarn("[OBS] Do you want to save this password in the config? (THIS WILL STORE THE PASSWORD IN PLAIN-TEXT, THIS CAN BE ACCESSED BY ANYONE WITH ACCESS TO YOUR FILES. THIS IS NOT RECOMMENDED!)");
                             while (key != ConsoleKey.Enter || key != ConsoleKey.Escape || key != ConsoleKey.Y || key != ConsoleKey.N)
                             {
                                 await Task.Delay(1000);
@@ -78,14 +78,14 @@ class OBSWebSocketEvents
 
                                 if (key == ConsoleKey.Escape)
                                 {
-                                    LogWarn("[OBS] Cancelled. Press any key to exit.");
+                                    _logger.LogWarn("[OBS] Cancelled. Press any key to exit.");
                                     Console.ReadKey();
                                     Environment.Exit(0);
                                     return;
                                 }
                                 else if (key == ConsoleKey.Y)
                                 {
-                                    LogInfo("[OBS] Your password is now saved in the Settings.json.");
+                                    _logger.LogInfo("[OBS] Your password is now saved in the Settings.json.");
                                     Program.LoadedSettings.OBSPassword = Password;
                                     Program.LoadedSettings.AskToSaveOBSPassword = true;
 
@@ -94,8 +94,8 @@ class OBSWebSocketEvents
                                 }
                                 else if (key == ConsoleKey.N || key == ConsoleKey.Enter)
                                 {
-                                    LogInfo("[OBS] Your password will not be saved. This wont be asked in the feature.");
-                                    LogInfo("[OBS] To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
+                                    _logger.LogInfo("[OBS] Your password will not be saved. This wont be asked in the feature.");
+                                    _logger.LogInfo("[OBS] To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
                                     Program.LoadedSettings.OBSPassword = "";
                                     Program.LoadedSettings.AskToSaveOBSPassword = false;
 
@@ -126,18 +126,18 @@ class OBSWebSocketEvents
             if (required.status == "ok")
             {
                 Program.SendNotification("Authenticated with OBS.", 1000, MessageType.INFO);
-                LogInfo("[OBS] Authenticated.");
+                _logger.LogInfo("[OBS] Authenticated.");
 
                 Program.obsWebSocket.Send($"{{\"request-type\":\"GetRecordingStatus\", \"message-id\":\"{CheckIfRecording}\"}}");
             }
             else
             {
-                LogError("[OBS] Failed to authenticate. Please check your password or wait a few seconds to try authentication again.");
+                _logger.LogError("[OBS] Failed to authenticate. Please check your password or wait a few seconds to try authentication again.");
                 await Program.obsWebSocket.Stop(WebSocketCloseStatus.NormalClosure, "Shutting down");
 
                 await Task.Delay(1000);
 
-                LogInfo("[OBS] Re-trying..");
+                _logger.LogInfo("[OBS] Re-trying..");
                 await Program.obsWebSocket.Start();
                 Program.obsWebSocket.Send($"{{\"request-type\":\"GetAuthRequired\", \"message-id\":\"{RequiredAuthenticationGuid}\"}}");
             }
@@ -150,7 +150,7 @@ class OBSWebSocketEvents
             OBSWebSocketStatus.OBSRecordingPaused = recordingStatus.isRecordingPaused;
 
             if (recordingStatus.isRecording)
-                LogWarn($"[OBS] A recording is already running.");
+                _logger.LogWarn($"[OBS] A recording is already running.");
         }
 
         if (msg.Text.Contains("\"update-type\":\"RecordingStopped\""))
@@ -158,7 +158,7 @@ class OBSWebSocketEvents
             Program.SendNotification("Recording stopped.", 1000, MessageType.INFO);
             RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<RecordingStopped>(msg.Text);
 
-            LogInfo($"[OBS] Recording stopped.");
+            _logger.LogInfo($"[OBS] Recording stopped.");
             OBSWebSocketStatus.OBSRecording = false;
 
             if (Program.LoadedSettings.Mod == "http-status")
@@ -169,7 +169,7 @@ class OBSWebSocketEvents
         else if (msg.Text.Contains("\"update-type\":\"RecordingStarted\""))
         {
             Program.SendNotification("Recording started.", 1000, MessageType.INFO);
-            LogInfo($"[OBS] Recording started.");
+            _logger.LogInfo($"[OBS] Recording started.");
             OBSWebSocketStatus.OBSRecording = true;
             while (OBSWebSocketStatus.OBSRecording)
             {
@@ -185,13 +185,13 @@ class OBSWebSocketEvents
         else if (msg.Text.Contains("\"update-type\":\"RecordingPaused\""))
         {
             Program.SendNotification("Recording paused.", 1000, MessageType.INFO);
-            LogInfo($"[OBS] Recording paused.");
+            _logger.LogInfo($"[OBS] Recording paused.");
             OBSWebSocketStatus.OBSRecordingPaused = true;
         }
         else if (msg.Text.Contains("\"update-type\":\"RecordingResumed\""))
         {
             Program.SendNotification("Recording resumed.", 500, MessageType.INFO);
-            LogInfo($"[OBS] Recording resumed.");
+            _logger.LogInfo($"[OBS] Recording resumed.");
             OBSWebSocketStatus.OBSRecordingPaused = false;
         }
     }
@@ -200,7 +200,7 @@ class OBSWebSocketEvents
     {
         if (msg.Type != ReconnectionType.Initial)
         {
-            LogInfo($"[OBS] Reconnected: {msg.Type}");
+            _logger.LogInfo($"[OBS] Reconnected: {msg.Type}");
 
             Objects.LastOBSWarning = ConnectionTypeWarning.CONNECTED;
 
@@ -219,7 +219,7 @@ class OBSWebSocketEvents
                 if (Objects.LastOBSWarning != ConnectionTypeWarning.NO_PROCESS)
                 {
                     Program.SendNotification("Couldn't connect to OBS, is it even running?", 10000, MessageType.ERROR);
-                    LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({msg.Type})");
+                    _logger.LogWarn($"[OBS] Couldn't find an OBS process, is your OBS running? ({msg.Type})");
                 }
                 Objects.LastOBSWarning = ConnectionTypeWarning.NO_PROCESS;
             }
@@ -246,7 +246,7 @@ class OBSWebSocketEvents
                 {
                     if (Objects.LastOBSWarning != ConnectionTypeWarning.MOD_INSTALLED)
                     {
-                        LogFatal($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({msg.Type})");
+                        _logger.LogFatal($"[OBS] OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to OBS. Please make sure obs-websocket is enabled.", 10000, MessageType.ERROR);
                     }
                     Objects.LastOBSWarning = ConnectionTypeWarning.MOD_INSTALLED;
@@ -255,7 +255,7 @@ class OBSWebSocketEvents
                 {
                     if (Objects.LastOBSWarning != ConnectionTypeWarning.MOD_NOT_INSTALLED)
                     {
-                        LogFatal($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({msg.Type})");
+                        _logger.LogFatal($"[OBS] OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({msg.Type})");
                         Program.SendNotification("Couldn't connect to OBS. Please make sure obs-websocket is installed.", 10000, MessageType.ERROR);
                     }
                     Objects.LastOBSWarning = ConnectionTypeWarning.MOD_NOT_INSTALLED;
@@ -264,7 +264,7 @@ class OBSWebSocketEvents
         }
         catch (Exception ex)
         {
-            LogError($"Failed to check if obs-websocket is installed: (Disconnect Reason: {msg.Type}) {ex}");
+            _logger.LogError($"Failed to check if obs-websocket is installed: (Disconnect Reason: {msg.Type}) {ex}");
         }
     }
 }
