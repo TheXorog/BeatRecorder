@@ -1,10 +1,10 @@
-﻿namespace BeatRecorder.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-public enum ConnectionTypeWarning
+namespace BeatRecorder.Enums;
+internal class ConnectionTypeWarning
 {
-    CONNECTED,
-    MOD_INSTALLED,
-    MOD_NOT_INSTALLED,
-    NOT_MODDED,
-    NO_PROCESS
 }

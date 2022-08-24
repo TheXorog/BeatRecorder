@@ -1,6 +1,6 @@
-﻿namespace BeatRecorder.Entities;
+﻿namespace BeatRecorder.Entities.OBS;
 
-public class AuthenticationRequired
+internal class AuthenticationRequired
 {
     public bool authRequired { get; set; }
     public string challenge { get; set; }

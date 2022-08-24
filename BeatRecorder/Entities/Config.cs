@@ -1,6 +1,6 @@
 ﻿namespace BeatRecorder.Entities;
 
-internal class Settings
+internal class Config
 {
     /// <summary>
     /// Instructions to go to the repository for help
@@ -10,12 +10,12 @@ internal class Settings
     /// <summary>
     /// The current log level
     /// </summary>
-    public Xorog.Logger.Enums.LogLevel ConsoleLogLevel { get; set; } = Xorog.Logger.Enums.LogLevel.INFO;
+    public LogLevel ConsoleLogLevel { get; set; } = LogLevel.INFO;
 
     /// <summary>
     /// What mod to connect to
     /// </summary>
-    public string Mod { get; set; } = "http-status";
+    public string Mod { get; set; } = "datapuller";
 
     /// <summary>
     /// Whether to display the GUI
