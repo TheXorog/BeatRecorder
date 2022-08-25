@@ -94,16 +94,17 @@ class Program
             {
                 case "http-status":
                 {
-                    BeatSaberClient = new HttpStatusHandler().Initialize(this);
+                    BeatSaberClient = new HttpStatusHandler().Initialize(this); // 6557
                     break;
                 }
                 case "datapuller":
                 {
-                    BeatSaberClient = new DataPullerHandler().Initialize(this);
+                    BeatSaberClient = new DataPullerHandler().Initialize(this); // 2946 
                     break;
                 }
                 case "beatsaberplus":
                 {
+                    BeatSaberClient = new BeatSaberPlusHandler().Initialize(this); // 2947
                     break;
                 }
             }

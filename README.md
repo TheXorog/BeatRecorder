@@ -8,12 +8,8 @@
 * **[What is this?](#what-is-this)**
 * **[Requirements](#requirements)**
 * **[How to set up](#how-to-set-up)**
-#### Config
-* **[Config Help](#config-help)**
-* **[Filename Placeholders](#filename-placeholders)**
 #### Troubleshooting
 * **[BeatRecorder not connecting?](#beatrecorder-not-connecting)**
-* **[Notable differences between beatsaber-http-status and BSDataPuller](#notable-differences-between-beatsaber-http-status-and-bsdatapuller)**
 * **[Contributing or forking](#contributing-or-forking)**
 
 ## Important info regarding OBS Websocket 5.x.x
@@ -22,7 +18,7 @@
 
 ## What is this?
 
-This application is for people who record their BeatSaber gameplay using OBS. It connects to **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** for older Beat Saber versions) or **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** to detect the current game-state and **[obs-websocket](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)** to automatically start and stop the recording.
+This application is for people who record their BeatSaber gameplay using OBS. It connects to **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** for older Beat Saber versions), **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** or **[BeatSaberPlus](https://github.com/hardcpp/BeatSaberPlus)** to detect the current game-state and **[obs-websocket](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)** to automatically start and stop the recording.
 
 Files are saved where-ever you set your output folder to in OBS.
 
@@ -33,18 +29,16 @@ Files are saved where-ever you set your output folder to in OBS.
 
 ## Requirements
 
-* **[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** or **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)**
+* **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** for older Beat Saber versions), **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** or **[BeatSaberPlus](https://github.com/hardcpp/BeatSaberPlus)**
 <br></br>
-* **[obs-websocket](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)**
+* **[obs-websocket v4.9.1](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)**
 
 ## How to set up
 
 1. Install all the previously mentioned dependencies.
 2. Download and unzip this application.
-3. Run it once, it'll ask you to input your Settings. Do so.
-   1. **If you want to use BSDataPuller instead of beatsaber-http-status, set `Mod` to `datapuller` and change the `BeatSaberPort` to the port that datapuller uses (Default: `2946`)**
-4. After configuring, close notepad and check if the applications starts up.
-5. Profit
+3. Run it once, it'll ask you to input your settings. Do so.
+4. Profit
 
 ## BeatRecorder not connecting?
 

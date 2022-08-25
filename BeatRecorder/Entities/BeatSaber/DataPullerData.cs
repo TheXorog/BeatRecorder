@@ -16,5 +16,5 @@ public class DataPullerData
     public int ColorType { get; set; }
     public int TimeElapsed { get; set; }
     public long unixTimestamp { get; set; }
-    public int EventTrigger { get; set; }
+    public int? EventTrigger { get; set; }
 }

@@ -11,13 +11,6 @@ public class SharedStatus
             ModUsed = Mod.HttpStatus,
             ModVersion = status.game?.pluginVersion,
             GameVersion = status.game?.gameVersion,
-            GameEnvironment = status.game.scene switch
-            {
-                "Menu" => GameEnvironment.Menu,
-                "Song" => GameEnvironment.InLevel,
-                "Spectator" => ((status.beatmap?.paused is not null) ? GameEnvironment.Paused : GameEnvironment.InLevel),
-                _ => GameEnvironment.Unknown
-            }
         };
 
         Bitmap bitmap = null;
@@ -67,6 +60,69 @@ public class SharedStatus
             SoftFailed = status.performance?.softFailed
         };
     }
+    
+    public SharedStatus(BeatSaberPlus status, Game game, int MaxCombo)
+    {
+        GameInfo = game;
+
+        Bitmap bitmap = null;
+
+        try
+        {
+            bitmap = (Bitmap)Image.FromStream(new MemoryStream(Convert.FromBase64String(status?.mapInfoChanged?.coverRaw)));
+        }
+        catch { }
+
+        this.BeatmapInfo = new()
+        {
+            Name = status.mapInfoChanged?.name,
+            SubName = status.mapInfoChanged?.sub_name,
+            Author = status.mapInfoChanged?.artist,
+            Creator = status.mapInfoChanged?.mapper,
+            Cover = bitmap,
+            IdOrHash = status.mapInfoChanged?.level_id,
+            Bpm = status.mapInfoChanged?.BPM,
+            Difficulty = status.mapInfoChanged?.difficulty,
+        };
+
+        double? v = null;
+
+        try
+        {
+            v = Math.Round(status.scoreEvent.accuracy * 100f, 2);
+        }
+        catch { }
+
+        string Rank = "E";
+
+        if (v >= 90)
+            Rank = "SS";
+        else if (v >= 80)
+            Rank = "S";
+        else if (v >= 65)
+            Rank = "A";
+        else if (v >= 50)
+            Rank = "B";
+        else if (v >= 35)
+            Rank = "C";
+        else if (v >= 20)
+            Rank = "D";
+        
+        
+
+        this.PerformanceInfo = new()
+        {
+            RawScore = status.scoreEvent?.score,
+            Score = status.scoreEvent?.score,
+            Accuracy = v ?? 00.00,
+            Rank = Rank,
+            MissedNoteCount = status.scoreEvent?.missCount,
+            Failed = false,
+            Finished = true,
+            MaxCombo = MaxCombo,
+            SoftFailed = status.scoreEvent?.currentHealth == 0f
+        };
+    }
 
     public SharedStatus(DataPullerMain main, DataPullerData data, int MaxCombo)
     {
@@ -75,7 +131,6 @@ public class SharedStatus
             ModUsed = Mod.Datapuller,
             ModVersion = main.PluginVersion,
             GameVersion = main.GameVersion,
-            GameEnvironment = (main.InLevel ? (main.LevelPaused ? GameEnvironment.Paused : GameEnvironment.InLevel) : GameEnvironment.Menu)
         };
 
         BeatmapInfo = new()
@@ -115,7 +170,6 @@ public class SharedStatus
 
         GameInfo.ModVersion = newStatus.GameInfo.ModVersion ?? GameInfo.ModVersion;
         GameInfo.GameVersion = newStatus.GameInfo.GameVersion ?? GameInfo.GameVersion;
-        GameInfo.GameEnvironment = newStatus.GameInfo.GameEnvironment ?? GameInfo.GameEnvironment;
 
         BeatmapInfo.Name = newStatus.BeatmapInfo.Name ?? BeatmapInfo.Name;
         BeatmapInfo.SubName = newStatus.BeatmapInfo.SubName ?? BeatmapInfo.SubName;
@@ -151,7 +205,6 @@ public class SharedStatus
         newStatus.GameInfo.ModUsed = GameInfo.ModUsed;
         newStatus.GameInfo.ModVersion = GameInfo.ModVersion;
         newStatus.GameInfo.GameVersion = GameInfo.GameVersion;
-        newStatus.GameInfo.GameEnvironment = GameInfo.GameEnvironment;
 
         newStatus.BeatmapInfo = new();
         newStatus.BeatmapInfo.Name = BeatmapInfo.Name;
@@ -190,7 +243,6 @@ public class SharedStatus
     public class Game
     {
         public Mod ModUsed { get; set; }
-        public GameEnvironment? GameEnvironment { get; set; }
         public string ModVersion { get; set; }
         public string GameVersion { get; set; }
     }
