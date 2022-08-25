@@ -13,7 +13,8 @@ public class DataPullerData
     public float Accuracy { get; set; }
     public int[] BlockHitScore { get; set; }
     public float PlayerHealth { get; set; }
+    public int ColorType { get; set; }
     public int TimeElapsed { get; set; }
-
-    public int maxCombo { get; set; }
+    public long unixTimestamp { get; set; }
+    public int EventTrigger { get; set; }
 }

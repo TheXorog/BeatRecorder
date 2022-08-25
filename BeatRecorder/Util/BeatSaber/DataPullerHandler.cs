@@ -87,6 +87,8 @@ internal class DataPullerHandler : BaseBeatSaberHandler
 
     private void MainMessageRecieved(string text)
     {
+        _logger.LogTrace(text);
+
         DataPullerMain _status;
 
         try
@@ -166,6 +168,7 @@ internal class DataPullerHandler : BaseBeatSaberHandler
 
     private void DataMessageRecieved(string text)
     {
+        _logger.LogTrace(text);
         DataPullerData _status;
 
         try
@@ -178,7 +181,7 @@ internal class DataPullerHandler : BaseBeatSaberHandler
             return;
         }
 
-        if (InLevel)
+        if (InLevel && CurrentData.unixTimestamp < _status.unixTimestamp)
             CurrentData = _status;
 
         if (CurrentMaxCombo < _status.Combo)

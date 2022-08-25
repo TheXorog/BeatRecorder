@@ -32,6 +32,7 @@ public class DataPullerMain
     public bool IsMultiplayer { get; set; }
     public int PreviousRecord { get; set; }
     public string PreviousBSR { get; set; }
+    public long unixTimestamp { get; set; }
 
     public class Modifier
     {
@@ -58,4 +59,5 @@ public class DataPullerMain
         public float startInAdvanceAndClearNotes { get; set; }
         public float startSongTime { get; set; }
     }
+
 }

@@ -88,7 +88,7 @@ class Program
             ObsClient = ObsHandler.Initialize(this);
         });
 
-        _ = Task.Run(async () =>
+        _ = Task.Run(() =>
         {
             switch (status.LoadedConfig.Mod)
             {
