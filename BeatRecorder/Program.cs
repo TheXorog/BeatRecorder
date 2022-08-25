@@ -83,24 +83,31 @@ class Program
                          $"Base Directory: {AppDomain.CurrentDomain.BaseDirectory}\n" +
                          $"Commandline: {Environment.CommandLine}\n");
 
-        ObsClient = ObsHandler.Initialize(this);
-
-        switch (status.LoadedConfig.Mod)
+        _ = Task.Run(() =>
         {
-            case "http-status":
+            ObsClient = ObsHandler.Initialize(this);
+        });
+
+        _ = Task.Run(async () =>
+        {
+            switch (status.LoadedConfig.Mod)
             {
-                BeatSaberClient = new HttpStatusHandler().Initialize(this);
-                break;
+                case "http-status":
+                {
+                    BeatSaberClient = new HttpStatusHandler().Initialize(this);
+                    break;
+                }
+                case "datapuller":
+                {
+                    BeatSaberClient = new DataPullerHandler().Initialize(this);
+                    break;
+                }
+                case "beatsaberplus":
+                {
+                    break;
+                }
             }
-            case "datapuller":
-            {
-                break;
-            }
-            case "beatsaberplus":
-            {
-                break;
-            }
-        }
+        });
 
         await Task.Delay(-1);
     }

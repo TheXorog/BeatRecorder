@@ -48,7 +48,7 @@ Files are saved where-ever you set your output folder to in OBS.
 
 ## BeatRecorder not connecting?
 
-**AVG Antivirus is known to cause all kinds of issues** with connection-related things. (Credit to `Arro#6969` to help me discover this issue)
+**AVG Antivirus is known to cause all kinds of issues** with connection-related things. (Credit to `Arro#6969`. They discoverd and reported this issue.)
 
 If you have AVG Antivirus installed, please uninstall it and find a better antivirus solution.
 

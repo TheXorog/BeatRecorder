@@ -56,7 +56,7 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
         }
         catch (Exception ex)
         {
-            _logger.LogFatal($"Unable to convert beatsaber-http-status message into an dictionary: {ex}");
+            _logger.LogFatal($"Unable to convert message into object", ex);
             return;
         }
 

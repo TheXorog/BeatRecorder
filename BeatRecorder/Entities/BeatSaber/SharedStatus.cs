@@ -68,7 +68,7 @@ public class SharedStatus
         };
     }
 
-    public SharedStatus(DataPullerMain main, DataPullerData data)
+    public SharedStatus(DataPullerMain main, DataPullerData data, int MaxCombo)
     {
         GameInfo = new()
         {
@@ -101,7 +101,7 @@ public class SharedStatus
             MissedNoteCount = data.Misses,
             Failed = main.LevelFailed,
             Finished = main.LevelFinished,
-            MaxCombo = data.maxCombo,
+            MaxCombo = MaxCombo,
             SoftFailed = (main.LevelFailed || data.PlayerHealth <= 0) && main.Modifiers.noFailOn0Energy
         };
     }
