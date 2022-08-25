@@ -22,7 +22,7 @@ namespace BOLL7708
         private EasyOpenVRSingleton() { }
 
         private bool _debug = true;
-        private Random _rnd = new Random();
+        private Random _rnd = new();
         private EVRApplicationType _appType = EVRApplicationType.VRApplication_Background;
         private Action<string> _debugLogAction = null;
 
@@ -30,7 +30,7 @@ namespace BOLL7708
         {
             get
             {
-                if (__instance == null) __instance = new EasyOpenVRSingleton();
+                __instance ??= new EasyOpenVRSingleton();
                 return __instance;
             }
         }
@@ -78,14 +78,14 @@ namespace BOLL7708
         #region statistics
         public Compositor_CumulativeStats GetCumulativeStats()
         {
-            Compositor_CumulativeStats stats = new Compositor_CumulativeStats();
+            Compositor_CumulativeStats stats = new();
             OpenVR.Compositor.GetCumulativeStats(ref stats, (uint)Marshal.SizeOf(stats));
             return stats;
         }
 
         public Compositor_FrameTiming GetFrameTiming()
         {
-            Compositor_FrameTiming timing = new Compositor_FrameTiming();
+            Compositor_FrameTiming timing = new();
             timing.m_nSize = (uint)Marshal.SizeOf(timing);
             var success = OpenVR.Compositor.GetFrameTiming(ref timing, 0);
             if (!success) DebugLog("Could not get frame timing.");
@@ -113,7 +113,7 @@ namespace BOLL7708
         #region chaperone
         public HmdQuad_t GetPlayAreaRect()
         {
-            HmdQuad_t rect = new HmdQuad_t();
+            HmdQuad_t rect = new();
             var success = OpenVR.Chaperone.GetPlayAreaRect(ref rect);
             if (!success) DebugLog("Failure getting PlayAreaRect");
             return rect;
@@ -139,8 +139,7 @@ namespace BOLL7708
 
         public bool MoveChaperoneBounds(HmdVector3_t offset)
         {
-            HmdQuad_t[] physQuad;
-            var success = OpenVR.ChaperoneSetup.GetWorkingCollisionBoundsInfo(out physQuad);
+            var success = OpenVR.ChaperoneSetup.GetWorkingCollisionBoundsInfo(out HmdQuad_t[] physQuad);
             if (!success) DebugLog("Failure to load Chaperone bounds.");
 
             for (int i = 0; i < physQuad.Length; i++)
@@ -193,7 +192,7 @@ namespace BOLL7708
          */
         public VRControllerState_t GetControllerState(uint index)
         {
-            VRControllerState_t state = new VRControllerState_t();
+            VRControllerState_t state = new();
             var success = OpenVR.System.GetControllerState(index, ref state, (uint)Marshal.SizeOf(state));
             if (!success) DebugLog("Failure getting ControllerState");
             return state;
@@ -245,7 +244,7 @@ namespace BOLL7708
         public string GetStringTrackedDeviceProperty(uint index, ETrackedDeviceProperty property)
         {
             var error = new ETrackedPropertyError();
-            StringBuilder sb = new StringBuilder((int)OpenVR.k_unMaxPropertyStringSize);
+            StringBuilder sb = new((int)OpenVR.k_unMaxPropertyStringSize);
             OpenVR.System.GetStringTrackedDeviceProperty(index, property, sb, OpenVR.k_unMaxPropertyStringSize, ref error);
             DebugLog(error);
             return sb.ToString();
@@ -301,7 +300,7 @@ namespace BOLL7708
         #endregion
 
         #region events
-        private Dictionary<EVREventType, List<Action<VREvent_t>>> _events = new Dictionary<EVREventType, List<Action<VREvent_t>>>();
+        private Dictionary<EVREventType, List<Action<VREvent_t>>> _events = new();
 
         ///<summary>Register an event that should trigger an action, run UpdateEvents() to get new events.</summary>
         public void RegisterEvent(EVREventType type, Action<VREvent_t> action)
@@ -445,8 +444,8 @@ namespace BOLL7708
             public ulong sourceHandle;
         }
 
-        private List<InputAction> _inputActions = new List<InputAction>();
-        private List<VRActiveActionSet_t> _inputActionSets = new List<VRActiveActionSet_t>();
+        private List<InputAction> _inputActions = new();
+        private List<VRActiveActionSet_t> _inputActionSets = new();
 
         /**
          * Load the actions manifest to register actions for the application
@@ -482,7 +481,7 @@ namespace BOLL7708
             if (handle != 0 && error == EVRInputError.None)
             {
                 ia.handle = handle;
-                ia.pathEnd = pathParts[pathParts.Length - 1];
+                ia.pathEnd = pathParts[^1];
                 _inputActions.Add(ia);
             }
             else DebugLog(error);
@@ -572,7 +571,7 @@ namespace BOLL7708
          */
         public bool UpdateActionStates(ulong[] inputSourceHandles = null)
         {
-            if (inputSourceHandles == null) inputSourceHandles = new ulong[] { OpenVR.k_ulInvalidPathHandle };
+            inputSourceHandles ??= new ulong[] { OpenVR.k_ulInvalidPathHandle };
             var error = OpenVR.Input.UpdateActionState(_inputActionSets.ToArray(), (uint)Marshal.SizeOf(typeof(VRActiveActionSet_t)));
 
             _inputActions.ForEach((InputAction action) =>
@@ -781,7 +780,7 @@ namespace BOLL7708
          * pointed out what was missing in May and December 2017, yet again in January 2019 and boom, now we have it!
          */
 
-        private List<uint> _notifications = new List<uint>();
+        private List<uint> _notifications = new();
 
         /*
          * We initialize an overlay to display notifications with.
@@ -833,11 +832,10 @@ namespace BOLL7708
 
         public bool EmptyNotificationsQueue()
         {
-            var error = EVRNotificationError.OK;
             var success = true;
             foreach (uint id in _notifications)
             {
-                error = OpenVR.Notifications.RemoveNotification(id);
+                EVRNotificationError error = OpenVR.Notifications.RemoveNotification(id);
                 success = DebugLog(error);
             }
             _notifications.Clear();
@@ -1265,14 +1263,14 @@ namespace BOLL7708
                 return new HmdMatrix34_t
                 {
                     m0 = ch * ca,
-                    m1 = sh * sb - ch * sa * cb,
-                    m2 = ch * sa * sb + sh * cb,
+                    m1 = (sh * sb) - (ch * sa * cb),
+                    m2 = (ch * sa * sb) + (sh * cb),
                     m4 = sa,
                     m5 = ca * cb,
                     m6 = -ca * sb,
                     m8 = -sh * ca,
-                    m9 = sh * sa * cb + ch * sb,
-                    m10 = -sh * sa * sb + ch * cb
+                    m9 = (sh * sa * cb) + (ch * sb),
+                    m10 = (-sh * sa * sb) + (ch * cb)
                 };
             }
 
@@ -1288,9 +1286,9 @@ namespace BOLL7708
             {
                 return new HmdVector3_t
                 {
-                    v0 = m.m0 * v.v0 + m.m1 * v.v1 + m.m2 * v.v2,
-                    v1 = m.m4 * v.v0 + m.m5 * v.v1 + m.m6 * v.v2,
-                    v2 = m.m8 * v.v0 + m.m9 * v.v1 + m.m10 * v.v2
+                    v0 = (m.m0 * v.v0) + (m.m1 * v.v1) + (m.m2 * v.v2),
+                    v1 = (m.m4 * v.v0) + (m.m5 * v.v1) + (m.m6 * v.v2),
+                    v2 = (m.m8 * v.v0) + (m.m9 * v.v1) + (m.m10 * v.v2)
                 };
             }
 
@@ -1307,22 +1305,22 @@ namespace BOLL7708
                 return new HmdMatrix34_t
                 {
                     // Row 0
-                    m0 = matA.m0 * matB.m0 + matA.m1 * matB.m4 + matA.m2 * matB.m8,
-                    m1 = matA.m0 * matB.m1 + matA.m1 * matB.m5 + matA.m2 * matB.m9,
-                    m2 = matA.m0 * matB.m2 + matA.m1 * matB.m6 + matA.m2 * matB.m10,
-                    m3 = matA.m0 * matB.m3 + matA.m1 * matB.m7 + matA.m2 * matB.m11 + matA.m3,
+                    m0 = (matA.m0 * matB.m0) + (matA.m1 * matB.m4) + (matA.m2 * matB.m8),
+                    m1 = (matA.m0 * matB.m1) + (matA.m1 * matB.m5) + (matA.m2 * matB.m9),
+                    m2 = (matA.m0 * matB.m2) + (matA.m1 * matB.m6) + (matA.m2 * matB.m10),
+                    m3 = (matA.m0 * matB.m3) + (matA.m1 * matB.m7) + (matA.m2 * matB.m11) + matA.m3,
                     
                     // Row 1
-                    m4 = matA.m4 * matB.m0 + matA.m5 * matB.m4 + matA.m6 * matB.m8,
-                    m5 = matA.m4 * matB.m1 + matA.m5 * matB.m5 + matA.m6 * matB.m9,
-                    m6 = matA.m4 * matB.m2 + matA.m5 * matB.m6 + matA.m6 * matB.m10,
-                    m7 = matA.m4 * matB.m3 + matA.m5 * matB.m7 + matA.m6 * matB.m11 + matA.m7,
+                    m4 = (matA.m4 * matB.m0) + (matA.m5 * matB.m4) + (matA.m6 * matB.m8),
+                    m5 = (matA.m4 * matB.m1) + (matA.m5 * matB.m5) + (matA.m6 * matB.m9),
+                    m6 = (matA.m4 * matB.m2) + (matA.m5 * matB.m6) + (matA.m6 * matB.m10),
+                    m7 = (matA.m4 * matB.m3) + (matA.m5 * matB.m7) + (matA.m6 * matB.m11) + matA.m7,
                         
                     // Row 2
-                    m8 = matA.m8 * matB.m0 + matA.m9 * matB.m4 + matA.m10 * matB.m8,
-                    m9 = matA.m8 * matB.m1 + matA.m9 * matB.m5 + matA.m10 * matB.m9,
-                    m10 = matA.m8 * matB.m2 + matA.m9 * matB.m6 + matA.m10 * matB.m10,
-                    m11 = matA.m8 * matB.m3 + matA.m9 * matB.m7 + matA.m10 * matB.m11 + matA.m11,
+                    m8 = (matA.m8 * matB.m0) + (matA.m9 * matB.m4) + (matA.m10 * matB.m8),
+                    m9 = (matA.m8 * matB.m1) + (matA.m9 * matB.m5) + (matA.m10 * matB.m9),
+                    m10 = (matA.m8 * matB.m2) + (matA.m9 * matB.m6) + (matA.m10 * matB.m10),
+                    m11 = (matA.m8 * matB.m3) + (matA.m9 * matB.m7) + (matA.m10 * matB.m11) + matA.m11,
                 };
             }
 
@@ -1350,7 +1348,7 @@ namespace BOLL7708
             {
                 // Had to switch roll and pitch here to match SteamVR
                 var q = QuaternionFromMatrix(m);
-                double test = q.x * q.y + q.z * q.w;
+                double test = (q.x * q.y) + (q.z * q.w);
                 if (test > 0.499)
                 { // singularity at north pole
                     return new YPR
@@ -1374,9 +1372,9 @@ namespace BOLL7708
                 double sqz = q.z * q.z;
                 return new YPR
                 {
-                    yaw = Math.Atan2(2 * q.y * q.w - 2 * q.x * q.z, 1 - 2 * sqy - 2 * sqz), // heading
+                    yaw = Math.Atan2((2 * q.y * q.w) - (2 * q.x * q.z), 1 - (2 * sqy) - (2 * sqz)), // heading
                     roll = Math.Asin(2 * test), // attitude
-                    pitch = Math.Atan2(2 * q.x * q.w - 2 * q.y * q.z, 1 - 2 * sqx - 2 * sqz) // bank
+                    pitch = Math.Atan2((2 * q.x * q.w) - (2 * q.y * q.z), 1 - (2 * sqx) - (2 * sqz)) // bank
                 };
             }
 
@@ -1403,7 +1401,7 @@ namespace BOLL7708
 
             private static double DotProduct(HmdVector3_t v1, HmdVector3_t v2)
             {
-                return v1.v0 * v2.v0 + v1.v1 * v2.v1 + v1.v2 * v2.v2;
+                return (v1.v0 * v2.v0) + (v1.v1 * v2.v1) + (v1.v2 * v2.v2);
             }
             #endregion
         }
@@ -1436,7 +1434,7 @@ namespace BOLL7708
 
             public static NotificationBitmap_t NotificationBitmapFromBitmapData(BitmapData TextureData)
             {
-                NotificationBitmap_t notification_icon = new NotificationBitmap_t();
+                NotificationBitmap_t notification_icon = new();
                 notification_icon.m_pImageData = TextureData.Scan0;
                 notification_icon.m_nWidth = TextureData.Width;
                 notification_icon.m_nHeight = TextureData.Height;
@@ -1668,22 +1666,22 @@ namespace BOLL7708
             return new HmdMatrix34_t
             {
                 // Row one
-                m0 = matA.m0 + (matB.m0 - matA.m0) * amount,
-                m1 = matA.m1 + (matB.m1 - matA.m1) * amount,
-                m2 = matA.m2 + (matB.m2 - matA.m2) * amount,
-                m3 = matA.m3 + (matB.m3 - matA.m3) * amount,
+                m0 = matA.m0 + ((matB.m0 - matA.m0) * amount),
+                m1 = matA.m1 + ((matB.m1 - matA.m1) * amount),
+                m2 = matA.m2 + ((matB.m2 - matA.m2) * amount),
+                m3 = matA.m3 + ((matB.m3 - matA.m3) * amount),
                 
                 // Row two
-                m4 = matA.m4 + (matB.m4 - matA.m4) * amount,
-                m5 = matA.m5 + (matB.m5 - matA.m5) * amount,
-                m6 = matA.m6 + (matB.m6 - matA.m6) * amount,
-                m7 = matA.m7 + (matB.m7 - matA.m7) * amount,
+                m4 = matA.m4 + ((matB.m4 - matA.m4) * amount),
+                m5 = matA.m5 + ((matB.m5 - matA.m5) * amount),
+                m6 = matA.m6 + ((matB.m6 - matA.m6) * amount),
+                m7 = matA.m7 + ((matB.m7 - matA.m7) * amount),
                 
                 // Row three
-                m8 = matA.m8 + (matB.m8 - matA.m8) * amount,
-                m9 = matA.m9 + (matB.m9 - matA.m9) * amount,
-                m10 = matA.m10 + (matB.m10 - matA.m10) * amount,
-                m11 = matA.m11 + (matB.m11 - matA.m11) * amount,
+                m8 = matA.m8 + ((matB.m8 - matA.m8) * amount),
+                m9 = matA.m9 + ((matB.m9 - matA.m9) * amount),
+                m10 = matA.m10 + ((matB.m10 - matA.m10) * amount),
+                m11 = matA.m11 + ((matB.m11 - matA.m11) * amount),
             };
         }
 

@@ -8154,8 +8154,7 @@ public class OpenVR
 	{
 		get
 		{
-			if (_OpenVRInternal_ModuleContext == null)
-				_OpenVRInternal_ModuleContext = new COpenVRContext();
+			_OpenVRInternal_ModuleContext ??= new COpenVRContext();
 			return _OpenVRInternal_ModuleContext;
 		}
 	}
