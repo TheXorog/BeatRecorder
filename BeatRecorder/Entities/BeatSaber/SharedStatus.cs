@@ -8,7 +8,14 @@ internal class SharedStatus
         {
             ModUsed = Mod.HttpStatus,
             ModVersion = status.game?.gameVersion,
-            GameVersion = status.game?.pluginVersion
+            GameVersion = status.game?.pluginVersion,
+            GameEnvironment = status.game.scene switch
+            {
+                "Menu" => GameEnvironment.Menu,
+                "Song" => GameEnvironment.InLevel,
+                "Spectator" => ((status.beatmap?.paused is not null) ? GameEnvironment.Paused : GameEnvironment.InLevel)
+                _ => GameEnvironment.Unknown
+            }
         };
 
         BeatmapInfo = new()
@@ -43,6 +50,44 @@ internal class SharedStatus
         };
     }
 
+    internal SharedStatus(DataPullerMain main, DataPullerData data)
+    {
+        GameInfo = new()
+        {
+            ModUsed = Mod.Datapuller,
+            ModVersion = main.GameVersion,
+            GameVersion = main.PluginVersion,
+            GameEnvironment = (main.InLevel ? (main.LevelPaused ? GameEnvironment.Paused : GameEnvironment.InLevel) : GameEnvironment.Menu)
+        };
+
+        BeatmapInfo = new()
+        {
+            Name = main.SongName,
+            SubName = main.SongSubName,
+            Author = main.SongAuthor,
+            Creator = main.Mapper,
+            Cover = (Bitmap)Bitmap.FromStream(new HttpClient().GetStreamAsync(main.coverImage).Result),
+            IdOrHash = main.Hash,
+            Bpm = main.BPM,
+            NoteJumpSpeed = main.NJS,
+            Difficulty = main.Difficulty,
+            CustomDifficulty = main.CustomDifficultyLabel
+        };
+
+        PerformanceInfo = new()
+        {
+            RawScore = data.Score,
+            Score = data.ScoreWithMultipliers,
+            Accuracy = (double)Math.Round(data.Accuracy, 2),
+            Rank = data.Rank,
+            MissedNoteCount = data.Misses,
+            Failed = main.LevelFailed,
+            Finished = main.LevelFinished,
+            MaxCombo = data.maxCombo,
+            SoftFailed = (main.LevelFailed || data.PlayerHealth <= 0) && main.Modifiers.noFailOn0Energy
+        };
+    }
+
     private SharedStatus() { }
 
     public void Update(SharedStatus newStatus)
@@ -52,6 +97,7 @@ internal class SharedStatus
 
         GameInfo.ModVersion = newStatus.GameInfo.ModVersion ?? GameInfo.ModVersion;
         GameInfo.GameVersion = newStatus.GameInfo.GameVersion ?? GameInfo.GameVersion;
+        GameInfo.GameEnvironment = newStatus.GameInfo.GameEnvironment ?? GameInfo.GameEnvironment;
 
         BeatmapInfo.Name = newStatus.BeatmapInfo.Name ?? BeatmapInfo.Name;
         BeatmapInfo.SubName = newStatus.BeatmapInfo.SubName ?? BeatmapInfo.SubName;
@@ -86,6 +132,7 @@ internal class SharedStatus
         newStatus.GameInfo.ModUsed = GameInfo.ModUsed;
         newStatus.GameInfo.ModVersion = GameInfo.ModVersion;
         newStatus.GameInfo.GameVersion = GameInfo.GameVersion;
+        newStatus.GameInfo.GameEnvironment = GameInfo.GameEnvironment;
 
         newStatus.BeatmapInfo.Name = BeatmapInfo.Name;
         newStatus.BeatmapInfo.SubName = BeatmapInfo.SubName;
@@ -121,6 +168,7 @@ internal class SharedStatus
     internal class Game
     {
         internal Mod ModUsed { get; set; }
+        internal GameEnvironment? GameEnvironment { get; set; }
         internal string ModVersion { get; set; }
         internal string GameVersion { get; set; }
     }

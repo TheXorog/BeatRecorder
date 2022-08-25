@@ -35,7 +35,7 @@ internal class HttpStatus
         public float noteJumpSpeed { get; set; }
         public int songTimeOffset { get; set; }
         public long start { get; set; }
-        public object paused { get; set; }
+        public long? paused { get; set; }
         public int length { get; set; }
         public string difficulty { get; set; }
         public int notesCount { get; set; }
