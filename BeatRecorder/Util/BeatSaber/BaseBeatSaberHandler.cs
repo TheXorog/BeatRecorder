@@ -81,12 +81,15 @@ internal abstract class BaseBeatSaberHandler
             "expert+" or "expertplus" => "EX+",
             _ => sharedStatus.BeatmapInfo.Difficulty.Truncate(1),
         };
+
+        var missesText = sharedStatus.PerformanceInfo?.CombinedMisses?.ToString() ?? "0";
+
         NewName = NewName.Replace("<rank>", sharedStatus.PerformanceInfo.Rank ?? "Z");
         NewName = NewName.Replace("<accuracy>", (GeneratedAccuracy.IsNullOrWhiteSpace() ? "Z" : GeneratedAccuracy));
         NewName = NewName.Replace("<max-combo>", sharedStatus.PerformanceInfo?.MaxCombo?.ToString() ?? "0");
         NewName = NewName.Replace("<score>", sharedStatus.PerformanceInfo?.Score?.ToString() ?? "0");
         NewName = NewName.Replace("<raw-score>", sharedStatus.PerformanceInfo?.RawScore?.ToString() ?? "0");
-        NewName = NewName.Replace("<misses>", sharedStatus.PerformanceInfo?.CombinedMisses?.ToString() ?? "0");
+        NewName = NewName.Replace("<misses>", (missesText == "0" ? "FC" : missesText));
 
         NewName = NewName.Replace("<song-name>", sharedStatus.BeatmapInfo?.Name ?? "Unknown");
         NewName = NewName.Replace("<song-sub-name>", sharedStatus.BeatmapInfo?.SubName ?? "Unknown");
