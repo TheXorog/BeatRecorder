@@ -22,7 +22,7 @@
 
 ## What is this?
 
-This application is for people who record their BeatSaber gameplay using OBS. It connects to **[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** or **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** to detect the current game-state and **[obs-websocket](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)** to automatically start and stop the recording.
+This application is for people who record their BeatSaber gameplay using OBS. It connects to **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** for older Beat Saber versions) or **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** to detect the current game-state and **[obs-websocket](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)** to automatically start and stop the recording.
 
 Files are saved where-ever you set your output folder to in OBS.
 
