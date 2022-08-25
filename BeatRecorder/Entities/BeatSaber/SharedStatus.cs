@@ -1,14 +1,16 @@
-﻿namespace BeatRecorder.Entities;
+﻿using BeatRecorder.Enums;
 
-internal class SharedStatus
+namespace BeatRecorder.Entities;
+
+public class SharedStatus
 {
-    internal SharedStatus(HttpStatus.Status status)
+    public SharedStatus(HttpStatus.Status status)
     {
         GameInfo = new()
         {
             ModUsed = Mod.HttpStatus,
-            ModVersion = status.game?.gameVersion,
-            GameVersion = status.game?.pluginVersion,
+            ModVersion = status.game?.pluginVersion,
+            GameVersion = status.game?.gameVersion,
             GameEnvironment = status.game.scene switch
             {
                 "Menu" => GameEnvironment.Menu,
@@ -18,13 +20,21 @@ internal class SharedStatus
             }
         };
 
-        BeatmapInfo = new()
+        Bitmap bitmap = null;
+
+        try
+        {
+            bitmap = (Bitmap)Image.FromStream(new MemoryStream(Convert.FromBase64String(status.beatmap?.songCover)));
+        }
+        catch { }
+
+        this.BeatmapInfo = new()
         {
             Name = status.beatmap?.songName,
             SubName = status.beatmap?.songSubName,
             Author = status.beatmap?.songAuthorName,
             Creator = status.beatmap?.levelAuthorName,
-            Cover = (Bitmap)Bitmap.FromStream(new MemoryStream(Convert.FromBase64String(status.beatmap?.songCover))),
+            Cover = bitmap,
             IdOrHash = status.beatmap?.levelId,
             Bpm = status.beatmap?.songBPM,
             NoteJumpSpeed = status.beatmap?.noteJumpSpeed,
@@ -34,11 +44,19 @@ internal class SharedStatus
             WallCount = status.beatmap?.obstaclesCount
         };
 
-        PerformanceInfo = new()
+        double? v = null;
+
+        try
+        {
+            v = Math.Round((double)((status.performance?.score * 100) / status.beatmap?.maxScore), 2);
+        }
+        catch { }
+
+        this.PerformanceInfo = new()
         {
             RawScore = status.performance?.rawScore,
             Score = status.performance?.score,
-            Accuracy = Math.Round((double)((status.performance?.score * 100) / status.beatmap?.maxScore), 2),
+            Accuracy = v ?? 00.00,
             Rank = status.performance?.rank,
             MissedNoteCount = status.performance?.passedNotes,
             BadCutCount = status.performance?.missedNotes,
@@ -50,13 +68,13 @@ internal class SharedStatus
         };
     }
 
-    internal SharedStatus(DataPullerMain main, DataPullerData data)
+    public SharedStatus(DataPullerMain main, DataPullerData data)
     {
         GameInfo = new()
         {
             ModUsed = Mod.Datapuller,
-            ModVersion = main.GameVersion,
-            GameVersion = main.PluginVersion,
+            ModVersion = main.PluginVersion,
+            GameVersion = main.GameVersion,
             GameEnvironment = (main.InLevel ? (main.LevelPaused ? GameEnvironment.Paused : GameEnvironment.InLevel) : GameEnvironment.Menu)
         };
 
@@ -129,11 +147,13 @@ internal class SharedStatus
     {
         var newStatus = new SharedStatus();
 
+        newStatus.GameInfo = new();
         newStatus.GameInfo.ModUsed = GameInfo.ModUsed;
         newStatus.GameInfo.ModVersion = GameInfo.ModVersion;
         newStatus.GameInfo.GameVersion = GameInfo.GameVersion;
         newStatus.GameInfo.GameEnvironment = GameInfo.GameEnvironment;
 
+        newStatus.BeatmapInfo = new();
         newStatus.BeatmapInfo.Name = BeatmapInfo.Name;
         newStatus.BeatmapInfo.SubName = BeatmapInfo.SubName;
         newStatus.BeatmapInfo.Author = BeatmapInfo.Author;
@@ -147,6 +167,7 @@ internal class SharedStatus
         newStatus.BeatmapInfo.WallCount = BeatmapInfo.WallCount;
         newStatus.BeatmapInfo.CustomDifficulty = BeatmapInfo.CustomDifficulty;
 
+        newStatus.PerformanceInfo = new();
         newStatus.PerformanceInfo.RawScore = PerformanceInfo.RawScore;
         newStatus.PerformanceInfo.Score = PerformanceInfo.Score;
         newStatus.PerformanceInfo.Accuracy = PerformanceInfo.Accuracy;
@@ -161,51 +182,52 @@ internal class SharedStatus
         return newStatus;
     }
 
-    internal Game GameInfo { get; set; }
-    internal Beatmap BeatmapInfo { get; set; }
-    internal Performance PerformanceInfo { get; set; }
+    public Game GameInfo { get; set; }
+    public Beatmap BeatmapInfo { get; set; }
 
-    internal class Game
+    public Performance PerformanceInfo { get; set; }
+
+    public class Game
     {
-        internal Mod ModUsed { get; set; }
-        internal GameEnvironment? GameEnvironment { get; set; }
-        internal string ModVersion { get; set; }
-        internal string GameVersion { get; set; }
+        public Mod ModUsed { get; set; }
+        public GameEnvironment? GameEnvironment { get; set; }
+        public string ModVersion { get; set; }
+        public string GameVersion { get; set; }
     }
 
-    internal class Beatmap
+    public class Beatmap
     {
-        internal string Name { get; set; }
-        internal string SubName { get; set; }
-        internal string NameWithSub => $"{Name}{(SubName.IsNullOrWhiteSpace() ? "" : $" {SubName}")}";
-        internal string Author { get; set; }
-        internal string Creator { get; set; }
-        internal Bitmap Cover { get; set; }
-        internal string IdOrHash { get; set; }
-        internal float? Bpm { get; set; }
-        internal float? NoteJumpSpeed { get; set; }
-        internal string Difficulty { get; set; }
-        internal string CustomDifficulty { get => (CustomDifficulty.IsNullOrWhiteSpace() ? Difficulty : _CustomDifficulty); set { _CustomDifficulty = value; } }
-        internal long? NoteCount { get; set; }
-        internal long? BombCount { get; set; }
-        internal long? WallCount { get; set; }
+        public string Name { get; set; }
+        public string SubName { get; set; }
+        public string NameWithSub => $"{Name}{(SubName.IsNullOrWhiteSpace() ? "" : $" {SubName}")}";
+        public string Author { get; set; }
+        public string Creator { get; set; }
+        public Bitmap Cover { get; set; }
+        public string IdOrHash { get; set; }
+        public float? Bpm { get; set; }
+        public float? NoteJumpSpeed { get; set; }
+        public string Difficulty { get; set; }
+        public string CustomDifficulty { get => (_CustomDifficulty.IsNullOrWhiteSpace() ? Difficulty : _CustomDifficulty); set { _CustomDifficulty = value; } }
+        public long? NoteCount { get; set; }
+        public long? BombCount { get; set; }
+        public long? WallCount { get; set; }
 
         private string _CustomDifficulty { get; set; }
     }
 
-    internal class Performance
+    public class Performance
     {
-        internal long? RawScore { get; set; }
-        internal long? Score { get; set; }
-        internal double? Accuracy { get; set; }
-        internal string Rank { get; set; }
-        internal long? MissedNoteCount { get; set; } = 0;
-        internal long? BadCutCount { get; set; } = 0;
-        internal long? BombHitCount { get; set; } = 0;
-        internal long? CombinedMisses { get => MissedNoteCount + BadCutCount + BombHitCount; }
-        internal long? MaxCombo { get; set; }
-        internal bool? SoftFailed { get; set; }
-        internal bool? Failed { get; set; }
-        internal bool? Finished { get; set; }
+        public long? RawScore { get; set; }
+        public long? Score { get; set; }
+        public double? Accuracy { get; set; }
+        public string Rank { get; set; }
+        public long? MissedNoteCount { get; set; } = 0;
+        public long? BadCutCount { get; set; } = 0;
+        public long? BombHitCount { get; set; } = 0;
+        public long? CombinedMisses { get => MissedNoteCount + BadCutCount + BombHitCount; }
+        public long? MaxCombo { get; set; }
+        public bool? SoftFailed { get; set; }
+        public bool? Failed { get; set; }
+        public bool? Finished { get; set; }
     }
 }

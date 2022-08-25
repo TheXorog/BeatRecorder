@@ -1,6 +1,6 @@
 ﻿namespace BeatRecorder.Enums;
 
-internal enum Mod
+public enum Mod
 {
     HttpStatus,
     Datapuller,

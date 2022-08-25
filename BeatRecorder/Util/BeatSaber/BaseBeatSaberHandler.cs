@@ -1,7 +1,13 @@
-﻿namespace BeatRecorder.Util.BeatSaber;
+﻿using BeatRecorder.Entities;
+
+namespace BeatRecorder.Util.BeatSaber;
 
 internal abstract class BaseBeatSaberHandler
 {
+    public abstract BaseBeatSaberHandler Initialize(Program program);
+    public abstract SharedStatus GetCurrentStatus();
+    public abstract SharedStatus GetLastCompletedStatus();
+
     public void HandleFile(string fileName, long RecordingLength, SharedStatus sharedStatus, Config loadedConfig)
     {
         if (sharedStatus is null)
@@ -85,7 +91,7 @@ internal abstract class BaseBeatSaberHandler
         NewName = NewName.Replace("<song-name>", sharedStatus.BeatmapInfo?.Name ?? "Unknown");
         NewName = NewName.Replace("<song-sub-name>", sharedStatus.BeatmapInfo?.SubName ?? "Unknown");
         NewName = NewName.Replace("<song-name-with-sub>", sharedStatus.BeatmapInfo?.NameWithSub ?? "Unknown");
-        NewName = NewName.Replace("<song-name-author>", sharedStatus.BeatmapInfo?.Author ?? "Unknown");
+        NewName = NewName.Replace("<song-author>", sharedStatus.BeatmapInfo?.Author ?? "Unknown");
         NewName = NewName.Replace("<mapper>", sharedStatus.BeatmapInfo?.Creator ?? "Unknown");
         NewName = NewName.Replace("<levelid>", sharedStatus.BeatmapInfo?.IdOrHash ?? "Unknown");
         NewName = NewName.Replace("<bpm>", sharedStatus.BeatmapInfo?.Bpm?.ToString() ?? "Unknown");

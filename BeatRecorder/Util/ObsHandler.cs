@@ -1,4 +1,6 @@
-﻿using BeatRecorder.Entities.OBS;
+﻿using BeatRecorder.Entities;
+using BeatRecorder.Entities.OBS;
+using BeatRecorder.Enums;
 
 namespace BeatRecorder.Util;
 
@@ -17,18 +19,19 @@ internal class ObsHandler
 
     internal bool IsRecording { get; private set; } = false;
     internal bool IsPaused { get; private set; } = false;
+    internal int RecordingSeconds { get; private set; } = 0;
 
     internal CancellationTokenSource StopRecordingDelayCancel = new();
 
-    private Config LoadedConfig = null;
+    private Program Program = null;
 
-    internal static ObsHandler Initialize(Config config)
+    internal static ObsHandler Initialize(Program program)
     {
         _logger.LogInfo("Initializing Connection to OBS..");
 
         ObsHandler obsHandler = new()
         {
-            LoadedConfig = config
+            Program = program
         };
 
         var factory = new Func<ClientWebSocket>(() => new ClientWebSocket
@@ -39,7 +42,7 @@ internal class ObsHandler
             }
         });
 
-        obsHandler.socket = new WebsocketClient(new Uri($"ws://{config.OBSUrl}:{config.OBSPort}"), factory)
+        obsHandler.socket = new WebsocketClient(new Uri($"ws://{obsHandler.Program.status.LoadedConfig.OBSUrl}:{obsHandler.Program.status.LoadedConfig.OBSPort}"), factory)
         {
             ReconnectTimeout = null,
             ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -68,7 +71,7 @@ internal class ObsHandler
 
     internal async Task StartRecording()
     {
-        if (!LoadedConfig.AutomaticRecording)
+        if (!Program.status.LoadedConfig.AutomaticRecording)
             return;
 
         if (!socket.IsRunning)
@@ -84,19 +87,19 @@ internal class ObsHandler
             }
         }
 
-        if (LoadedConfig.MininumWaitUntilRecordingCanStart < 200 || LoadedConfig.MininumWaitUntilRecordingCanStart > 2000)
+        if (Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart < 200 || Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart > 2000)
         {
             _logger.LogWarn("MininumWaitUntilRecordingCanStart was reset to 800. Allowed range for value is between 200 and 2000");
-            LoadedConfig.MininumWaitUntilRecordingCanStart = 800;
+            Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart = 800;
         }
 
-        Thread.Sleep(LoadedConfig.MininumWaitUntilRecordingCanStart);
+        Thread.Sleep(Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart);
         socket.Send(new StartRecordingRequest().Build());
     }
 
     internal async Task StopRecording(bool ForceStop = false)
     {
-        if (!LoadedConfig.AutomaticRecording)
+        if (!Program.status.LoadedConfig.AutomaticRecording)
             return;
 
         if (!socket.IsRunning)
@@ -104,15 +107,15 @@ internal class ObsHandler
 
         if (!ForceStop)
         {
-            if (LoadedConfig.StopRecordingDelay < 0 || LoadedConfig.StopRecordingDelay > 20)
+            if (Program.status.LoadedConfig.StopRecordingDelay < 0 || Program.status.LoadedConfig.StopRecordingDelay > 20)
             {
                 _logger.LogWarn("StopRecordingDelay was reset to 5. Allowed range for value is between 0 and 20");
-                LoadedConfig.StopRecordingDelay = 5;
+                Program.status.LoadedConfig.StopRecordingDelay = 5;
             }
 
             try
             {
-                var millisecondsDelay = LoadedConfig.StopRecordingDelay;
+                var millisecondsDelay = Program.status.LoadedConfig.StopRecordingDelay;
                 await Task.Delay((millisecondsDelay <= 0 ? 1 : millisecondsDelay) * 1000, this.StopRecordingDelayCancel.Token);
             }
             catch (OperationCanceledException)
@@ -155,7 +158,7 @@ internal class ObsHandler
 
             if (required.authRequired)
             {
-                if (LoadedConfig.OBSPassword.IsNullOrWhiteSpace())
+                if (Program.status.LoadedConfig.OBSPassword.IsNullOrWhiteSpace())
                 {
                     await Task.Delay(1000);
                     _logger.LogInfo("A password is required to log into your obs websocket.");
@@ -199,7 +202,7 @@ internal class ObsHandler
 
                     if (key == ConsoleKey.Enter)
                     {
-                        if (LoadedConfig.AskToSaveOBSPassword)
+                        if (Program.status.LoadedConfig.AskToSaveOBSPassword)
                         {
                             key = ConsoleKey.A;
 
@@ -223,32 +226,32 @@ internal class ObsHandler
                                 else if (key == ConsoleKey.Y)
                                 {
                                     _logger.LogInfo("Your password is now saved in the Settings.json.");
-                                    LoadedConfig.OBSPassword = Password;
-                                    LoadedConfig.AskToSaveOBSPassword = true;
+                                    Program.status.LoadedConfig.OBSPassword = Password;
+                                    Program.status.LoadedConfig.AskToSaveOBSPassword = true;
 
-                                    File.WriteAllText("Settings.json", JsonConvert.SerializeObject(LoadedConfig, Formatting.Indented));
+                                    File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.status.LoadedConfig, Formatting.Indented));
                                     break;
                                 }
                                 else if (key == ConsoleKey.N || key == ConsoleKey.Enter)
                                 {
                                     _logger.LogInfo("Your password will not be saved. This wont be asked in the feature.");
                                     _logger.LogInfo("To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
-                                    LoadedConfig.OBSPassword = "";
-                                    LoadedConfig.AskToSaveOBSPassword = false;
+                                    Program.status.LoadedConfig.OBSPassword = "";
+                                    Program.status.LoadedConfig.AskToSaveOBSPassword = false;
 
-                                    File.WriteAllText("Settings.json", JsonConvert.SerializeObject(LoadedConfig, Formatting.Indented));
+                                    File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.status.LoadedConfig, Formatting.Indented));
                                     break;
                                 }
                             }
                         }
 
-                        LoadedConfig.OBSPassword = Password;
+                        Program.status.LoadedConfig.OBSPassword = Password;
                     }
                 }
 
                 _logger.LogInfo("Connection with OBS requires authentication. Attempting log in..");
 
-                string secret = Extensions.HashEncode(LoadedConfig.OBSPassword + required.salt);
+                string secret = Extensions.HashEncode(Program.status.LoadedConfig.OBSPassword + required.salt);
                 string authResponse = Extensions.HashEncode(secret + required.challenge);
 
                 socket.Send(new AuthenticateRequest(authResponse, AuthenticationGuid).Build());
@@ -286,6 +289,16 @@ internal class ObsHandler
             IsRecording = true;
 
             _logger.LogInfo("Recording started.");
+
+            while (IsRecording)
+            {
+                if (!IsPaused)
+                    RecordingSeconds++;
+
+                await Task.Delay(1000);
+            }
+            await Task.Delay(2000);
+            RecordingSeconds = 0;
         }
         else if (Message.UpdateType == "RecordingStopped")
         {
@@ -295,6 +308,7 @@ internal class ObsHandler
             _logger.LogInfo("Recording stopped.");
 
             RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<RecordingStopped>(msg.Text);
+            Program.BeatSaberClient.HandleFile(RecordingStopped.recordingFilename, RecordingSeconds, Program.BeatSaberClient.GetLastCompletedStatus(), Program.status.LoadedConfig);
         }
         else if (Message.UpdateType == "RecordingPaused")
         {
@@ -324,8 +338,10 @@ internal class ObsHandler
                 _logger.LogTrace(message);
 
                 socket.Send(message);
-            }    
+            }
         }
+
+        LastWarning = ConnectionTypeWarning.Connected;
     }
 
     private void Disconnected(DisconnectionInfo msg)

@@ -1,6 +1,6 @@
 ﻿namespace BeatRecorder.Entities;
 
-internal class DataPullerData
+public class DataPullerData
 {
     public int Score { get; set; }
     public int ScoreWithMultipliers { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace BeatRecorder.Entities;
 
-internal class HttpStatus
+public class HttpStatus
 {
     public string @event { get; set; }
     public long time { get; set; }

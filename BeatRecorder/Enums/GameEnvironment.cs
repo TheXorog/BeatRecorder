@@ -1,6 +1,6 @@
 ﻿namespace BeatRecorder.Enums;
 
-internal enum GameEnvironment
+public enum GameEnvironment
 {
     Menu,
     InLevel,

@@ -1,4 +1,8 @@
-﻿namespace BeatRecorder;
+﻿using BeatRecorder.Entities;
+using BeatRecorder.Util;
+using BeatRecorder.Util.BeatSaber;
+
+namespace BeatRecorder;
 
 class Program
 {
@@ -7,7 +11,9 @@ class Program
     public Status status { get; set; } = new();
 
     public ObsHandler ObsClient { get; set; }
-    public SharedStatus LastCompletedStatus { get; set; } = null;
+
+    public BaseBeatSaberHandler BeatSaberClient { get; set; } = null;
+
 
     static void Main(string[] args)
     {
@@ -77,7 +83,24 @@ class Program
                          $"Base Directory: {AppDomain.CurrentDomain.BaseDirectory}\n" +
                          $"Commandline: {Environment.CommandLine}\n");
 
-        ObsClient = ObsHandler.Initialize(status.LoadedConfig);
+        ObsClient = ObsHandler.Initialize(this);
+
+        switch (status.LoadedConfig.Mod)
+        {
+            case "http-status":
+            {
+                BeatSaberClient = new HttpStatusHandler().Initialize(this);
+                break;
+            }
+            case "datapuller":
+            {
+                break;
+            }
+            case "beatsaberplus":
+            {
+                break;
+            }
+        }
 
         await Task.Delay(-1);
     }

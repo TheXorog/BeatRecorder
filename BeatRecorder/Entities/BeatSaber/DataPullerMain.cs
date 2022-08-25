@@ -1,6 +1,6 @@
 ﻿namespace BeatRecorder.Entities;
 
-internal class DataPullerMain
+public class DataPullerMain
 {
     public string GameVersion { get; set; }
     public string PluginVersion { get; set; }
