@@ -7,6 +7,7 @@ class Program
     public Status status { get; set; } = new();
 
     public ObsHandler ObsClient { get; set; }
+    public SharedStatus LastCompletedStatus { get; set; } = null;
 
     static void Main(string[] args)
     {

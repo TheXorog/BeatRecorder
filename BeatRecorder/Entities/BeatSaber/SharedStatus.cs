@@ -13,7 +13,7 @@ internal class SharedStatus
             {
                 "Menu" => GameEnvironment.Menu,
                 "Song" => GameEnvironment.InLevel,
-                "Spectator" => ((status.beatmap?.paused is not null) ? GameEnvironment.Paused : GameEnvironment.InLevel)
+                "Spectator" => ((status.beatmap?.paused is not null) ? GameEnvironment.Paused : GameEnvironment.InLevel),
                 _ => GameEnvironment.Unknown
             }
         };
