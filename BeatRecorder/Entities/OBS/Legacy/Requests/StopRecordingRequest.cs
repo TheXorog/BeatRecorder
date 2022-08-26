@@ -1,4 +1,4 @@
-﻿namespace BeatRecorder.Entities.OBS;
+﻿namespace BeatRecorder.Entities.OBS.Legacy;
 internal class StopRecordingRequest : BaseRequest
 {
     internal StopRecordingRequest(string id = null)

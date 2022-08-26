@@ -1,4 +1,4 @@
-﻿namespace BeatRecorder.Entities.OBS;
+﻿namespace BeatRecorder.Entities.OBS.Legacy;
 
 internal class SetCurrentScene : BaseRequest
 {

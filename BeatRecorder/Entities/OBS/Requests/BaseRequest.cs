@@ -2,11 +2,8 @@
 
 internal abstract class BaseRequest
 {
-    [JsonProperty("request-type")]
-    public string RequestType { get; set; }
-
-    [JsonProperty("message-id")]
-    public string MessageId { get; set; }
+    public int op { get; set; }
+    public object d { get; set; }
 
     internal string Build() => JsonConvert.SerializeObject(this);
 }

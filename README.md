@@ -29,7 +29,8 @@ Files are saved where-ever you set your output folder to in OBS.
 
 ## Requirements
 
-* **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** for older Beat Saber versions), **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** or **[BeatSaberPlus](https://github.com/hardcpp/BeatSaberPlus)**
+* **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[HttpStatus](https://github.com/opl-/beatsaber-http-status/)** for older BS versions), **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** or **[BeatSaberPlus (experimental)](https://github.com/hardcpp/BeatSaberPlus)**
+    - **BeatSaberPlus support is incomplete as it does not provide a way of knowing if a song was failed or finished.**
 <br></br>
 * **[obs-websocket v4.9.1](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)**
 

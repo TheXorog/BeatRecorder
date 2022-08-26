@@ -1,14 +1,19 @@
-﻿namespace BeatRecorder.Entities.OBS;
+﻿using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
-internal class AuthenticateRequest : BaseRequest
+namespace BeatRecorder.Entities.OBS;
+
+internal class Indentify : BaseRequest
 {
-    internal AuthenticateRequest(string auth, string id = null)
+    internal Indentify(string auth = "", int rpcVersion = 1)
     {
-        this.Auth = auth;
-        this.RequestType = "Authenticate";
-        this.MessageId = id ?? Guid.NewGuid().ToString();
-    }
+        this.op = 1;
+        this.d = new JObject
+        {
+            ["rpcVersion"] = rpcVersion,
+        };
 
-    [JsonProperty("auth")]
-    internal string Auth { get; set; }
+        if (!auth.IsNullOrWhiteSpace())
+            ((JObject)this.d).Add("authentication", auth);
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using BeatRecorder.Entities;
 using BeatRecorder.Util;
 using BeatRecorder.Util.BeatSaber;
+using BeatRecorder.Util.OBS;
 
 namespace BeatRecorder;
 
@@ -10,7 +11,7 @@ class Program
 
     public Status status { get; set; } = new();
 
-    public ObsHandler ObsClient { get; set; }
+    public BaseObsHandler ObsClient { get; set; }
 
     public BaseBeatSaberHandler BeatSaberClient { get; set; } = null;
 
@@ -30,7 +31,7 @@ class Program
 
         _ = Task.Run(async () =>
         {
-            await Task.Delay(10000);
+            await Task.Delay(1000);
 
             if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
             {
@@ -83,9 +84,42 @@ class Program
                          $"Base Directory: {AppDomain.CurrentDomain.BaseDirectory}\n" +
                          $"Commandline: {Environment.CommandLine}\n");
 
-        _ = Task.Run(() =>
+        _ = Task.Run(async () =>
         {
-            ObsClient = ObsHandler.Initialize(this);
+            HttpClient httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(3);
+
+            async Task<bool> UseModernSocket()
+            {
+                try
+                {
+                    _logger.LogDebug($"Checking if obs-websocket v5 is available at {this.status.LoadedConfig.OBSUrl}:{this.status.LoadedConfig.OBSPortModern}..");
+                    var response = await httpClient.GetAsync($"http://{this.status.LoadedConfig.OBSUrl}:{this.status.LoadedConfig.OBSPortModern}");
+                    _logger.LogDebug($"obs-websocket v5 is available");
+                    return true;
+                }
+                catch (Exception)
+                {
+                    _logger.LogWarn($"obs-websocket is not available, attempting fall back to legacy..");
+
+                    try
+                    {
+                        var response = await httpClient.GetAsync($"http://{this.status.LoadedConfig.OBSUrl}:{this.status.LoadedConfig.OBSPortLegacy}");
+                        _logger.LogDebug($"obs-websocket v4 is available");
+                        return false;
+                    }
+                    catch (Exception)
+                    {
+                        _logger.LogWarn($"obs-websocket v4 is not available, re-checking..");
+                        return await UseModernSocket();
+                    }
+                }
+            }
+
+            if (await UseModernSocket())
+                this.ObsClient = ObsHandler.Initialize(this);
+            else
+                this.ObsClient = LegacyObsHandler.Initialize(this);
         });
 
         _ = Task.Run(async () =>

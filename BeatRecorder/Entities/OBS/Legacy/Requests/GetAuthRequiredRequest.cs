@@ -1,4 +1,4 @@
-﻿namespace BeatRecorder.Entities.OBS;
+﻿namespace BeatRecorder.Entities.OBS.Legacy;
 internal class GetAuthRequiredRequest : BaseRequest
 {
     internal GetAuthRequiredRequest(string id = null)

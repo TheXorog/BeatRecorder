@@ -1,12 +1,11 @@
-﻿using BeatRecorder.Entities;
-using BeatRecorder.Entities.OBS;
+﻿using BeatRecorder.Entities.OBS.Legacy;
 using BeatRecorder.Enums;
 
-namespace BeatRecorder.Util;
+namespace BeatRecorder.Util.OBS;
 
-internal class ObsHandler
+internal class LegacyObsHandler : BaseObsHandler
 {
-    private ObsHandler() { }
+    private LegacyObsHandler() { }
 
     private WebsocketClient socket { get; set; } = null;
 
@@ -25,11 +24,11 @@ internal class ObsHandler
 
     private Program Program = null;
 
-    internal static ObsHandler Initialize(Program program)
+    internal static BaseObsHandler Initialize(Program program)
     {
         _logger.LogInfo("Initializing Connection to OBS..");
 
-        ObsHandler obsHandler = new()
+        LegacyObsHandler obsHandler = new()
         {
             Program = program
         };
@@ -42,7 +41,7 @@ internal class ObsHandler
             }
         });
 
-        obsHandler.socket = new WebsocketClient(new Uri($"ws://{obsHandler.Program.status.LoadedConfig.OBSUrl}:{obsHandler.Program.status.LoadedConfig.OBSPort}"), factory)
+        obsHandler.socket = new WebsocketClient(new Uri($"ws://{obsHandler.Program.status.LoadedConfig.OBSUrl}:{obsHandler.Program.status.LoadedConfig.OBSPortLegacy}"), factory)
         {
             ReconnectTimeout = null,
             ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -69,7 +68,7 @@ internal class ObsHandler
         return obsHandler;
     }
 
-    internal async Task StartRecording()
+    internal override async Task StartRecording()
     {
         if (!Program.status.LoadedConfig.AutomaticRecording)
             return;
@@ -97,7 +96,7 @@ internal class ObsHandler
         socket.Send(new StartRecordingRequest().Build());
     }
 
-    internal async Task StopRecording(bool ForceStop = false)
+    internal override async Task StopRecording(bool ForceStop = false)
     {
         if (!Program.status.LoadedConfig.AutomaticRecording)
             return;
@@ -132,17 +131,17 @@ internal class ObsHandler
         socket.Send(new StopRecordingRequest().Build());
     }
 
-    internal void PauseRecording()
+    internal override void PauseRecording()
     {
         socket.Send(new PauseRecordingRequest().Build());
     }
     
-    internal void ResumeRecording()
+    internal override void ResumeRecording()
     {
         socket.Send(new ResumeRecordingRequest().Build());
     }
     
-    internal void SetCurrentScene(string scene)
+    internal override void SetCurrentScene(string scene)
     {
         socket.Send(new SetCurrentScene(scene).Build());
     }
@@ -234,7 +233,7 @@ internal class ObsHandler
                                 }
                                 else if (key == ConsoleKey.N || key == ConsoleKey.Enter)
                                 {
-                                    _logger.LogInfo("Your password will not be saved. This wont be asked in the feature.");
+                                    _logger.LogInfo("Your password will not be saved. This wont be asked in the future.");
                                     _logger.LogInfo("To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
                                     Program.status.LoadedConfig.OBSPassword = "";
                                     Program.status.LoadedConfig.AskToSaveOBSPassword = false;

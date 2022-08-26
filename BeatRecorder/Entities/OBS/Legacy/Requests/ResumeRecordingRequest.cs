@@ -1,4 +1,4 @@
-﻿namespace BeatRecorder.Entities.OBS;
+﻿namespace BeatRecorder.Entities.OBS.Legacy;
 internal class ResumeRecordingRequest : BaseRequest
 {
     internal ResumeRecordingRequest(string id = null)

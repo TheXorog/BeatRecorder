@@ -58,9 +58,14 @@ internal class Config
     public string OBSUrl { get; set; } = "127.0.0.1";
 
     /// <summary>
-    /// The port of the websocket for obs
+    /// The port of the websocket server for a legacy version obs-websocket
     /// </summary>
-    public string OBSPort { get; set; } = "4444";
+    public string OBSPortLegacy { get; set; } = "4444";
+    
+    /// <summary>
+    /// The port of the websocket server for v5.0+ versions of obs-websocket
+    /// </summary>
+    public string OBSPortModern { get; set; } = "4455";
 
     /// <summary>
     /// The password for the obs websocket
