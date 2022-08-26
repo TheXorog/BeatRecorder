@@ -88,7 +88,7 @@ class Program
             ObsClient = ObsHandler.Initialize(this);
         });
 
-        _ = Task.Run(() =>
+        _ = Task.Run(async () =>
         {
             switch (status.LoadedConfig.Mod)
             {
@@ -104,6 +104,9 @@ class Program
                 }
                 case "beatsaberplus":
                 {
+                    _logger.LogFatal("BeatSaberPlus Integration is currently incomplete. BSP does not provide a way of knowing if a song was failed or finished, making filenames always seem like the song was finished.");
+                    _logger.LogFatal("To continue anyways, wait 10 seconds.");
+                    await Task.Delay(10000);
                     BeatSaberClient = new BeatSaberPlusHandler().Initialize(this); // 2947
                     break;
                 }
