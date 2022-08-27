@@ -191,7 +191,6 @@ internal class ObsHandler : BaseObsHandler
 
                 _logger.LogInfo("Successfully identified to websocket.");
                 AttemptedToIdentify = false;
-                Program.steamNotifications?.SendNotification("Connected to OBS", 1000, MessageType.INFO);
                 break;
             }
             case 5:

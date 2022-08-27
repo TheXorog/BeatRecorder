@@ -1,4 +1,6 @@
-﻿namespace BeatRecorder.Entities;
+﻿using BeatRecorder.Enums;
+
+namespace BeatRecorder.Entities;
 
 internal class NotificationEntry
 {

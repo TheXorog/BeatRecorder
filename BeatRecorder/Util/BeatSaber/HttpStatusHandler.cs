@@ -163,8 +163,6 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
 
     internal void Disconnected(DisconnectionInfo msg)
     {
-        Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
-
         try
         {
             Process[] processCollection = Process.GetProcesses();
@@ -174,6 +172,7 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
                 if (LastWarning != ConnectionTypeWarning.NoProcess)
                 {
                     _logger.LogWarn($"Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
+                    Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
                 }
                 LastWarning = ConnectionTypeWarning.NoProcess;
             }
@@ -196,8 +195,10 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
                     if (LastWarning != ConnectionTypeWarning.NotModded)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
                     }
                     LastWarning = ConnectionTypeWarning.NotModded;
+                    return;
                 }
 
                 if (FoundWebSocketDll)
@@ -205,6 +206,7 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
                     if (LastWarning != ConnectionTypeWarning.ModInstalled)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
                     }
                     LastWarning = ConnectionTypeWarning.ModInstalled;
                 }
@@ -213,6 +215,7 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
                     if (LastWarning != ConnectionTypeWarning.ModNotInstalled)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
+                        Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
                     }
                     LastWarning = ConnectionTypeWarning.ModNotInstalled;
                 }
