@@ -16,7 +16,7 @@ public partial class SettingsUI : Form
         SettingsRequired = settingsRequired;
     }
 
-    BeatRecorder.Objects.Settings _loadedSettings = null;
+    BeatRecorder.Entities.Config _loadedSettings = null;
 
     private void SettingsUI_Shown(object sender, EventArgs e)
     {
@@ -29,12 +29,13 @@ public partial class SettingsUI : Form
 
         OBSIpBox.Enabled = false;
         OBSPortBox.Enabled = false;
+        OBSLegacyPortBox.Enabled = false;
 
         DisplayUserInterfaceCheck.Enabled = false;
         AutomaticRecordingCheck.Enabled = false;
 
         if (File.Exists("Settings.json"))
-            _loadedSettings = JsonConvert.DeserializeObject<BeatRecorder.Objects.Settings>(File.ReadAllText("Settings.json"));
+            _loadedSettings = JsonConvert.DeserializeObject<BeatRecorder.Entities.Config>(File.ReadAllText("Settings.json"));
 
         if (_loadedSettings == null)
         {
@@ -67,7 +68,8 @@ public partial class SettingsUI : Form
             BeatSaberIpBox.Text = _loadedSettings.BeatSaberUrl;
             BeatSaberPortBox.Text = _loadedSettings.BeatSaberPort;
             OBSIpBox.Text = _loadedSettings.OBSUrl;
-            OBSPortBox.Text = _loadedSettings.OBSPort;
+            OBSPortBox.Text = _loadedSettings.OBSPortModern;
+            OBSLegacyPortBox.Text = _loadedSettings.OBSPortLegacy;
             DisplayUserInterfaceCheck.Checked = _loadedSettings.DisplayUI;
             AutomaticRecordingCheck.Checked = _loadedSettings.AutomaticRecording;
             PauseOnIngamePauseCheck.Checked = _loadedSettings.PauseRecordingOnIngamePause;
@@ -101,6 +103,7 @@ public partial class SettingsUI : Form
 
             OBSIpBox.Enabled = true;
             OBSPortBox.Enabled = true;
+            OBSLegacyPortBox.Enabled = true;
 
             DisplayUserInterfaceCheck.Enabled = true;
             AutomaticRecordingCheck.Enabled = true;
@@ -115,6 +118,7 @@ public partial class SettingsUI : Form
 
             OBSIpBox.Enabled = false;
             OBSPortBox.Enabled = false;
+            OBSLegacyPortBox.Enabled = false;
 
             DisplayUserInterfaceCheck.Enabled = false;
             AutomaticRecordingCheck.Enabled = false;
@@ -146,9 +150,13 @@ public partial class SettingsUI : Form
 
         if (ModSelectionBox.Text == "datapuller")
             BeatSaberPortBox.Value = 2946;
-
-        if (ModSelectionBox.Text == "http-status")
+        else if (ModSelectionBox.Text == "http-status")
             BeatSaberPortBox.Value = 6557;
+        else if (ModSelectionBox.Text == "beatsaberplus")
+        {
+            _ = Task.Run(() => { MessageBox.Show("BeatSaberPlus Integration is currently incomplete. Filenames will always appear as if you finished the song.", "Warning", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning); });
+            BeatSaberPortBox.Value = 2947;
+        }
     }
 
     private void ModSelectionBox_TextChanged(object sender, EventArgs e)
@@ -165,9 +173,13 @@ public partial class SettingsUI : Form
 
         if (ModSelectionBox.Text == "datapuller")
             BeatSaberPortBox.Value = 2946;
-
-        if (ModSelectionBox.Text == "http-status")
+        else if (ModSelectionBox.Text == "http-status")
             BeatSaberPortBox.Value = 6557;
+        else if (ModSelectionBox.Text == "beatsaberplus")
+        {
+            _ = Task.Run(() => { MessageBox.Show("BeatSaberPlus Integration is currently incomplete. Filenames will always appear as if you finished the song.", "Warning", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning); });
+            BeatSaberPortBox.Value = 2947;
+        }
     }
 
     private void Cancel_Click(object sender, EventArgs e)
@@ -201,7 +213,8 @@ public partial class SettingsUI : Form
         _loadedSettings.BeatSaberUrl = BeatSaberIpBox.Text;
         _loadedSettings.BeatSaberPort = BeatSaberPortBox.Text;
         _loadedSettings.OBSUrl = OBSIpBox.Text;
-        _loadedSettings.OBSPort = OBSPortBox.Text;
+        _loadedSettings.OBSPortModern = OBSPortBox.Text;
+        _loadedSettings.OBSPortLegacy = OBSLegacyPortBox.Text;
         _loadedSettings.DisplayUI = DisplayUserInterfaceCheck.Checked;
         _loadedSettings.AutomaticRecording = AutomaticRecordingCheck.Checked;
         _loadedSettings.PauseRecordingOnIngamePause = PauseOnIngamePauseCheck.Checked;

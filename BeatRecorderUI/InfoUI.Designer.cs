@@ -33,7 +33,6 @@ partial class InfoUI
             this.SongNameLabel = new System.Windows.Forms.Label();
             this.SongAuthorLabel = new System.Windows.Forms.Label();
             this.MapperLabel = new System.Windows.Forms.Label();
-            this.BSRLabel = new System.Windows.Forms.Label();
             this.OpenSettings = new System.Windows.Forms.Button();
             this.ScoreLabel = new System.Windows.Forms.Label();
             this.ComboLabel = new System.Windows.Forms.Label();
@@ -45,7 +44,6 @@ partial class InfoUI
             this.label1 = new System.Windows.Forms.Label();
             this.ShowConsole = new System.Windows.Forms.Button();
             this.Restart = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
             this.CheckForUpdates = new System.Windows.Forms.Button();
             this.VersionLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -86,21 +84,11 @@ partial class InfoUI
             // 
             this.MapperLabel.AutoSize = true;
             this.MapperLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.MapperLabel.Location = new System.Drawing.Point(257, 234);
+            this.MapperLabel.Location = new System.Drawing.Point(255, 217);
             this.MapperLabel.Name = "MapperLabel";
             this.MapperLabel.Size = new System.Drawing.Size(48, 15);
             this.MapperLabel.TabIndex = 3;
             this.MapperLabel.Text = "Mapper";
-            // 
-            // BSRLabel
-            // 
-            this.BSRLabel.AutoSize = true;
-            this.BSRLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.BSRLabel.Location = new System.Drawing.Point(257, 217);
-            this.BSRLabel.Name = "BSRLabel";
-            this.BSRLabel.Size = new System.Drawing.Size(27, 15);
-            this.BSRLabel.TabIndex = 4;
-            this.BSRLabel.Text = "BSR";
             // 
             // OpenSettings
             // 
@@ -187,14 +175,13 @@ partial class InfoUI
             // 
             // label1
             // 
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
-            this.label1.ForeColor = System.Drawing.Color.Gray;
-            this.label1.Location = new System.Drawing.Point(255, 293);
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label1.ForeColor = System.Drawing.Color.Gold;
+            this.label1.Location = new System.Drawing.Point(255, 232);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(371, 17);
+            this.label1.Size = new System.Drawing.Size(371, 78);
             this.label1.TabIndex = 13;
-            this.label1.Text = "You can disable the new UI in the advanced settings";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label1.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // ShowConsole
             // 
@@ -221,18 +208,6 @@ partial class InfoUI
             this.Restart.Text = "Restart BeatRecorder";
             this.Restart.UseVisualStyleBackColor = false;
             this.Restart.Click += new System.EventHandler(this.Restart_Click);
-            // 
-            // label2
-            // 
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
-            this.label2.ForeColor = System.Drawing.Color.Gray;
-            this.label2.Location = new System.Drawing.Point(255, 262);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(371, 31);
-            this.label2.TabIndex = 16;
-            this.label2.Text = "To find out why something isn\'t working, you can check your log files. It\'s worth" +
-    " a shot.";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // CheckForUpdates
             // 
@@ -266,7 +241,6 @@ partial class InfoUI
             this.ClientSize = new System.Drawing.Size(784, 321);
             this.Controls.Add(this.VersionLabel);
             this.Controls.Add(this.CheckForUpdates);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.Restart);
             this.Controls.Add(this.ShowConsole);
             this.Controls.Add(this.label1);
@@ -278,7 +252,6 @@ partial class InfoUI
             this.Controls.Add(this.ComboLabel);
             this.Controls.Add(this.ScoreLabel);
             this.Controls.Add(this.OpenSettings);
-            this.Controls.Add(this.BSRLabel);
             this.Controls.Add(this.MapperLabel);
             this.Controls.Add(this.SongAuthorLabel);
             this.Controls.Add(this.SongNameLabel);
@@ -307,7 +280,6 @@ partial class InfoUI
     public Label SongNameLabel;
     public Label SongAuthorLabel;
     public Label MapperLabel;
-    public Label BSRLabel;
     public Label ScoreLabel;
     public Label ComboLabel;
     public Label MissesLabel;
@@ -316,7 +288,6 @@ partial class InfoUI
     public Label label1;
     public Button ShowConsole;
     private Button Restart;
-    public Label label2;
     private Button CheckForUpdates;
     public Label VersionLabel;
 }

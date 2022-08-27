@@ -7,37 +7,32 @@ public partial class InfoUI : Form
 
     bool loadedTopmost = false;
 
-    bool SettingsRequired = false;
+    public bool SettingsRequired = false;
 
-    public InfoUI(string version, bool alwaysTopMost = false, bool settingsRequired = false)
+    public InfoUI(string version, bool alwaysTopMost = false)
     {
         InitializeComponent();
 
         loadedTopmost = alwaysTopMost;
 
-        SettingsRequired = settingsRequired;
         VersionLabel.Text = $"v{version}";
     }
 
     private void InfoUI_Shown(object sender, EventArgs e)
     {
         this.TopMost = loadedTopmost;
-
-        if (SettingsRequired)
-        {
-            SettingsUI settingsUI = new(this.TopMost);
-            this.Hide();
-            settingsUI.ShowDialog();
-            this.Close();
-        }
     }
 
-    private void OpenSettings_Click(object sender, EventArgs e)
+    public void OpenSettings_Click(object sender, EventArgs e)
     {
         SettingsUI settingsUI = new(this.TopMost);
+
+        if (SettingsRequired)
+            this.Hide();
+
         settingsUI.ShowDialog();
 
-        if (settingsUI.SettingsUpdated)
+        if (settingsUI.SettingsUpdated || SettingsRequired)
         {
             SettingsUpdated = true;
             this.Close();

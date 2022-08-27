@@ -1,4 +1,5 @@
 ﻿global using Newtonsoft.Json;
+global using Newtonsoft.Json.Linq;
 global using Octokit;
 global using System;
 global using System.Diagnostics;
@@ -15,19 +16,16 @@ global using BOLL7708;
 global using System.Collections.Generic;
 global using System.Drawing;
 global using System.Drawing.Imaging;
-global using System.Windows.Forms;
 
-global using BeatRecorder.Entities;
-global using BeatRecorder.Enums;
-global using BeatRecorder.Util;
-
+global using Xorog.UniversalExtensions;
 global using Xorog.Logger;
+global using Xorog.Logger.Enums;
 global using static Xorog.Logger.Logger;
-global using static Xorog.Logger.LoggerObjects;
+global using static BeatRecorder.Log;
 global using System.Runtime.InteropServices;
-global using BeatRecorderUI;
 
 global using BeatRecorder;
 global using Valve.VR;
 global using Websocket.Client.Models;
 global using System.ComponentModel;
+

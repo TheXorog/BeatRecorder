@@ -49,6 +49,7 @@ partial class SettingsUI
             this.difficultyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shortDifficultyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.songNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.songNameWithSubNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.songAuthorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.songSubNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapperToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -86,12 +87,14 @@ partial class SettingsUI
             this.label14 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
-            this.songNameWithSubNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.OBSLegacyPortBox = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.BeatSaberPortBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OBSPortBox)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.StopRecordingDelay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DeleteIfShorterThan)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.OBSLegacyPortBox)).BeginInit();
             this.SuspendLayout();
             // 
             // BeatSaberIpBox
@@ -211,7 +214,8 @@ partial class SettingsUI
             this.ModSelectionBox.FormattingEnabled = true;
             this.ModSelectionBox.Items.AddRange(new object[] {
             "http-status",
-            "datapuller"});
+            "datapuller",
+            "beatsaberplus"});
             this.ModSelectionBox.Location = new System.Drawing.Point(12, 29);
             this.ModSelectionBox.Name = "ModSelectionBox";
             this.ModSelectionBox.Size = new System.Drawing.Size(360, 23);
@@ -301,7 +305,7 @@ partial class SettingsUI
             this.scoreToolStripMenuItem,
             this.rawScoreToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(221, 356);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(221, 334);
             // 
             // difficultyToolStripMenuItem
             // 
@@ -323,6 +327,13 @@ partial class SettingsUI
             this.songNameToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.songNameToolStripMenuItem.Text = "Song Name";
             this.songNameToolStripMenuItem.Click += new System.EventHandler(this.songNameToolStripMenuItem_Click);
+            // 
+            // songNameWithSubNameToolStripMenuItem
+            // 
+            this.songNameWithSubNameToolStripMenuItem.Name = "songNameWithSubNameToolStripMenuItem";
+            this.songNameWithSubNameToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this.songNameWithSubNameToolStripMenuItem.Text = "Song Name with Sub Name";
+            this.songNameWithSubNameToolStripMenuItem.Click += new System.EventHandler(this.songNameWithSubNameToolStripMenuItem_Click);
             // 
             // songAuthorToolStripMenuItem
             // 
@@ -553,7 +564,7 @@ partial class SettingsUI
             this.DisplayUserInterfaceCheck.FlatAppearance.BorderSize = 0;
             this.DisplayUserInterfaceCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DisplayUserInterfaceCheck.ForeColor = System.Drawing.Color.White;
-            this.DisplayUserInterfaceCheck.Location = new System.Drawing.Point(412, 201);
+            this.DisplayUserInterfaceCheck.Location = new System.Drawing.Point(412, 247);
             this.DisplayUserInterfaceCheck.Name = "DisplayUserInterfaceCheck";
             this.DisplayUserInterfaceCheck.Size = new System.Drawing.Size(189, 19);
             this.DisplayUserInterfaceCheck.TabIndex = 30;
@@ -581,7 +592,7 @@ partial class SettingsUI
             this.AutomaticRecordingCheck.FlatAppearance.BorderSize = 0;
             this.AutomaticRecordingCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.AutomaticRecordingCheck.ForeColor = System.Drawing.Color.White;
-            this.AutomaticRecordingCheck.Location = new System.Drawing.Point(412, 226);
+            this.AutomaticRecordingCheck.Location = new System.Drawing.Point(412, 272);
             this.AutomaticRecordingCheck.Name = "AutomaticRecordingCheck";
             this.AutomaticRecordingCheck.Size = new System.Drawing.Size(134, 19);
             this.AutomaticRecordingCheck.TabIndex = 32;
@@ -677,7 +688,7 @@ partial class SettingsUI
             this.EntirelyHideConsoleCheck.FlatAppearance.BorderSize = 0;
             this.EntirelyHideConsoleCheck.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.EntirelyHideConsoleCheck.ForeColor = System.Drawing.Color.White;
-            this.EntirelyHideConsoleCheck.Location = new System.Drawing.Point(412, 251);
+            this.EntirelyHideConsoleCheck.Location = new System.Drawing.Point(412, 297);
             this.EntirelyHideConsoleCheck.Name = "EntirelyHideConsoleCheck";
             this.EntirelyHideConsoleCheck.Size = new System.Drawing.Size(136, 19);
             this.EntirelyHideConsoleCheck.TabIndex = 36;
@@ -728,12 +739,32 @@ partial class SettingsUI
             this.label16.Text = "You can hover over items to get more details";
             this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // songNameWithSubNameToolStripMenuItem
+            // OBSLegacyPortBox
             // 
-            this.songNameWithSubNameToolStripMenuItem.Name = "songNameWithSubNameToolStripMenuItem";
-            this.songNameWithSubNameToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
-            this.songNameWithSubNameToolStripMenuItem.Text = "Song Name with Sub Name";
-            this.songNameWithSubNameToolStripMenuItem.Click += new System.EventHandler(this.songNameWithSubNameToolStripMenuItem_Click);
+            this.OBSLegacyPortBox.BackColor = System.Drawing.Color.Black;
+            this.OBSLegacyPortBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.OBSLegacyPortBox.Enabled = false;
+            this.OBSLegacyPortBox.ForeColor = System.Drawing.Color.White;
+            this.OBSLegacyPortBox.Location = new System.Drawing.Point(412, 218);
+            this.OBSLegacyPortBox.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.OBSLegacyPortBox.Name = "OBSLegacyPortBox";
+            this.OBSLegacyPortBox.Size = new System.Drawing.Size(360, 23);
+            this.OBSLegacyPortBox.TabIndex = 45;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(412, 198);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(190, 17);
+            this.label1.TabIndex = 44;
+            this.label1.Text = "(Legacy) OBS Websocket Port";
             // 
             // SettingsUI
             // 
@@ -741,6 +772,8 @@ partial class SettingsUI
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(23)))), ((int)(((byte)(23)))));
             this.ClientSize = new System.Drawing.Size(784, 691);
+            this.Controls.Add(this.OBSLegacyPortBox);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.PauseSceneBox);
@@ -794,6 +827,7 @@ partial class SettingsUI
             this.contextMenuStrip1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.StopRecordingDelay)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DeleteIfShorterThan)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.OBSLegacyPortBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -858,4 +892,6 @@ partial class SettingsUI
     private TextBox PauseSceneBox;
     public Label label16;
     private ToolStripMenuItem songNameWithSubNameToolStripMenuItem;
+    private NumericUpDown OBSLegacyPortBox;
+    private Label label1;
 }
