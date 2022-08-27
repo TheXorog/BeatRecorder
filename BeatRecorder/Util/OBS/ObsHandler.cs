@@ -193,6 +193,62 @@ internal class ObsHandler : BaseObsHandler
             }
             case 5:
             {
+                EventType eventType = JsonConvert.DeserializeObject<EventType>(msg.Text);
+
+                switch (eventType.d.eventType)
+                {
+                    case "RecordStateChanged":
+                    {
+                        RecordStateChanged recordStateChanged = JsonConvert.DeserializeObject<RecordStateChanged>(msg.Text);
+
+                        switch (recordStateChanged.d.eventData.outputState)
+                        {
+                            case "OBS_WEBSOCKET_OUTPUT_STARTED":
+                            {
+                                IsRecording = true;
+
+                                _logger.LogInfo("Recording started.");
+
+                                while (IsRecording)
+                                {
+                                    if (!IsPaused)
+                                        RecordingSeconds++;
+
+                                    await Task.Delay(1000);
+                                }
+                                await Task.Delay(2000);
+                                RecordingSeconds = 0;
+                                break;
+                            }
+                            case "OBS_WEBSOCKET_OUTPUT_STOPPED":
+                            {
+                                IsRecording = false;
+                                IsPaused = false;
+
+                                _logger.LogInfo("Recording stopped.");
+
+                                Program.BeatSaberClient.HandleFile(recordStateChanged.d.eventData.outputPath, RecordingSeconds, Program.BeatSaberClient.GetLastCompletedStatus(), Program.status.LoadedConfig);
+                                break;
+                            }
+                            case "OBS_WEBSOCKET_OUTPUT_PAUSED":
+                            {
+                                IsPaused = true;
+
+                                _logger.LogInfo("Recording paused.");
+                                break;
+                            }
+                            case "OBS_WEBSOCKET_OUTPUT_RESUMED":
+                            {
+                                IsPaused = false;
+
+                                _logger.LogInfo("Recording resumed.");
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
                 break;
             }
         }
@@ -203,7 +259,7 @@ internal class ObsHandler : BaseObsHandler
         LastWarning = ConnectionTypeWarning.Connected;
     }
 
-    private async void Disconnected(DisconnectionInfo msg)
+    private void Disconnected(DisconnectionInfo msg)
     {
         try
         {
