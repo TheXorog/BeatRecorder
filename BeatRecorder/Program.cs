@@ -105,7 +105,7 @@ class Program
                     try
                     {
                         var response = await httpClient.GetAsync($"http://{this.status.LoadedConfig.OBSUrl}:{this.status.LoadedConfig.OBSPortLegacy}");
-                        _logger.LogDebug($"obs-websocket v4 is available");
+                        _logger.LogWarn($"obs-websocket v4 is available. While still supported, you should update to obs websocket v5 here: https://github.com/obsproject/obs-websocket/releases");
                         return false;
                     }
                     catch (Exception)
