@@ -2,6 +2,7 @@
 using BeatRecorder.Util;
 using BeatRecorder.Util.BeatSaber;
 using BeatRecorder.Util.OBS;
+using BeatRecorder.Util.OpenVR;
 
 namespace BeatRecorder;
 
@@ -14,6 +15,8 @@ class Program
     public BaseObsHandler ObsClient { get; set; }
 
     public BaseBeatSaberHandler BeatSaberClient { get; set; } = null;
+
+    public SteamNotifications steamNotifications { get; set; } = null;
 
 
     static void Main(string[] args)
@@ -197,6 +200,9 @@ class Program
                 }
             }
         });
+
+        if (status.LoadedConfig.DisplaySteamNotifications)
+            steamNotifications = SteamNotifications.Initialize();
 
         await Task.Delay(-1);
     }

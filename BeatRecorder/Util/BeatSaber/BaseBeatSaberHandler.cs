@@ -1,4 +1,5 @@
 ﻿using BeatRecorder.Entities;
+using BeatRecorder.Enums;
 
 namespace BeatRecorder.Util.BeatSaber;
 
@@ -8,7 +9,7 @@ internal abstract class BaseBeatSaberHandler
     public abstract SharedStatus GetCurrentStatus();
     public abstract SharedStatus GetLastCompletedStatus();
 
-    public void HandleFile(string fileName, long RecordingLength, SharedStatus sharedStatus, Config loadedConfig)
+    public void HandleFile(string fileName, long RecordingLength, SharedStatus sharedStatus, Program program)
     {
         if (sharedStatus is null)
         {
@@ -21,13 +22,13 @@ internal abstract class BaseBeatSaberHandler
         _logger.LogTrace(JsonConvert.SerializeObject(sharedStatus));
 
         bool DeleteFile = false;
-        string NewName = loadedConfig.FileFormat;
+        string NewName = program.status.LoadedConfig.FileFormat;
 
         string GeneratedAccuracy = "";
 
         if (sharedStatus.PerformanceInfo.SoftFailed.Value)
         {
-            if (loadedConfig.DeleteSoftFailed)
+            if (program.status.LoadedConfig.DeleteSoftFailed)
             {
                 _logger.LogDebug("Song Soft-Failed. Deletion requested");
                 DeleteFile = true;
@@ -40,13 +41,13 @@ internal abstract class BaseBeatSaberHandler
             GeneratedAccuracy += sharedStatus.PerformanceInfo.Accuracy.ToString();
         else
         {
-            if (loadedConfig.DeleteIfQuitAfterSoftFailed)
+            if (program.status.LoadedConfig.DeleteIfQuitAfterSoftFailed)
             {
                 _logger.LogDebug("Song Quit. Deletion requested");
                 DeleteFile = true;
 
                 if (GeneratedAccuracy == "NF-")
-                    if (!loadedConfig.DeleteIfQuitAfterSoftFailed)
+                    if (!program.status.LoadedConfig.DeleteIfQuitAfterSoftFailed)
                     {
                         _logger.LogDebug($"Song Soft-Failed but quit, deletion request reverted.");
                         DeleteFile = false;
@@ -58,7 +59,7 @@ internal abstract class BaseBeatSaberHandler
 
         if (sharedStatus.PerformanceInfo.Failed.Value)
         {
-            if (loadedConfig.DeleteFailed)
+            if (program.status.LoadedConfig.DeleteFailed)
             {
                 _logger.LogDebug("Song failed. Deletion requested");
                 DeleteFile = true;
@@ -69,7 +70,7 @@ internal abstract class BaseBeatSaberHandler
             GeneratedAccuracy = $"FAILED";
         }
 
-        if (loadedConfig.DeleteIfShorterThan > RecordingLength)
+        if (program.status.LoadedConfig.DeleteIfShorterThan > RecordingLength)
         {
             _logger.LogDebug("Recording too short. Deletion requested");
             DeleteFile = true;
@@ -131,11 +132,15 @@ internal abstract class BaseBeatSaberHandler
             {
                 File.Delete(fileName);
                 _logger.LogInfo("Recording deleted");
+
+                program.steamNotifications?.SendNotification("Recording deleted", 1000, MessageType.INFO);
             }
             else
             {
                 File.Move(fileName, NewFileName);
                 _logger.LogInfo("Recording renamed");
+
+                program.steamNotifications?.SendNotification("Recording renamed", 1000, MessageType.INFO);
             }
         }
         catch (Exception ex)

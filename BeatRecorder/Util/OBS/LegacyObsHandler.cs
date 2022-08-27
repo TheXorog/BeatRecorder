@@ -261,6 +261,7 @@ internal class LegacyObsHandler : BaseObsHandler
             if (Message.Status == "ok")
             {
                 _logger.LogInfo("Authentication with OBS successful.");
+                Program.steamNotifications?.SendNotification("Connected to OBS", 1000, MessageType.INFO);
             }
             else
             {
@@ -285,6 +286,8 @@ internal class LegacyObsHandler : BaseObsHandler
 
         if (Message.UpdateType == "RecordingStarted")
         {
+            Program.steamNotifications?.SendNotification("Recording started", 1000, MessageType.INFO);
+
             IsRecording = true;
 
             _logger.LogInfo("Recording started.");
@@ -301,22 +304,28 @@ internal class LegacyObsHandler : BaseObsHandler
         }
         else if (Message.UpdateType == "RecordingStopped")
         {
+            Program.steamNotifications?.SendNotification("Recording stopped", 1000, MessageType.INFO);
+
             IsRecording = false;
             IsPaused = false;
 
             _logger.LogInfo("Recording stopped.");
 
             RecordingStopped RecordingStopped = JsonConvert.DeserializeObject<RecordingStopped>(msg.Text);
-            Program.BeatSaberClient.HandleFile(RecordingStopped.recordingFilename, RecordingSeconds, Program.BeatSaberClient.GetLastCompletedStatus(), Program.status.LoadedConfig);
+            Program.BeatSaberClient.HandleFile(RecordingStopped.recordingFilename, RecordingSeconds, Program.BeatSaberClient.GetLastCompletedStatus(), Program);
         }
         else if (Message.UpdateType == "RecordingPaused")
         {
+            Program.steamNotifications?.SendNotification("Recording paused", 1000, MessageType.INFO);
+
             IsPaused = true;
 
             _logger.LogInfo("Recording paused.");
         }
         else if (Message.UpdateType == "RecordingResumed")
         {
+            Program.steamNotifications?.SendNotification("Recording resumed", 1000, MessageType.INFO);
+
             IsPaused = false;
 
             _logger.LogInfo("Recording resumed.");
@@ -345,6 +354,8 @@ internal class LegacyObsHandler : BaseObsHandler
 
     private void Disconnected(DisconnectionInfo msg)
     {
+        Program.steamNotifications?.SendNotification("Disconnected from OBS", 1000, MessageType.ERROR);
+
         try
         {
             Process[] processCollection = Process.GetProcesses();

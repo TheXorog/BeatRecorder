@@ -187,8 +187,11 @@ internal class ObsHandler : BaseObsHandler
                 if (indentified.d.negotiatedRpcVersion != 1)
                     _logger.LogWarn("Negotiated Rpc Version does not match 1. Please expect possible bugs.");
 
+                Program.steamNotifications?.SendNotification("Connected to OBS", 1000, MessageType.INFO);
+
                 _logger.LogInfo("Successfully identified to websocket.");
                 AttemptedToIdentify = false;
+                Program.steamNotifications?.SendNotification("Connected to OBS", 1000, MessageType.INFO);
                 break;
             }
             case 5:
@@ -205,6 +208,8 @@ internal class ObsHandler : BaseObsHandler
                         {
                             case "OBS_WEBSOCKET_OUTPUT_STARTED":
                             {
+                                Program.steamNotifications?.SendNotification("Recording started", 1000, MessageType.INFO);
+
                                 IsRecording = true;
 
                                 _logger.LogInfo("Recording started.");
@@ -222,16 +227,20 @@ internal class ObsHandler : BaseObsHandler
                             }
                             case "OBS_WEBSOCKET_OUTPUT_STOPPED":
                             {
+                                Program.steamNotifications?.SendNotification("Recording stopped", 1000, MessageType.INFO);
+
                                 IsRecording = false;
                                 IsPaused = false;
 
                                 _logger.LogInfo("Recording stopped.");
 
-                                Program.BeatSaberClient.HandleFile(recordStateChanged.d.eventData.outputPath, RecordingSeconds, Program.BeatSaberClient.GetLastCompletedStatus(), Program.status.LoadedConfig);
+                                Program.BeatSaberClient.HandleFile(recordStateChanged.d.eventData.outputPath, RecordingSeconds, Program.BeatSaberClient.GetLastCompletedStatus(), Program);
                                 break;
                             }
                             case "OBS_WEBSOCKET_OUTPUT_PAUSED":
                             {
+                                Program.steamNotifications?.SendNotification("Recording paused", 1000, MessageType.INFO);
+
                                 IsPaused = true;
 
                                 _logger.LogInfo("Recording paused.");
@@ -239,6 +248,8 @@ internal class ObsHandler : BaseObsHandler
                             }
                             case "OBS_WEBSOCKET_OUTPUT_RESUMED":
                             {
+                                Program.steamNotifications?.SendNotification("Recording resumed", 1000, MessageType.INFO);
+
                                 IsPaused = false;
 
                                 _logger.LogInfo("Recording resumed.");
@@ -261,6 +272,8 @@ internal class ObsHandler : BaseObsHandler
 
     private void Disconnected(DisconnectionInfo msg)
     {
+        Program.steamNotifications?.SendNotification("Disconnected from OBS", 1000, MessageType.ERROR);
+
         try
         {
             _ = Task.Delay(2000).ContinueWith(_ =>

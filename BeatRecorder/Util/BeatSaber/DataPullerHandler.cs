@@ -190,6 +190,8 @@ internal class DataPullerHandler : BaseBeatSaberHandler
 
     private void Disconnected(DisconnectionInfo msg)
     {
+        Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
+
         try
         {
             Process[] processCollection = Process.GetProcesses();
@@ -251,6 +253,8 @@ internal class DataPullerHandler : BaseBeatSaberHandler
 
     private void Reconnected(ReconnectionInfo msg)
     {
+        Program.steamNotifications?.SendNotification("Connected to Beat Saber", 1000, MessageType.INFO);
+
         if (msg.Type != ReconnectionType.Initial)
             _logger.LogInfo($"Beat Saber Connection via DataPuller re-established: {msg.Type}");
 
