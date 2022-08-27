@@ -12,13 +12,9 @@
 * **[BeatRecorder not connecting?](#beatrecorder-not-connecting)**
 * **[Contributing or forking](#contributing-or-forking)**
 
-## Important info regarding OBS Websocket 5.x.x
-
-**OBS Websocket 5.X.X is currently not supported. Please download and use [4.9.1](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1-compat) for now.** 5.x.x support will be added soon, so stay tuned for that.
-
 ## What is this?
 
-This application is for people who record their BeatSaber gameplay using OBS. It connects to **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** for older Beat Saber versions), **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** or **[BeatSaberPlus](https://github.com/hardcpp/BeatSaberPlus)** to detect the current game-state and **[obs-websocket](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)** to automatically start and stop the recording.
+This application is for people who record their BeatSaber gameplay using OBS. It connects to **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** for older Beat Saber versions), **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** or **[BeatSaberPlus](https://github.com/hardcpp/BeatSaberPlus)** to detect the current game-state and **[obs-websocket](https://github.com/obsproject/obs-websocket/releases/)** to automatically start and stop the recording.
 
 Files are saved where-ever you set your output folder to in OBS.
 
@@ -32,7 +28,7 @@ Files are saved where-ever you set your output folder to in OBS.
 * **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[HttpStatus](https://github.com/opl-/beatsaber-http-status/)** for older BS versions), **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** or **[BeatSaberPlus (experimental)](https://github.com/hardcpp/BeatSaberPlus)**
     - **BeatSaberPlus support is incomplete as it does not provide a way of knowing if a song was failed or finished.**
 <br></br>
-* **[obs-websocket v4.9.1](https://github.com/obsproject/obs-websocket/releases/tag/4.9.1)**
+* **[obs-websocket v5.0+ or v4.9.1](https://github.com/obsproject/obs-websocket/releases/)**
 
 ## How to set up
 
