@@ -137,4 +137,10 @@ internal class Config
     /// </summary>
     public string OBSPauseScene { get; set; } = "";
 
+
+    
+    /// <summary>
+    /// Migration value for deserializering
+    /// </summary>
+    public string OBSPort { set { OBSPortLegacy = value; } }
 }
