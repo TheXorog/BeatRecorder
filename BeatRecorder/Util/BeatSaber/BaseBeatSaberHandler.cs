@@ -22,13 +22,13 @@ internal abstract class BaseBeatSaberHandler
         _logger.LogTrace(JsonConvert.SerializeObject(sharedStatus));
 
         bool DeleteFile = false;
-        string NewName = program.status.LoadedConfig.FileFormat;
+        string NewName = program.LoadedConfig.FileFormat;
 
         string GeneratedAccuracy = "";
 
         if (sharedStatus.PerformanceInfo.SoftFailed.Value)
         {
-            if (program.status.LoadedConfig.DeleteSoftFailed)
+            if (program.LoadedConfig.DeleteSoftFailed)
             {
                 _logger.LogDebug("Song Soft-Failed. Deletion requested");
                 DeleteFile = true;
@@ -41,13 +41,13 @@ internal abstract class BaseBeatSaberHandler
             GeneratedAccuracy += sharedStatus.PerformanceInfo.Accuracy.ToString();
         else
         {
-            if (program.status.LoadedConfig.DeleteIfQuitAfterSoftFailed)
+            if (program.LoadedConfig.DeleteIfQuitAfterSoftFailed)
             {
                 _logger.LogDebug("Song Quit. Deletion requested");
                 DeleteFile = true;
 
                 if (GeneratedAccuracy == "NF-")
-                    if (!program.status.LoadedConfig.DeleteIfQuitAfterSoftFailed)
+                    if (!program.LoadedConfig.DeleteIfQuitAfterSoftFailed)
                     {
                         _logger.LogDebug($"Song Soft-Failed but quit, deletion request reverted.");
                         DeleteFile = false;
@@ -59,7 +59,7 @@ internal abstract class BaseBeatSaberHandler
 
         if (sharedStatus.PerformanceInfo.Failed.Value)
         {
-            if (program.status.LoadedConfig.DeleteFailed)
+            if (program.LoadedConfig.DeleteFailed)
             {
                 _logger.LogDebug("Song failed. Deletion requested");
                 DeleteFile = true;
@@ -70,7 +70,7 @@ internal abstract class BaseBeatSaberHandler
             GeneratedAccuracy = $"FAILED";
         }
 
-        if (program.status.LoadedConfig.DeleteIfShorterThan > RecordingLength)
+        if (program.LoadedConfig.DeleteIfShorterThan > RecordingLength)
         {
             _logger.LogDebug("Recording too short. Deletion requested");
             DeleteFile = true;

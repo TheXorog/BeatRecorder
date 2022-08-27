@@ -10,7 +10,7 @@ class Program
 {
     public static string Version = "2.0";
 
-    public Status status { get; set; } = new();
+    internal Config LoadedConfig { get; set; } = null;
 
     public BaseObsHandler ObsClient { get; set; }
 
@@ -49,26 +49,26 @@ class Program
 
         try
         {
-            status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("Settings.json"));
+            LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("Settings.json"));
 
-            if (status.LoadedConfig.Mod is not "http-status" and not "datapuller" and not "beatsaberplus")
-                throw new ArgumentException($"Invalid mod selected: {status.LoadedConfig.Mod}");
+            if (LoadedConfig.Mod is not "http-status" and not "datapuller" and not "beatsaberplus")
+                throw new ArgumentException($"Invalid mod selected: {LoadedConfig.Mod}");
 
-            _logger.ChangeLogLevel(status.LoadedConfig.ConsoleLogLevel);
+            _logger.ChangeLogLevel(LoadedConfig.ConsoleLogLevel);
 
             #if DEBUG
             _logger.ChangeLogLevel(LogLevel.TRACE);
             #endif
 
-            if (!string.IsNullOrWhiteSpace(status.LoadedConfig.OBSPassword))
-                _logger.AddBlacklist(status.LoadedConfig.OBSPassword);
+            if (!string.IsNullOrWhiteSpace(LoadedConfig.OBSPassword))
+                _logger.AddBlacklist(LoadedConfig.OBSPassword);
 
             _logger.AddBlacklist(Environment.UserName);
             _logger.AddBlacklist(Environment.UserDomainName);
             _logger.AddBlacklist(Environment.MachineName);
 
             _logger.LogInfo("Settings loaded");
-            _logger.LogDebug($"{JsonConvert.SerializeObject(status.LoadedConfig)}");
+            _logger.LogDebug($"{JsonConvert.SerializeObject(LoadedConfig)}");
         }
         catch (Exception ex)
         {
@@ -147,8 +147,8 @@ class Program
             {
                 try
                 {
-                    _logger.LogDebug($"Checking if obs-websocket v5 is available at {this.status.LoadedConfig.OBSUrl}:{this.status.LoadedConfig.OBSPortModern}..");
-                    var response = await httpClient.GetAsync($"http://{this.status.LoadedConfig.OBSUrl}:{this.status.LoadedConfig.OBSPortModern}");
+                    _logger.LogDebug($"Checking if obs-websocket v5 is available at {this.LoadedConfig.OBSUrl}:{this.LoadedConfig.OBSPortModern}..");
+                    var response = await httpClient.GetAsync($"http://{this.LoadedConfig.OBSUrl}:{this.LoadedConfig.OBSPortModern}");
                     _logger.LogDebug($"obs-websocket v5 is available");
                     return true;
                 }
@@ -158,7 +158,7 @@ class Program
 
                     try
                     {
-                        var response = await httpClient.GetAsync($"http://{this.status.LoadedConfig.OBSUrl}:{this.status.LoadedConfig.OBSPortLegacy}");
+                        var response = await httpClient.GetAsync($"http://{this.LoadedConfig.OBSUrl}:{this.LoadedConfig.OBSPortLegacy}");
                         _logger.LogWarn($"obs-websocket v4 is available. While still supported, you should update to obs websocket v5 here: https://github.com/obsproject/obs-websocket/releases");
                         return false;
                     }
@@ -178,7 +178,7 @@ class Program
 
         _ = Task.Run(async () =>
         {
-            switch (status.LoadedConfig.Mod)
+            switch (LoadedConfig.Mod)
             {
                 case "http-status":
                 {
@@ -201,7 +201,7 @@ class Program
             }
         });
 
-        if (status.LoadedConfig.DisplaySteamNotifications)
+        if (LoadedConfig.DisplaySteamNotifications)
             steamNotifications = SteamNotifications.Initialize();
 
         await Task.Delay(-1);

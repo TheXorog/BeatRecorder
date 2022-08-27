@@ -41,7 +41,7 @@ internal class LegacyObsHandler : BaseObsHandler
             }
         });
 
-        obsHandler.socket = new WebsocketClient(new Uri($"ws://{obsHandler.Program.status.LoadedConfig.OBSUrl}:{obsHandler.Program.status.LoadedConfig.OBSPortLegacy}"), factory)
+        obsHandler.socket = new WebsocketClient(new Uri($"ws://{obsHandler.Program.LoadedConfig.OBSUrl}:{obsHandler.Program.LoadedConfig.OBSPortLegacy}"), factory)
         {
             ReconnectTimeout = null,
             ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -70,7 +70,7 @@ internal class LegacyObsHandler : BaseObsHandler
 
     internal override async Task StartRecording()
     {
-        if (!Program.status.LoadedConfig.AutomaticRecording)
+        if (!Program.LoadedConfig.AutomaticRecording)
             return;
 
         if (!socket.IsRunning)
@@ -86,19 +86,19 @@ internal class LegacyObsHandler : BaseObsHandler
             }
         }
 
-        if (Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart < 200 || Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart > 2000)
+        if (Program.LoadedConfig.MininumWaitUntilRecordingCanStart < 200 || Program.LoadedConfig.MininumWaitUntilRecordingCanStart > 2000)
         {
             _logger.LogWarn("MininumWaitUntilRecordingCanStart was reset to 800. Allowed range for value is between 200 and 2000");
-            Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart = 800;
+            Program.LoadedConfig.MininumWaitUntilRecordingCanStart = 800;
         }
 
-        Thread.Sleep(Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart);
+        Thread.Sleep(Program.LoadedConfig.MininumWaitUntilRecordingCanStart);
         socket.Send(new StartRecordingRequest().Build());
     }
 
     internal override async Task StopRecording(bool ForceStop = false)
     {
-        if (!Program.status.LoadedConfig.AutomaticRecording)
+        if (!Program.LoadedConfig.AutomaticRecording)
             return;
 
         if (!socket.IsRunning)
@@ -106,15 +106,15 @@ internal class LegacyObsHandler : BaseObsHandler
 
         if (!ForceStop)
         {
-            if (Program.status.LoadedConfig.StopRecordingDelay < 0 || Program.status.LoadedConfig.StopRecordingDelay > 20)
+            if (Program.LoadedConfig.StopRecordingDelay < 0 || Program.LoadedConfig.StopRecordingDelay > 20)
             {
                 _logger.LogWarn("StopRecordingDelay was reset to 5. Allowed range for value is between 0 and 20");
-                Program.status.LoadedConfig.StopRecordingDelay = 5;
+                Program.LoadedConfig.StopRecordingDelay = 5;
             }
 
             try
             {
-                var millisecondsDelay = Program.status.LoadedConfig.StopRecordingDelay;
+                var millisecondsDelay = Program.LoadedConfig.StopRecordingDelay;
                 await Task.Delay((millisecondsDelay <= 0 ? 1 : millisecondsDelay) * 1000, this.StopRecordingDelayCancel.Token);
             }
             catch (OperationCanceledException)
@@ -157,7 +157,7 @@ internal class LegacyObsHandler : BaseObsHandler
 
             if (required.authRequired)
             {
-                if (Program.status.LoadedConfig.OBSPassword.IsNullOrWhiteSpace())
+                if (Program.LoadedConfig.OBSPassword.IsNullOrWhiteSpace())
                 {
                     await Task.Delay(1000);
                     _logger.LogInfo("A password is required to log into your obs websocket.");
@@ -201,7 +201,7 @@ internal class LegacyObsHandler : BaseObsHandler
 
                     if (key == ConsoleKey.Enter)
                     {
-                        if (Program.status.LoadedConfig.AskToSaveOBSPassword)
+                        if (Program.LoadedConfig.AskToSaveOBSPassword)
                         {
                             key = ConsoleKey.A;
 
@@ -225,32 +225,32 @@ internal class LegacyObsHandler : BaseObsHandler
                                 else if (key == ConsoleKey.Y)
                                 {
                                     _logger.LogInfo("Your password is now saved in the Settings.json.");
-                                    Program.status.LoadedConfig.OBSPassword = Password;
-                                    Program.status.LoadedConfig.AskToSaveOBSPassword = true;
+                                    Program.LoadedConfig.OBSPassword = Password;
+                                    Program.LoadedConfig.AskToSaveOBSPassword = true;
 
-                                    File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.status.LoadedConfig, Formatting.Indented));
+                                    File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.LoadedConfig, Formatting.Indented));
                                     break;
                                 }
                                 else if (key == ConsoleKey.N || key == ConsoleKey.Enter)
                                 {
                                     _logger.LogInfo("Your password will not be saved. This wont be asked in the future.");
                                     _logger.LogInfo("To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
-                                    Program.status.LoadedConfig.OBSPassword = "";
-                                    Program.status.LoadedConfig.AskToSaveOBSPassword = false;
+                                    Program.LoadedConfig.OBSPassword = "";
+                                    Program.LoadedConfig.AskToSaveOBSPassword = false;
 
-                                    File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.status.LoadedConfig, Formatting.Indented));
+                                    File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.LoadedConfig, Formatting.Indented));
                                     break;
                                 }
                             }
                         }
 
-                        Program.status.LoadedConfig.OBSPassword = Password;
+                        Program.LoadedConfig.OBSPassword = Password;
                     }
                 }
 
                 _logger.LogInfo("Connection with OBS requires authentication. Attempting log in..");
 
-                string secret = Extensions.HashEncode(Program.status.LoadedConfig.OBSPassword + required.salt);
+                string secret = Extensions.HashEncode(Program.LoadedConfig.OBSPassword + required.salt);
                 string authResponse = Extensions.HashEncode(secret + required.challenge);
 
                 socket.Send(new AuthenticateRequest(authResponse, AuthenticationGuid).Build());

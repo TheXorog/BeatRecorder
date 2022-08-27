@@ -2,5 +2,5 @@
 
 internal class Status
 {
-    internal Config LoadedConfig { get; set; } = null;
+    
 }

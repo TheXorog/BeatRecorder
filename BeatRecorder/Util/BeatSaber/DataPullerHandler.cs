@@ -38,7 +38,7 @@ internal class DataPullerHandler : BaseBeatSaberHandler
 
         Task mainConn = Task.Run(() =>
         {
-            mainSocket = new WebsocketClient(new Uri($"ws://{Program.status.LoadedConfig.BeatSaberUrl}:{Program.status.LoadedConfig.BeatSaberPort}/BSDataPuller/MapData"), factory)
+            mainSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedConfig.BeatSaberUrl}:{Program.LoadedConfig.BeatSaberPort}/BSDataPuller/MapData"), factory)
             {
                 ReconnectTimeout = null,
                 ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -58,7 +58,7 @@ internal class DataPullerHandler : BaseBeatSaberHandler
 
         Task dataConn = Task.Run(() =>
         {
-            dataSocket = new WebsocketClient(new Uri($"ws://{Program.status.LoadedConfig.BeatSaberUrl}:{Program.status.LoadedConfig.BeatSaberPort}/BSDataPuller/LiveData"), factory)
+            dataSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedConfig.BeatSaberUrl}:{Program.LoadedConfig.BeatSaberPort}/BSDataPuller/LiveData"), factory)
             {
                 ReconnectTimeout = null,
                 ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -109,8 +109,8 @@ internal class DataPullerHandler : BaseBeatSaberHandler
                 CurrentMain = _status;
                 CurrentMaxCombo = 0;
 
-                if (!Program.status.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                    Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSIngameScene);
+                if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                    Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
 
                 _ = Program.ObsClient.StartRecording();
             }
@@ -129,10 +129,10 @@ internal class DataPullerHandler : BaseBeatSaberHandler
 
                 _ = Program.ObsClient.StopRecording();
 
-                if (!Program.status.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
-                    Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSMenuScene);
+                if (!Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
+                    Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSMenuScene);
 
-                if (Program.status.LoadedConfig.PauseRecordingOnIngamePause)
+                if (Program.LoadedConfig.PauseRecordingOnIngamePause)
                     Program.ObsClient.ResumeRecording();
             }
         }
@@ -146,22 +146,22 @@ internal class DataPullerHandler : BaseBeatSaberHandler
                     IsPaused = true;
                     _logger.LogInfo("Song paused.");
 
-                    if (Program.status.LoadedConfig.PauseRecordingOnIngamePause)
+                    if (Program.LoadedConfig.PauseRecordingOnIngamePause)
                         Program.ObsClient.PauseRecording();
 
-                    if (!Program.status.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
-                        Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSPauseScene);
+                    if (!Program.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
+                        Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSPauseScene);
                 }
                 else if (IsPaused && !_status.LevelPaused)
                 {
                     IsPaused = false;
                     _logger.LogInfo("Song resumed.");
 
-                    if (Program.status.LoadedConfig.PauseRecordingOnIngamePause)
+                    if (Program.LoadedConfig.PauseRecordingOnIngamePause)
                         Program.ObsClient.ResumeRecording();
 
-                    if (!Program.status.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                        Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSIngameScene);
+                    if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                        Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
                 }
             }
         }

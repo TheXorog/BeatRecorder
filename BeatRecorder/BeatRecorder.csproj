@@ -38,6 +38,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Xorog.Logger\Xorog.Logger.csproj" />
     <ProjectReference Include="..\..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
+    <ProjectReference Include="..\BeatRecorderUI\BeatRecorderUI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

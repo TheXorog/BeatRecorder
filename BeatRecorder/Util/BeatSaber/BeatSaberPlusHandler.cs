@@ -34,7 +34,7 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
             }
         });
 
-        socket = new WebsocketClient(new Uri($"ws://{program.status.LoadedConfig.BeatSaberUrl}:{program.status.LoadedConfig.BeatSaberPort}/socket"), factory)
+        socket = new WebsocketClient(new Uri($"ws://{program.LoadedConfig.BeatSaberUrl}:{program.LoadedConfig.BeatSaberPort}/socket"), factory)
         {
             ReconnectTimeout = null,
             ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
@@ -98,10 +98,10 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                             _logger.LogInfo($"Stopped playing \"{LastCompletedStatus.BeatmapInfo.NameWithSub}\" by \"{LastCompletedStatus.BeatmapInfo.Author}\"");
                             _ = Program.ObsClient.StopRecording();
 
-                            if (!Program.status.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
-                                Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSMenuScene);
+                            if (!Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
+                                Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSMenuScene);
 
-                            if (Program.status.LoadedConfig.PauseRecordingOnIngamePause)
+                            if (Program.LoadedConfig.PauseRecordingOnIngamePause)
                                 Program.ObsClient.ResumeRecording();
 
                             break;
@@ -114,8 +114,8 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                             CurrentMaxCombo = 0;
                             Current.scoreEvent = new();
 
-                            if (!Program.status.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                                Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSIngameScene);
+                            if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                                Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
 
                             _ = Program.ObsClient.StartRecording();
                             break;
@@ -143,11 +143,11 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                     {
                         _logger.LogInfo($"Song resumed.");
 
-                        if (Program.status.LoadedConfig.PauseRecordingOnIngamePause)
+                        if (Program.LoadedConfig.PauseRecordingOnIngamePause)
                             Program.ObsClient.ResumeRecording();
 
-                        if (!Program.status.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                            Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSIngameScene);
+                        if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                            Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
 
                         break;
                     }
@@ -155,11 +155,11 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                     {
                         _logger.LogInfo($"Song paused.");
 
-                        if (Program.status.LoadedConfig.PauseRecordingOnIngamePause)
+                        if (Program.LoadedConfig.PauseRecordingOnIngamePause)
                             Program.ObsClient.PauseRecording();
 
-                        if (!Program.status.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
-                            Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSPauseScene);
+                        if (!Program.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
+                            Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSPauseScene);
 
                         break;
                     }
