@@ -101,6 +101,9 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                             if (!Program.status.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
                                 Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSMenuScene);
 
+                            if (Program.status.LoadedConfig.PauseRecordingOnIngamePause)
+                                Program.ObsClient.ResumeRecording();
+
                             break;
                         }
                         else if (_status.gameStateChanged.ToLower() == "playing")

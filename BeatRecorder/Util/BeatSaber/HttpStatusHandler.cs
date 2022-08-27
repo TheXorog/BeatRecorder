@@ -143,6 +143,9 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
                 if (!Program.status.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
                     Program.ObsClient.SetCurrentScene(Program.status.LoadedConfig.OBSMenuScene);
 
+                if (Program.status.LoadedConfig.PauseRecordingOnIngamePause)
+                    Program.ObsClient.ResumeRecording();
+
                 break;
             }
         }
