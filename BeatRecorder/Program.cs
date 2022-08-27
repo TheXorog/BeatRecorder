@@ -8,7 +8,7 @@ namespace BeatRecorder;
 
 public class Program
 {
-    public static string Version = "2.0";
+    public static string Version = "2.0-RC1";
 
     public bool RunningPrerelease = false;
 
