@@ -1,17 +1,19 @@
-# <img src="/BeatRecorder/Assets/Icon.png" alt="" width="30"/> BeatRecorder
+<h1 align="center">BeatRecorder</h1>
 
-
+<p align="center"><img src="/BeatRecorder/Assets/Icon.png" width=250 align="center"></p>
+<p align="center" style="font-weight:bold;">Easily record your BeatSaber gameplay!</p>
+<a href="https://github.com/TheXorog/BeatRecorder/releases" ><p align="center"><img src="BeatRecorder/Assets/DownloadButtonYesIKnowImNotGoodAtMakingGraphics.png" width=450 align="center"></p></a>
 
 
 ### General info and instructions
-* **[What is this?](#what-is-this)**
+* **[What is BeatRecorder?](#what-is-beatrecorder)**
 * **[Requirements](#requirements)**
 * **[How to set up](#how-to-set-up)**
 ### Troubleshooting
 * **[BeatRecorder not connecting?](#beatrecorder-not-connecting)**
 * **[Contributing or forking](#contributing-or-forking)**
 
-## What is this?
+## What is BeatRecorder?
 
 This application is for people who record their BeatSaber gameplay using OBS. It connects to **[HttpSiraStatus](https://github.com/denpadokei/HttpSiraStatus)** (**[beatsaber-http-status](https://github.com/opl-/beatsaber-http-status/)** for older Beat Saber versions), **[BSDataPuller](https://github.com/kOFReadie/BSDataPuller)** or **[BeatSaberPlus](https://github.com/hardcpp/BeatSaberPlus)** to detect the current game-state and **[obs-websocket](https://github.com/obsproject/obs-websocket/releases/)** to automatically start and stop the recording.
 
