@@ -1,14 +1,13 @@
-# <img src="/BeatRecorder/Assets/Icon.png" alt="drawing" width="30"/> BeatRecorder
+# <img src="/BeatRecorder/Assets/Icon.png" alt="" width="30"/> BeatRecorder
 
 
 
-## Table of Contents  
 
-#### General info and instructions
+### General info and instructions
 * **[What is this?](#what-is-this)**
 * **[Requirements](#requirements)**
 * **[How to set up](#how-to-set-up)**
-#### Troubleshooting
+### Troubleshooting
 * **[BeatRecorder not connecting?](#beatrecorder-not-connecting)**
 * **[Contributing or forking](#contributing-or-forking)**
 
