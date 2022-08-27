@@ -7,7 +7,7 @@ namespace BeatRecorder;
 
 class Program
 {
-    public static readonly string Version = "2.0-alpha_dev";
+    public static string Version = "2.0";
 
     public Status status { get; set; } = new();
 
@@ -83,6 +83,57 @@ class Program
                          $"Current Directory: {Environment.CurrentDirectory}\n" +
                          $"Base Directory: {AppDomain.CurrentDomain.BaseDirectory}\n" +
                          $"Commandline: {Environment.CommandLine}\n");
+
+        await Task.Run(async () =>
+        {
+            try
+            {
+                var github = new GitHubClient(new ProductHeaderValue("BeatRecorderUpdateCheck"));
+                IReadOnlyList<Release> releases = await github.Repository.Release.GetAll("TheXorog", "BeatRecorder");
+
+                #if DEBUG
+                Version += "-dev";
+                #endif
+
+                bool RunningPrerelease = (Version.ToLower().Contains("dev") || Version.ToLower().Contains("rc") || Version.ToLower().Contains("beta") || Version.ToLower().Contains("alpha"));
+
+                if (RunningPrerelease)
+                    _logger.LogWarn("You're running a pre-release version of BeatRecorder. If you find any bugs, please report them at https://github.com/TheXorog/BeatRecorder");
+
+                Release repo = null;
+
+                foreach (var rel in releases)
+                {
+                    if (rel.Prerelease && RunningPrerelease)
+                    {
+                        repo = rel;
+                        break;
+                    }
+
+                    if (!rel.Prerelease)
+                    {
+                        repo = rel;
+                        break;
+                    }
+                }
+
+                if (repo is null)
+                    throw new Exception("Failed to get latest version.");
+
+                _logger.LogInfo($"Current latest release is \"{repo.TagName}\". You're currently running: \"{Version}\"");
+
+                if (repo.TagName != Version && !Version.Contains("dev"))
+                {
+                    _logger.LogFatal($"You're running an outdated version of BeatRecorder, please update at https://github.com/TheXorog/BeatRecorder/releases/latest." +
+                            $"\n\nWhat changed in the new version:\n\n" +
+                            $"{repo.Body}\n");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unable to get latest version", ex);
+            }
+        });
 
         _ = Task.Run(async () =>
         {
