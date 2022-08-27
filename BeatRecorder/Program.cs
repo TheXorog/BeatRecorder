@@ -86,7 +86,7 @@ class Program
 
         _ = Task.Run(async () =>
         {
-            HttpClient httpClient = new HttpClient();
+            HttpClient httpClient = new();
             httpClient.Timeout = TimeSpan.FromSeconds(3);
 
             async Task<bool> UseModernSocket()

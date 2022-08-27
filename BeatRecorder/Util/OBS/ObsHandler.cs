@@ -329,26 +329,79 @@ internal class ObsHandler : BaseObsHandler
 
     internal override async Task StartRecording()
     {
+        if (!Program.status.LoadedConfig.AutomaticRecording)
+            return;
 
+        if (!socket.IsRunning)
+            throw new ArgumentException("Connection with OBS is not established.");
+
+        if (IsRecording)
+        {
+            await StopRecording(true);
+
+            while (IsRecording)
+            {
+                Thread.Sleep(20);
+            }
+        }
+
+        if (Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart < 200 || Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart > 2000)
+        {
+            _logger.LogWarn("MininumWaitUntilRecordingCanStart was reset to 800. Allowed range for value is between 200 and 2000");
+            Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart = 800;
+        }
+
+        Thread.Sleep(Program.status.LoadedConfig.MininumWaitUntilRecordingCanStart);
+        socket.Send(new StartRecord().Build());
     }
 
     internal override async Task StopRecording(bool ForceStop = false)
     {
+        if (!Program.status.LoadedConfig.AutomaticRecording)
+            return;
 
+        if (!socket.IsRunning)
+            throw new ArgumentException("Connection with OBS is not established.");
+
+        if (!ForceStop)
+        {
+            if (Program.status.LoadedConfig.StopRecordingDelay < 0 || Program.status.LoadedConfig.StopRecordingDelay > 20)
+            {
+                _logger.LogWarn("StopRecordingDelay was reset to 5. Allowed range for value is between 0 and 20");
+                Program.status.LoadedConfig.StopRecordingDelay = 5;
+            }
+
+            try
+            {
+                var millisecondsDelay = Program.status.LoadedConfig.StopRecordingDelay;
+                await Task.Delay((millisecondsDelay <= 0 ? 1 : millisecondsDelay) * 1000, this.StopRecordingDelayCancel.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+        }
+        else
+        {
+            StopRecordingDelayCancel.Cancel();
+            StopRecordingDelayCancel = new();
+        }
+
+        socket.Send(new StopRecord().Build());
     }
 
     internal override void PauseRecording()
     {
-
+        socket.Send(new PauseRecord().Build());
     }
 
     internal override void ResumeRecording()
     {
-
+        socket.Send(new ResumeRecord().Build());
     }
 
     internal override void SetCurrentScene(string scene)
     {
-
+        socket.Send(new SetCurrentProgramScene(scene).Build());
     }
 }
