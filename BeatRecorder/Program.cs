@@ -6,9 +6,11 @@ using BeatRecorder.Util.OpenVR;
 
 namespace BeatRecorder;
 
-class Program
+public class Program
 {
     public static string Version = "2.0";
+
+    public bool RunningPrerelease = false;
 
     internal Config LoadedConfig { get; set; } = null;
 
@@ -17,6 +19,8 @@ class Program
     public BaseBeatSaberHandler BeatSaberClient { get; set; } = null;
 
     public SteamNotifications steamNotifications { get; set; } = null;
+
+    public UIHandler GUI { get; set; } = null;
 
 
     static void Main(string[] args)
@@ -28,6 +32,8 @@ class Program
 
     private async Task MainAsync(string[] args)
     {
+        Console.ResetColor();
+
         if (!Directory.Exists("logs"))
             Directory.CreateDirectory("logs");
         _logger = StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", Xorog.Logger.Enums.LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
@@ -87,7 +93,16 @@ class Program
                          $"Base Directory: {AppDomain.CurrentDomain.BaseDirectory}\n" +
                          $"Commandline: {Environment.CommandLine}\n");
 
-        await Task.Run(async () =>
+        if (LoadedConfig.DisplayUI)
+            GUI = UIHandler.Initialize(this);
+
+        _ = Task.Run(() =>
+        {
+            if (LoadedConfig.DisplaySteamNotifications)
+                steamNotifications = SteamNotifications.Initialize();
+        });
+
+        _ = Task.Run(async () =>
         {
             try
             {
@@ -98,7 +113,7 @@ class Program
                 Version += "-dev";
                 #endif
 
-                bool RunningPrerelease = (Version.ToLower().Contains("dev") || Version.ToLower().Contains("rc") || Version.ToLower().Contains("beta") || Version.ToLower().Contains("alpha"));
+                RunningPrerelease = (Version.ToLower().Contains("dev") || Version.ToLower().Contains("rc") || Version.ToLower().Contains("beta") || Version.ToLower().Contains("alpha"));
 
                 if (RunningPrerelease)
                     _logger.LogWarn("You're running a pre-release version of BeatRecorder. If you find any bugs, please report them at https://github.com/TheXorog/BeatRecorder");
@@ -130,6 +145,8 @@ class Program
                     _logger.LogFatal($"You're running an outdated version of BeatRecorder, please update at https://github.com/TheXorog/BeatRecorder/releases/latest." +
                             $"\n\nWhat changed in the new version:\n\n" +
                             $"{repo.Body}\n");
+
+                    _ = Task.Run(() => { GUI.ShowNotification($"You're running an outdated version of BeatRecorder.\nVersion {repo.TagName} is available.\n\n{repo.Body}", "New version available", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning); });
                 }
             }
             catch (Exception ex)
@@ -178,6 +195,9 @@ class Program
 
         _ = Task.Run(async () =>
         {
+            while (ObsClient is null)
+                await Task.Delay(100);
+
             switch (LoadedConfig.Mod)
             {
                 case "http-status":
@@ -192,6 +212,7 @@ class Program
                 }
                 case "beatsaberplus":
                 {
+                    _ = Task.Run(() => { GUI.ShowNotification("BeatSaberPlus Integration is currently incomplete. Filenames will always appear as if you finished the song.", "Warning", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning); });
                     _logger.LogFatal("BeatSaberPlus Integration is currently incomplete. BSP does not provide a way of knowing if a song was failed or finished, making filenames always seem like the song was finished.");
                     _logger.LogFatal("To continue anyways, wait 10 seconds.");
                     await Task.Delay(10000);
@@ -200,9 +221,6 @@ class Program
                 }
             }
         });
-
-        if (LoadedConfig.DisplaySteamNotifications)
-            steamNotifications = SteamNotifications.Initialize();
 
         await Task.Delay(-1);
     }

@@ -1,4 +1,6 @@
-﻿namespace BeatRecorder.Entities;
+﻿using Xorog.Logger.Enums;
+
+namespace BeatRecorder.Entities;
 
 internal class Config
 {

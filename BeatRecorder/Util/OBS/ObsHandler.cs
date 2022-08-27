@@ -50,11 +50,6 @@ internal class ObsHandler : BaseObsHandler
 
         obsHandler.socket.Start().Wait();
 
-        while (!obsHandler.socket.IsRunning)
-            Thread.Sleep(50);
-
-        _logger.LogInfo("Connection with OBS established.");
-
         return obsHandler;
     }
 
@@ -74,6 +69,15 @@ internal class ObsHandler : BaseObsHandler
                 {
                     if (Program.LoadedConfig.OBSPassword.IsNullOrWhiteSpace())
                     {
+                        if (Program.LoadedConfig.DisplayUI)
+                        {
+                            Thread.Sleep(3000);
+
+                            Program.GUI.ShowNotification("A password is required to log into your obs websocket.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                            Program.GUI.ShowSettings(true);
+                            return;
+                        }
+
                         await Task.Delay(1000);
                         _logger.LogInfo("A password is required to log into your obs websocket.");
                         await Task.Delay(1000);
@@ -416,4 +420,12 @@ internal class ObsHandler : BaseObsHandler
     {
         socket.Send(new SetCurrentProgramScene(scene).Build());
     }
+
+    internal override bool GetIsRunning() => socket?.IsRunning ?? false;
+
+    internal override bool GetIsRecording() => IsRecording;
+
+    internal override bool GetIsPaused() => IsPaused;
+
+    internal override int GetRecordingSeconds() => RecordingSeconds;
 }

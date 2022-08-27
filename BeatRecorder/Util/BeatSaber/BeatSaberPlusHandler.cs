@@ -10,7 +10,7 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
     ConnectionTypeWarning LastWarning = ConnectionTypeWarning.Connected;
 
     private Program Program = null;
-    internal SharedStatus CurrentStatus => new(Current, GameInfo, CurrentMaxCombo);
+    internal SharedStatus CurrentStatus => new(Current, GameInfo, CurrentMaxCombo, this);
     internal SharedStatus LastCompletedStatus { get; set; }
 
     private SharedStatus.Game GameInfo { get; set; } = null;
@@ -93,7 +93,7 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                         {
                             IsPlaying = false;
 
-                            CurrentStatus.Update(new SharedStatus(_status, GameInfo, CurrentMaxCombo));
+                            CurrentStatus.Update(new SharedStatus(_status, GameInfo, CurrentMaxCombo, this));
                             LastCompletedStatus = CurrentStatus.Clone();
                             _logger.LogInfo($"Stopped playing \"{LastCompletedStatus.BeatmapInfo.NameWithSub}\" by \"{LastCompletedStatus.BeatmapInfo.Author}\"");
                             _ = Program.ObsClient.StopRecording();
@@ -244,4 +244,6 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
 
         LastWarning = ConnectionTypeWarning.Connected;
     }
+
+    internal override bool GetIsRunning() => socket?.IsRunning ?? false;
 }

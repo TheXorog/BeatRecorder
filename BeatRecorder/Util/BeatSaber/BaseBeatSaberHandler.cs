@@ -3,11 +3,12 @@ using BeatRecorder.Enums;
 
 namespace BeatRecorder.Util.BeatSaber;
 
-internal abstract class BaseBeatSaberHandler
+public abstract class BaseBeatSaberHandler
 {
     public abstract BaseBeatSaberHandler Initialize(Program program);
     public abstract SharedStatus GetCurrentStatus();
     public abstract SharedStatus GetLastCompletedStatus();
+    internal abstract bool GetIsRunning();
 
     public void HandleFile(string fileName, long RecordingLength, SharedStatus sharedStatus, Program program)
     {
@@ -148,4 +149,6 @@ internal abstract class BaseBeatSaberHandler
             _logger.LogError($"Failed to rename or delete '{fileName}'", ex);
         }
     }
+
+    public Dictionary<string, Image> ImageCache = new();
 }

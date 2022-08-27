@@ -7,7 +7,7 @@ internal class ResumeRecord : BaseRequest
         this.op = 6;
         this.d = new JObject
         {
-            ["requestType"] = "PauseRecord",
+            ["requestType"] = "ResumeRecord",
             ["requestId"] = Guid.NewGuid().ToString(),
         };
     }

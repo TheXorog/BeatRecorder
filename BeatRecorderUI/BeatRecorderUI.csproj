@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+	<SelfContained>true</SelfContained>
+	<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Xorog.Logger\Xorog.Logger.csproj" />
+  </ItemGroup>
+
+</Project>

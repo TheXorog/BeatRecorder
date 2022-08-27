@@ -10,7 +10,7 @@ internal class DataPullerHandler : BaseBeatSaberHandler
     private WebsocketClient mainSocket { get; set; }
     private WebsocketClient dataSocket { get; set; }
 
-    internal SharedStatus CurrentStatus => new(CurrentMain, CurrentData, CurrentMaxCombo);
+    internal SharedStatus CurrentStatus => new(CurrentMain, CurrentData, CurrentMaxCombo, this);
     internal SharedStatus LastCompletedStatus { get; set; }
 
     private DataPullerMain CurrentMain = null;
@@ -124,7 +124,7 @@ internal class DataPullerHandler : BaseBeatSaberHandler
 
                 CurrentMain = _status;
 
-                CurrentStatus.Update(new SharedStatus(CurrentMain, CurrentData, CurrentMaxCombo));
+                CurrentStatus.Update(new SharedStatus(CurrentMain, CurrentData, CurrentMaxCombo, this));
                 LastCompletedStatus = CurrentStatus.Clone();
 
                 _ = Program.ObsClient.StopRecording();
@@ -181,7 +181,7 @@ internal class DataPullerHandler : BaseBeatSaberHandler
             return;
         }
 
-        if (InLevel && CurrentData.unixTimestamp < _status.unixTimestamp)
+        if (InLevel && (CurrentData?.unixTimestamp ?? 0) < _status.unixTimestamp)
             CurrentData = _status;
 
         if (CurrentMaxCombo < _status.Combo)
@@ -263,4 +263,6 @@ internal class DataPullerHandler : BaseBeatSaberHandler
 
         LastWarning = ConnectionTypeWarning.Connected;
     }
+
+    internal override bool GetIsRunning() => (mainSocket?.IsRunning ?? false) && (dataSocket?.IsRunning ?? false);
 }

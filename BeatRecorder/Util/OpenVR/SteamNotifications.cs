@@ -3,7 +3,7 @@ using BeatRecorder.Enums;
 
 namespace BeatRecorder.Util.OpenVR;
 
-internal class SteamNotifications
+public class SteamNotifications
 {
     List<NotificationEntry> NotificationList = new();
     ulong SteamNotificationId = 0;

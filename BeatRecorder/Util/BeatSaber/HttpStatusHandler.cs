@@ -10,7 +10,7 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
     ConnectionTypeWarning LastWarning = ConnectionTypeWarning.Connected;
 
     private Program Program = null;
-    internal SharedStatus CurrentStatus => new(Current.status);
+    internal SharedStatus CurrentStatus => new(Current.status, this);
     internal SharedStatus LastCompletedStatus { get; set; }
 
     private HttpStatus Current = null;
@@ -134,7 +134,7 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
 
             case "menu":
             {
-                CurrentStatus.Update(new SharedStatus(_status.status));
+                CurrentStatus.Update(new SharedStatus(_status.status, this));
                 LastCompletedStatus = CurrentStatus.Clone();
                 _logger.LogInfo($"Stopped playing \"{LastCompletedStatus.BeatmapInfo.NameWithSub}\" by \"{LastCompletedStatus.BeatmapInfo.Author}\"");
                 Current = _status;
@@ -226,4 +226,6 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
             _logger.LogError($"Failed to check if beatsaber-http-status is installed: (Disconnect Reason: {msg.Type}) {ex}");
         }
     }
+
+    internal override bool GetIsRunning() => socket?.IsRunning ?? false;
 }

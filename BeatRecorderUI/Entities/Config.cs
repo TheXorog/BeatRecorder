@@ -1,0 +1,1 @@
+../../BeatRecorder/Entities/Config.cs

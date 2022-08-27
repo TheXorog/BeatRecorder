@@ -1,10 +1,11 @@
 ﻿using BeatRecorder.Enums;
+using BeatRecorder.Util.BeatSaber;
 
 namespace BeatRecorder.Entities;
 
 public class SharedStatus
 {
-    public SharedStatus(HttpStatus.Status status)
+    public SharedStatus(HttpStatus.Status status, BaseBeatSaberHandler baseBeatSaberHandler)
     {
         GameInfo = new()
         {
@@ -17,7 +18,18 @@ public class SharedStatus
 
         try
         {
-            bitmap = (Bitmap)Image.FromStream(new MemoryStream(Convert.FromBase64String(status.beatmap?.songCover)));
+            if (!status?.beatmap?.songCover.IsNullOrWhiteSpace() ?? false)
+            {
+                bitmap = (Bitmap)Image.FromStream(new MemoryStream(Convert.FromBase64String(status?.beatmap?.songCover)));
+            }
+            else
+            {
+
+                if (!baseBeatSaberHandler.ImageCache.ContainsKey("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
+                    baseBeatSaberHandler.ImageCache.TryAdd("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
+
+                bitmap = (Bitmap)baseBeatSaberHandler.ImageCache["https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
+            }
         }
         catch { }
 
@@ -57,11 +69,12 @@ public class SharedStatus
             Failed = status.performance?.failed,
             Finished = status.performance?.finished,
             MaxCombo = status.performance?.maxCombo,
+            Combo = status.performance?.combo,
             SoftFailed = status.performance?.softFailed
         };
     }
     
-    public SharedStatus(BeatSaberPlus status, Game game, int MaxCombo)
+    public SharedStatus(BeatSaberPlus status, Game game, int MaxCombo, BaseBeatSaberHandler baseBeatSaberHandler)
     {
         GameInfo = game;
 
@@ -69,7 +82,18 @@ public class SharedStatus
 
         try
         {
-            bitmap = (Bitmap)Image.FromStream(new MemoryStream(Convert.FromBase64String(status?.mapInfoChanged?.coverRaw)));
+            if (!status?.mapInfoChanged?.coverRaw.IsNullOrWhiteSpace() ?? false)
+            {
+                bitmap = (Bitmap)Image.FromStream(new MemoryStream(Convert.FromBase64String(status?.mapInfoChanged?.coverRaw)));
+            }
+            else
+            {
+
+                if (!baseBeatSaberHandler.ImageCache.ContainsKey("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
+                    baseBeatSaberHandler.ImageCache.TryAdd("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
+
+                bitmap = (Bitmap)baseBeatSaberHandler.ImageCache["https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
+            }
         }
         catch { }
 
@@ -89,7 +113,7 @@ public class SharedStatus
 
         try
         {
-            v = Math.Round(status.scoreEvent.accuracy * 100f, 2);
+            v = Math.Round((status.scoreEvent?.accuracy ?? 0) * 100f, 2);
         }
         catch { }
 
@@ -120,44 +144,51 @@ public class SharedStatus
             Failed = false,
             Finished = true,
             MaxCombo = MaxCombo,
+            Combo = status.scoreEvent?.combo,
             SoftFailed = status.scoreEvent?.currentHealth == 0f
         };
     }
 
-    public SharedStatus(DataPullerMain main, DataPullerData data, int MaxCombo)
+    public SharedStatus(DataPullerMain main, DataPullerData data, int MaxCombo, BaseBeatSaberHandler baseBeatSaberHandler)
     {
         GameInfo = new()
         {
             ModUsed = Mod.Datapuller,
-            ModVersion = main.PluginVersion,
-            GameVersion = main.GameVersion,
+            ModVersion = main?.PluginVersion,
+            GameVersion = main?.GameVersion,
         };
 
+        if (!baseBeatSaberHandler.ImageCache.ContainsKey(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
+            baseBeatSaberHandler.ImageCache.TryAdd(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
+
+        Bitmap image = (Bitmap)baseBeatSaberHandler.ImageCache[main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
+        
         BeatmapInfo = new()
         {
-            Name = main.SongName,
-            SubName = main.SongSubName,
-            Author = main.SongAuthor,
-            Creator = main.Mapper,
-            Cover = (Bitmap)Bitmap.FromStream(new HttpClient().GetStreamAsync(main.coverImage).Result),
-            IdOrHash = main.Hash,
-            Bpm = main.BPM,
-            NoteJumpSpeed = main.NJS,
-            Difficulty = main.Difficulty,
-            CustomDifficulty = main.CustomDifficultyLabel
+            Name = main?.SongName,
+            SubName = main?.SongSubName,
+            Author = main?.SongAuthor,
+            Creator = main?.Mapper,
+            Cover = (Bitmap)image,
+            IdOrHash = main?.Hash,
+            Bpm = main?.BPM,
+            NoteJumpSpeed = main?.NJS,
+            Difficulty = main?.Difficulty,
+            CustomDifficulty = main?.CustomDifficultyLabel
         };
 
         PerformanceInfo = new()
         {
-            RawScore = data.Score,
-            Score = data.ScoreWithMultipliers,
-            Accuracy = (double)Math.Round(data.Accuracy, 2),
-            Rank = data.Rank,
-            MissedNoteCount = data.Misses,
-            Failed = main.LevelFailed,
-            Finished = main.LevelFinished,
+            RawScore = data?.Score,
+            Score = data?.ScoreWithMultipliers,
+            Accuracy = (double)Math.Round(data?.Accuracy ?? 0, 2),
+            Rank = data?.Rank,
+            MissedNoteCount = data?.Misses,
+            Failed = main?.LevelFailed,
+            Finished = main?.LevelFinished,
             MaxCombo = MaxCombo,
-            SoftFailed = (main.LevelFailed || data.PlayerHealth <= 0) && main.Modifiers.noFailOn0Energy
+            Combo = data?.Combo,
+            SoftFailed = ((main?.LevelFailed ?? false) || (data?.PlayerHealth ?? 0) <= 0) && (main?.Modifiers.noFailOn0Energy ?? false)
         };
     }
 
@@ -184,6 +215,7 @@ public class SharedStatus
         BeatmapInfo.WallCount = newStatus.BeatmapInfo.WallCount ?? BeatmapInfo.WallCount;
         BeatmapInfo.CustomDifficulty = newStatus.BeatmapInfo.CustomDifficulty ?? BeatmapInfo.CustomDifficulty;
 
+        PerformanceInfo.Combo = newStatus.PerformanceInfo.Combo ?? PerformanceInfo.Combo;
         PerformanceInfo.RawScore = newStatus.PerformanceInfo.RawScore ?? PerformanceInfo.RawScore;
         PerformanceInfo.Score = newStatus.PerformanceInfo.Score ?? PerformanceInfo.Score;
         PerformanceInfo.Accuracy = newStatus.PerformanceInfo.Accuracy ?? PerformanceInfo.Accuracy;
@@ -277,6 +309,7 @@ public class SharedStatus
         public long? BadCutCount { get; set; } = 0;
         public long? BombHitCount { get; set; } = 0;
         public long? CombinedMisses { get => MissedNoteCount + BadCutCount + BombHitCount; }
+        public long? Combo { get; set; }
         public long? MaxCombo { get; set; }
         public bool? SoftFailed { get; set; }
         public bool? Failed { get; set; }

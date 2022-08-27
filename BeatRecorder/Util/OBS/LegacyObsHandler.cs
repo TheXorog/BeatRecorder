@@ -159,6 +159,15 @@ internal class LegacyObsHandler : BaseObsHandler
             {
                 if (Program.LoadedConfig.OBSPassword.IsNullOrWhiteSpace())
                 {
+                    if (Program.LoadedConfig.DisplayUI)
+                    {
+                        Thread.Sleep(3000);
+
+                        Program.GUI.ShowNotification("A password is required to log into your obs websocket.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        Program.GUI.ShowSettings(true);
+                        return;
+                    }
+
                     await Task.Delay(1000);
                     _logger.LogInfo("A password is required to log into your obs websocket.");
                     await Task.Delay(1000);
@@ -410,4 +419,12 @@ internal class LegacyObsHandler : BaseObsHandler
             _logger.LogError($"Failed to check if obs-websocket is installed: (Disconnect Reason: {msg.Type}) {ex}");
         }
     }
+
+    internal override bool GetIsRunning() => socket?.IsRunning ?? false;
+
+    internal override bool GetIsRecording() => IsRecording;
+
+    internal override bool GetIsPaused() => IsPaused;
+
+    internal override int GetRecordingSeconds() => RecordingSeconds;
 }
