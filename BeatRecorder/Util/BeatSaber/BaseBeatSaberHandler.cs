@@ -42,7 +42,7 @@ public abstract class BaseBeatSaberHandler
             GeneratedAccuracy += sharedStatus.PerformanceInfo.Accuracy.ToString();
         else
         {
-            if (program.LoadedConfig.DeleteIfQuitAfterSoftFailed)
+            if (program.LoadedConfig.DeleteQuit)
             {
                 _logger.LogDebug("Song Quit. Deletion requested");
                 DeleteFile = true;
