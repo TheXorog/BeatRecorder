@@ -20,11 +20,6 @@ internal class Config
     public string Mod { get; set; } = "datapuller";
 
     /// <summary>
-    /// Whether the GUI should always be above other windows
-    /// </summary>
-    public bool DisplayUITopmost { get; set; } = true;
-
-    /// <summary>
     /// Whether the Console should be hidden entirely or just minimized upon loading the GUI
     /// </summary>
     public bool HideConsole { get; set; } = true;
