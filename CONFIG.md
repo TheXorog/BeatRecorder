@@ -1,0 +1,48 @@
+<h1 align="center">BeatRecorder Config Documentation</h1>
+
+- `ConsoleLogLevel` - _This will determines what log level is displayed inside the console._
+- `Mod` - _Controls what mod you want to use to connect to Beat Saber._
+    - Valid options are: `http-status`, `datapuller`, `beatsaberplus`
+- `DisplayUI` - _Whether to display the Graphical User Interface. **Windows only.**_
+- `DisplayUITopmost` - _Whether to display the Graphical User Interface always on top. **Windows only.**_
+- `HideConsole` - _Whether to hide the console entirely upon launching the GUI._
+- `AutomaticRecording` - _Whether to atuomatically record._
+- `DisplaySteamNotifications` - _Whether to show Steam Notifications through OpenVR. **Windows only.**_
+- `BeatSaberUrl` - _The ip address of the host that runs Beat Saber._
+- `BeatSaberPort` - _The port of the host that runs Beat Saber._
+    - `http-status`: `6557`
+    - `datapuller`: `2946`
+    - `beatsaberplus`: `2947`
+- `OBSUrl` - _The ip adress of the host that runs OBS._
+    - Note: If OBS runs on a different device, renaming or deleting files will fail.
+- `OBSPort` - _The port of the host that runs OBS._
+- `OBSPassword` - _The password of the OBS websocket._
+- `MininumWaitUntilRecordingCanStart` - _How long BeatRecorder should wait to start another recording._
+- `AskToSaveOBSPassword` - _Whether to ask if you want to save your password, if filled in interactively via the console._
+- `PauseRecordingOnIngamePause` - _Whether to pause the recording when the current song has been paused._
+- `FileFormat` - _What recorded files should be named._
+    - `<difficulty>` - _The difficulty._
+    - `<short-difficulty>` - _The short version of the difficulty._
+    - `<song-name>` - _The song name._
+    - `<song-sub-name>` - _The song sub name._
+    - `<song-name-with-sub>` - _Automatically combines the song name and sub name with a space._
+    - `<song-author>` - _The song author._
+    - `<mapper>` - _The mapper._
+    - `<levelid>` - _The level id or hash, depending on the mod used._
+    - `<bpm>` - _The beats per minute of the song._
+    - `<rank>` - _The rank you achieved._
+    - `<accuracy>` - _The accuracy you achieved._
+    - `<misses>` - _How often you missed._
+    - `<max-combo>` - _The largest combo you had._
+    - `<score>` - _The score you achieved._
+    - `<raw-score>` - _The score you achieved, without applying modifiers._
+- `StopRecordingDelay` - _How long, in seconds, to wait before ending the recording._
+- `DeleteIfShorterThan` - _How long, in seconds, a recording has to be so BeatRecorder will not delete it._
+- `DeleteQuit` - _Whether to delete songs that have not been finished._
+- `DeleteIfQuitAfterSoftFailed` - _Whether to delete songs that have not been finished after failing with No-Fail on._
+- `DeleteFailed` - _Whether to delete songs that have been failed._
+- `DeleteSoftFailed` - _Whether to delete songs that have been completed but failed with No-Fail on._
+- `OBSMenuScene` - _The obs scene to automatically switch to upon entering the main menu._
+- `OBSIngameScene` - _The obs scene to automatically switch to upon entering a song._
+- `OBSPauseScene` - _The obs scene to automatically switch to upon pausing a song._
+    - If you use `OBSPauseScene`, i recommend specifying `OBSIngameScene`. Otherwise, BeatRecorder __will not__ switch back to the previous scene.
