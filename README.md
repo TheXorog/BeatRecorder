@@ -1,6 +1,6 @@
 <h1 align="center">BeatRecorder</h1>
 
-<p align="center"><img src="/BeatRecorder/Assets/Icon.png" width=250 align="center"></p>
+<p align="center"><img src="./BeatRecorder/Assets/Icon.png" width=250 align="center"></p>
 <p align="center" style="font-weight:bold;">Easily record your BeatSaber gameplay!</p>
 <a href="https://github.com/TheXorog/BeatRecorder/releases" ><p align="center"><img src="BeatRecorder/Assets/DownloadButtonYesIKnowImNotGoodAtMakingGraphics.png" width=450 align="center"></p></a>
 
@@ -27,6 +27,8 @@ Files are saved where-ever you set your output folder to in OBS.
 1. Install all the previously mentioned dependencies.
 2. Download and unzip this application.
 3. Run it once, it'll ask you to input your settings. Do so.
+    - If running on linux, you do not have access to the GUI.
+    - You can find documentation on the config file here: [BeatRecorder Config Documentation](./CONFIG.md)
 4. Profit
 
 ## BeatRecorder not connecting?
