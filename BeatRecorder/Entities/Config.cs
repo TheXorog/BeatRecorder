@@ -20,11 +20,6 @@ internal class Config
     public string Mod { get; set; } = "datapuller";
 
     /// <summary>
-    /// Whether to display the GUI
-    /// </summary>
-    public bool DisplayUI { get; set; } = true;
-
-    /// <summary>
     /// Whether the GUI should always be above other windows
     /// </summary>
     public bool DisplayUITopmost { get; set; } = true;
@@ -38,11 +33,6 @@ internal class Config
     /// Record automatically
     /// </summary>
     public bool AutomaticRecording { get; set; } = true;
-
-    /// <summary>
-    /// Display Steam Notifications
-    /// </summary>
-    public bool DisplaySteamNotifications { get; set; } = false;
 
     /// <summary>
     /// The websocket server to connect to for fetching the ingame status

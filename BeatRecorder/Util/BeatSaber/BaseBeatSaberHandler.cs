@@ -133,15 +133,11 @@ public abstract class BaseBeatSaberHandler
             {
                 File.Delete(fileName);
                 _logger.LogInfo("Recording deleted");
-
-                program.steamNotifications?.SendNotification("Recording deleted", 1000, MessageType.INFO);
             }
             else
             {
                 File.Move(fileName, NewFileName);
                 _logger.LogInfo("Recording renamed");
-
-                program.steamNotifications?.SendNotification("Recording renamed", 1000, MessageType.INFO);
             }
         }
         catch (Exception ex)
@@ -149,6 +145,4 @@ public abstract class BaseBeatSaberHandler
             _logger.LogError($"Failed to rename or delete '{fileName}'", ex);
         }
     }
-
-    public Dictionary<string, Image> ImageCache = new();
 }

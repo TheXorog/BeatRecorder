@@ -14,32 +14,12 @@ public class SharedStatus
             GameVersion = status.game?.gameVersion,
         };
 
-        Bitmap bitmap = null;
-
-        try
-        {
-            if (!status?.beatmap?.songCover.IsNullOrWhiteSpace() ?? false)
-            {
-                bitmap = (Bitmap)Image.FromStream(new MemoryStream(Convert.FromBase64String(status?.beatmap?.songCover)));
-            }
-            else
-            {
-
-                if (!baseBeatSaberHandler.ImageCache.ContainsKey("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
-                    baseBeatSaberHandler.ImageCache.TryAdd("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
-
-                bitmap = (Bitmap)baseBeatSaberHandler.ImageCache["https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
-            }
-        }
-        catch { }
-
         this.BeatmapInfo = new()
         {
             Name = status.beatmap?.songName,
             SubName = status.beatmap?.songSubName,
             Author = status.beatmap?.songAuthorName,
             Creator = status.beatmap?.levelAuthorName,
-            Cover = bitmap,
             IdOrHash = status.beatmap?.levelId,
             Bpm = status.beatmap?.songBPM,
             NoteJumpSpeed = status.beatmap?.noteJumpSpeed,
@@ -78,32 +58,12 @@ public class SharedStatus
     {
         GameInfo = game;
 
-        Bitmap bitmap = null;
-
-        try
-        {
-            if (!status?.mapInfoChanged?.coverRaw.IsNullOrWhiteSpace() ?? false)
-            {
-                bitmap = (Bitmap)Image.FromStream(new MemoryStream(Convert.FromBase64String(status?.mapInfoChanged?.coverRaw)));
-            }
-            else
-            {
-
-                if (!baseBeatSaberHandler.ImageCache.ContainsKey("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
-                    baseBeatSaberHandler.ImageCache.TryAdd("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync("https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
-
-                bitmap = (Bitmap)baseBeatSaberHandler.ImageCache["https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
-            }
-        }
-        catch { }
-
         this.BeatmapInfo = new()
         {
             Name = status.mapInfoChanged?.name,
             SubName = status.mapInfoChanged?.sub_name,
             Author = status.mapInfoChanged?.artist,
             Creator = status.mapInfoChanged?.mapper,
-            Cover = bitmap,
             IdOrHash = status.mapInfoChanged?.level_id,
             Bpm = status.mapInfoChanged?.BPM,
             Difficulty = status.mapInfoChanged?.difficulty,
@@ -158,18 +118,12 @@ public class SharedStatus
             GameVersion = main?.GameVersion,
         };
 
-        if (!baseBeatSaberHandler.ImageCache.ContainsKey(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
-            baseBeatSaberHandler.ImageCache.TryAdd(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
-
-        Bitmap image = (Bitmap)baseBeatSaberHandler.ImageCache[main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
-        
         BeatmapInfo = new()
         {
             Name = main?.SongName,
             SubName = main?.SongSubName,
             Author = main?.SongAuthor,
             Creator = main?.Mapper,
-            Cover = (Bitmap)image,
             IdOrHash = main?.Hash,
             Bpm = main?.BPM,
             NoteJumpSpeed = main?.NJS,

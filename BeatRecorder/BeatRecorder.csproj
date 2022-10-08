@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <SelfContained>true</SelfContained>
     <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -38,7 +38,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Xorog.Logger\Xorog.Logger.csproj" />
     <ProjectReference Include="..\..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
-    <ProjectReference Include="..\BeatRecorderUI\BeatRecorderUI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

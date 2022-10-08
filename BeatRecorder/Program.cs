@@ -2,7 +2,6 @@
 using BeatRecorder.Util;
 using BeatRecorder.Util.BeatSaber;
 using BeatRecorder.Util.OBS;
-using BeatRecorder.Util.OpenVR;
 
 namespace BeatRecorder;
 
@@ -17,11 +16,6 @@ public class Program
     public BaseObsHandler ObsClient { get; set; }
 
     public BaseBeatSaberHandler BeatSaberClient { get; set; } = null;
-
-    public SteamNotifications steamNotifications { get; set; } = null;
-
-    public UIHandler GUI { get; set; } = null;
-
 
     static void Main(string[] args)
     {
@@ -93,15 +87,6 @@ public class Program
                          $"Base Directory: {AppDomain.CurrentDomain.BaseDirectory}\n" +
                          $"Commandline: {Environment.CommandLine}\n");
 
-        if (LoadedConfig.DisplayUI)
-            GUI = UIHandler.Initialize(this);
-
-        _ = Task.Run(() =>
-        {
-            if (LoadedConfig.DisplaySteamNotifications)
-                steamNotifications = SteamNotifications.Initialize();
-        });
-
         _ = Task.Run(async () =>
         {
             try
@@ -145,8 +130,6 @@ public class Program
                     _logger.LogFatal($"You're running an outdated version of BeatRecorder, please update at https://github.com/TheXorog/BeatRecorder/releases/latest." +
                             $"\n\nWhat changed in the new version:\n\n" +
                             $"{repo.Body}\n");
-
-                    _ = Task.Run(() => { GUI.ShowNotification($"You're running an outdated version of BeatRecorder.\nVersion {repo.TagName} is available.\n\n{repo.Body}", "New version available", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning); });
                 }
             }
             catch (Exception ex)
@@ -212,7 +195,6 @@ public class Program
                 }
                 case "beatsaberplus":
                 {
-                    _ = Task.Run(() => { GUI.ShowNotification("BeatSaberPlus Integration is currently incomplete. Filenames will always appear as if you finished the song.", "Warning", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning); });
                     _logger.LogFatal("BeatSaberPlus Integration is currently incomplete. BSP does not provide a way of knowing if a song was failed or finished, making filenames always seem like the song was finished.");
                     _logger.LogFatal("To continue anyways, wait 10 seconds.");
                     await Task.Delay(10000);
