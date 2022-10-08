@@ -45,7 +45,7 @@ public class Program
         });
 
         if (!File.Exists("Settings.json"))
-            File.WriteAllText("Settings.json", JsonConvert.SerializeObject(new Config()));
+            File.WriteAllText("Settings.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented));
 
         try
         {
@@ -165,6 +165,7 @@ public class Program
                     catch (Exception)
                     {
                         _logger.LogWarn($"obs-websocket v4 is not available, re-checking..");
+                        await Task.Delay(1000);
                         return await UseModernSocket();
                     }
                 }
