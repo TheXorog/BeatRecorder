@@ -119,13 +119,13 @@ public abstract class BaseBeatSaberHandler
 
         FileInfo fileInfo = new(fileName);
 
-        while (File.Exists($"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}"))
+        while (File.Exists($"{fileInfo.Directory.FullName}/{NewName}{FileExist}{fileInfo.Extension}"))
         {
             FileExist = $" ({FileExistCount})";
             FileExistCount++;
         }
 
-        string NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}";
+        string NewFileName = $"{fileInfo.Directory.FullName}/{NewName}{FileExist}{fileInfo.Extension}";
 
         try
         {

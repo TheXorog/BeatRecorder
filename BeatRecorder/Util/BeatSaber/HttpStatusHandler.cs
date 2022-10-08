@@ -177,12 +177,12 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
             {
                 bool FoundWebSocketDll = false;
 
-                string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")).MainModule.FileName;
-                InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
+                string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")).MainModule.FileName.Replace("\\", "/");
+                InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("/"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("/"));
 
                 if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
                 {
-                    if (Directory.GetFiles($"{InstallationDirectory}\\Plugins").Any(x => x.Contains("HTTPStatus") && x.EndsWith(".dll")))
+                    if (Directory.GetFiles($"{InstallationDirectory}/Plugins").Any(x => x.Contains("HTTPStatus") && x.EndsWith(".dll")))
                     {
                         FoundWebSocketDll = true;
                     }
