@@ -2,12 +2,13 @@
 using BeatRecorder.Util;
 using BeatRecorder.Util.BeatSaber;
 using BeatRecorder.Util.OBS;
+using System.Reflection;
 
 namespace BeatRecorder;
 
 public class Program
 {
-    public static string Version = "2.0.1";
+    public static string Version = "2.1.0";
 
     public bool RunningPrerelease = false;
 
@@ -36,9 +37,10 @@ public class Program
         {
             await Task.Delay(1000);
 
-            if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
+            if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)).Length > 1)
             {
                 _logger.LogError("Only one instance of this application is allowed");
+                await Task.Delay(1000);
                 Environment.Exit(0);
                 return;
             }
@@ -191,7 +193,10 @@ public class Program
                 }
                 case "datapuller":
                 {
-                    BeatSaberClient = new DataPullerHandler().Initialize(this); // 2946 
+                    if (LoadedConfig.BeatSaberUseLegacyIfAvailable)
+                        BeatSaberClient = new DataPullerLegacyHandler().Initialize(this); // 2946
+                    else
+                        BeatSaberClient = new DataPullerHandler().Initialize(this);
                     break;
                 }
                 case "beatsaberplus":

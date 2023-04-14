@@ -1,4 +1,4 @@
-﻿namespace BeatRecorder.Entities;
+﻿namespace BeatRecorder.Entities.Legacy;
 
 public class DataPullerMain
 {

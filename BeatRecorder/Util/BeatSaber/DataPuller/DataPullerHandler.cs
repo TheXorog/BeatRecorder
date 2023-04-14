@@ -181,7 +181,7 @@ internal class DataPullerHandler : BaseBeatSaberHandler
             return;
         }
 
-        if (InLevel && (CurrentData?.unixTimestamp ?? 0) < _status.unixTimestamp)
+        if (InLevel && (CurrentData?.UnixTimestamp ?? 0) < _status.UnixTimestamp)
             CurrentData = _status;
 
         if (CurrentMaxCombo < _status.Combo)

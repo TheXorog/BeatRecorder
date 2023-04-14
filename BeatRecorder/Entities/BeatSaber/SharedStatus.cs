@@ -118,6 +118,54 @@ public class SharedStatus
             GameVersion = main?.GameVersion,
         };
 
+        if (!baseBeatSaberHandler.ImageCache.ContainsKey(main?.CoverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
+            baseBeatSaberHandler.ImageCache.TryAdd(main?.CoverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync(main?.CoverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
+
+        Bitmap image = (Bitmap)baseBeatSaberHandler.ImageCache[main?.CoverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
+        
+        BeatmapInfo = new()
+        {
+            Name = main?.SongName,
+            SubName = main?.SongSubName,
+            Author = main?.SongAuthor,
+            Creator = main?.Mapper,
+            Cover = (Bitmap)image,
+            IdOrHash = main?.Hash,
+            Bpm = main?.BPM,
+            NoteJumpSpeed = main?.NJS,
+            Difficulty = main?.Difficulty,
+            CustomDifficulty = main?.CustomDifficultyLabel
+        };
+
+        PerformanceInfo = new()
+        {
+            RawScore = data?.Score,
+            Score = data?.ScoreWithMultipliers,
+            Accuracy = (double)Math.Round(data?.Accuracy ?? 0, 2),
+            Rank = data?.Rank,
+            MissedNoteCount = data?.Misses,
+            Failed = main?.LevelFailed,
+            Finished = main?.LevelFinished,
+            MaxCombo = MaxCombo,
+            Combo = data?.Combo,
+            SoftFailed = ((main?.LevelFailed ?? false) || (data?.PlayerHealth ?? 0) <= 0) && (main?.Modifiers.NoFailOn0Energy ?? false)
+        };
+    }
+
+    public SharedStatus(Entities.Legacy.DataPullerMain main, Entities.Legacy.DataPullerData data, int MaxCombo, BaseBeatSaberHandler baseBeatSaberHandler)
+    {
+        GameInfo = new()
+        {
+            ModUsed = Mod.Datapuller,
+            ModVersion = main?.PluginVersion,
+            GameVersion = main?.GameVersion,
+        };
+
+        if (!baseBeatSaberHandler.ImageCache.ContainsKey(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
+            baseBeatSaberHandler.ImageCache.TryAdd(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
+
+        Bitmap image = (Bitmap)baseBeatSaberHandler.ImageCache[main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
+
         BeatmapInfo = new()
         {
             Name = main?.SongName,
