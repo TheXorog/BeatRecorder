@@ -118,18 +118,12 @@ public class SharedStatus
             GameVersion = main?.GameVersion,
         };
 
-        if (!baseBeatSaberHandler.ImageCache.ContainsKey(main?.CoverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
-            baseBeatSaberHandler.ImageCache.TryAdd(main?.CoverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync(main?.CoverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
-
-        Bitmap image = (Bitmap)baseBeatSaberHandler.ImageCache[main?.CoverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
-        
         BeatmapInfo = new()
         {
             Name = main?.SongName,
             SubName = main?.SongSubName,
             Author = main?.SongAuthor,
             Creator = main?.Mapper,
-            Cover = (Bitmap)image,
             IdOrHash = main?.Hash,
             Bpm = main?.BPM,
             NoteJumpSpeed = main?.NJS,
@@ -160,11 +154,6 @@ public class SharedStatus
             ModVersion = main?.PluginVersion,
             GameVersion = main?.GameVersion,
         };
-
-        if (!baseBeatSaberHandler.ImageCache.ContainsKey(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"))
-            baseBeatSaberHandler.ImageCache.TryAdd(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg", Bitmap.FromStream(new HttpClient().GetStreamAsync(main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg").Result));
-
-        Bitmap image = (Bitmap)baseBeatSaberHandler.ImageCache[main?.coverImage ?? "https://raw.githubusercontent.com/TheXorog/BeatRecorder/main/BeatRecorder/Assets/BeatSaberIcon.jpg"];
 
         BeatmapInfo = new()
         {
