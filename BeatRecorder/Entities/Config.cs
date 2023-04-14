@@ -55,6 +55,12 @@ internal class Config
     public string BeatSaberPort { get; set; } = "6557";
 
     /// <summary>
+    /// Whether to use the legacy handler of the selected mod, if supported.
+    /// Currently supports: DataPuller.
+    /// </summary>
+    public bool BeatSaberUseLegacyIfAvailable { get; set; } = false;
+
+    /// <summary>
     /// The websocket server to connect to for obs
     /// </summary>
     public string OBSUrl { get; set; } = "127.0.0.1";
@@ -138,7 +144,6 @@ internal class Config
     /// What scene to switch to when pausing a song
     /// </summary>
     public string OBSPauseScene { get; set; } = "";
-
 
     
     /// <summary>

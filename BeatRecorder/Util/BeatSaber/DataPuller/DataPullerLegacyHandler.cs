@@ -1,9 +1,12 @@
 ﻿using BeatRecorder.Entities;
+using BeatRecorder.Entities.Legacy;
 using BeatRecorder.Enums;
+using DataPullerData = BeatRecorder.Entities.Legacy.DataPullerData;
+using DataPullerMain = BeatRecorder.Entities.Legacy.DataPullerMain;
 
 namespace BeatRecorder.Util.BeatSaber;
 
-internal class DataPullerHandler : BaseBeatSaberHandler
+internal class DataPullerLegacyHandler : BaseBeatSaberHandler
 {
     private Program Program = null;
 

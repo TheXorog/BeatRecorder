@@ -8,7 +8,7 @@ namespace BeatRecorder;
 
 public class Program
 {
-    public static string Version = "2.0.1";
+    public static string Version = "2.1.0";
 
     public bool RunningPrerelease = false;
 
@@ -208,7 +208,10 @@ public class Program
                 }
                 case "datapuller":
                 {
-                    BeatSaberClient = new DataPullerHandler().Initialize(this); // 2946 
+                    if (LoadedConfig.BeatSaberUseLegacyIfAvailable)
+                        BeatSaberClient = new DataPullerLegacyHandler().Initialize(this); // 2946
+                    else
+                        BeatSaberClient = new DataPullerHandler().Initialize(this);
                     break;
                 }
                 case "beatsaberplus":
