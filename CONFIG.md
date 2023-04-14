@@ -13,6 +13,8 @@
     - `http-status`: `6557`
     - `datapuller`: `2946`
     - `beatsaberplus`: `2947`
+- `BeatSaberUseLegacyIfAvailable` - _Whether to use a legacy handler of the selected mod, if supported._
+	- Currently supports: `datapuller`.
 - `OBSUrl` - _The ip adress of the host that runs OBS._
     - Note: If OBS runs on a different device, renaming or deleting files will fail.
 - `OBSPort` - _The port of the host that runs OBS._
