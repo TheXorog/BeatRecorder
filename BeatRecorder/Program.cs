@@ -3,6 +3,7 @@ using BeatRecorder.Util;
 using BeatRecorder.Util.BeatSaber;
 using BeatRecorder.Util.OBS;
 using BeatRecorder.Util.OpenVR;
+using System.Reflection;
 
 namespace BeatRecorder;
 
@@ -42,9 +43,10 @@ public class Program
         {
             await Task.Delay(1000);
 
-            if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
+            if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)).Length > 1)
             {
                 _logger.LogError("Only one instance of this application is allowed");
+                await Task.Delay(1000);
                 Environment.Exit(0);
                 return;
             }
