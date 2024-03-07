@@ -10,7 +10,7 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
     ConnectionTypeWarning LastWarning = ConnectionTypeWarning.Connected;
 
     private Program Program = null;
-    internal SharedStatus CurrentStatus => new(Current, GameInfo, CurrentMaxCombo, this);
+    internal SharedStatus CurrentStatus => new(this.Current, this.GameInfo, this.CurrentMaxCombo, this);
     internal SharedStatus LastCompletedStatus { get; set; }
 
     private SharedStatus.Game GameInfo { get; set; } = null;
@@ -34,23 +34,23 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
             }
         });
 
-        socket = new WebsocketClient(new Uri($"ws://{program.LoadedConfig.BeatSaberUrl}:{program.LoadedConfig.BeatSaberPort}/socket"), factory)
+        this.socket = new WebsocketClient(new Uri($"ws://{program.LoadedConfig.BeatSaberUrl}:{program.LoadedConfig.BeatSaberPort}/socket"), factory)
         {
             ReconnectTimeout = null,
             ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
         };
 
-        socket.MessageReceived.Subscribe(msg => { MessageReceived(msg.Text); });
-        socket.ReconnectionHappened.Subscribe(type => { Reconnected(type); });
-        socket.DisconnectionHappened.Subscribe(type => { Disconnected(type); });
+        _ = this.socket.MessageReceived.Subscribe(msg => this.MessageReceived(msg.Text));
+        _ = this.socket.ReconnectionHappened.Subscribe(this.Reconnected);
+        _ = this.socket.DisconnectionHappened.Subscribe(this.Disconnected);
 
-        socket.Start().Wait();
+        this.socket.Start().Wait();
         return this;
     }
 
-    public override SharedStatus GetCurrentStatus() => CurrentStatus;
+    public override SharedStatus GetCurrentStatus() => this.CurrentStatus;
 
-    public override SharedStatus GetLastCompletedStatus() => LastCompletedStatus;
+    public override SharedStatus GetLastCompletedStatus() => this.LastCompletedStatus;
 
     private void MessageReceived(string text)
     {
@@ -67,7 +67,7 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
         }
 
         if (_status.mapInfoChanged is not null)
-            Current.mapInfoChanged = _status.mapInfoChanged;
+            this.Current.mapInfoChanged = _status.mapInfoChanged;
 
         switch (_status._type)
         {
@@ -75,7 +75,7 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
             {
                 _logger.LogInfo($"Connected to Beat Saber via BeatSaberPlus");
 
-                GameInfo = new SharedStatus.Game
+                this.GameInfo = new SharedStatus.Game
                 {
                     ModUsed = Mod.BeatSaberPlus,
                     ModVersion = _status.protocolVersion.ToString(),
@@ -89,53 +89,53 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                 {
                     case "gameState":
                     {
-                        if (_status.gameStateChanged.ToLower() == "menu" && IsPlaying)
+                        if (_status.gameStateChanged.Equals("menu", StringComparison.CurrentCultureIgnoreCase) && this.IsPlaying)
                         {
-                            IsPlaying = false;
+                            this.IsPlaying = false;
 
-                            CurrentStatus.Update(new SharedStatus(_status, GameInfo, CurrentMaxCombo, this));
-                            LastCompletedStatus = CurrentStatus.Clone();
-                            _logger.LogInfo($"Stopped playing \"{LastCompletedStatus.BeatmapInfo.NameWithSub}\" by \"{LastCompletedStatus.BeatmapInfo.Author}\"");
-                            _ = Program.ObsClient.StopRecording();
+                            this.CurrentStatus.Update(new SharedStatus(_status, this.GameInfo, this.CurrentMaxCombo, this));
+                            this.LastCompletedStatus = this.CurrentStatus.Clone();
+                            _logger.LogInfo($"Stopped playing \"{this.LastCompletedStatus.BeatmapInfo.NameWithSub}\" by \"{this.LastCompletedStatus.BeatmapInfo.Author}\"");
+                            _ = this.Program.ObsClient.StopRecording();
 
-                            if (!Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
-                                Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSMenuScene);
+                            if (!this.Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
+                                this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSMenuScene);
 
-                            if (Program.LoadedConfig.PauseRecordingOnIngamePause)
-                                Program.ObsClient.ResumeRecording();
+                            if (this.Program.LoadedConfig.PauseRecordingOnIngamePause)
+                                this.Program.ObsClient.ResumeRecording();
 
                             break;
                         }
-                        else if (_status.gameStateChanged.ToLower() == "playing")
+                        else if (_status.gameStateChanged.Equals("playing", StringComparison.CurrentCultureIgnoreCase))
                         {
-                            IsPlaying = true;
-                            _logger.LogInfo($"Started playing \"{Current.mapInfoChanged.name}\" by \"{Current.mapInfoChanged.artist}\"");
+                            this.IsPlaying = true;
+                            _logger.LogInfo($"Started playing \"{this.Current.mapInfoChanged.name}\" by \"{this.Current.mapInfoChanged.artist}\"");
 
-                            CurrentMaxCombo = 0;
-                            Current.scoreEvent = new();
+                            this.CurrentMaxCombo = 0;
+                            this.Current.scoreEvent = new();
 
-                            if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                                Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
+                            if (!this.Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                                this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSIngameScene);
 
-                            _ = Program.ObsClient.StartRecording();
+                            _ = this.Program.ObsClient.StartRecording();
                             break;
                         }
                         break;
                     }
                     case "mapInfo":
                     {
-                        Current.mapInfoChanged = _status.mapInfoChanged;
+                        this.Current.mapInfoChanged = _status.mapInfoChanged;
                         break;
                     }
                     case "score":
                     {
-                        if ((Current.scoreEvent?.time ?? 0f) < _status.scoreEvent?.time && _status.scoreEvent is not null)
+                        if ((this.Current.scoreEvent?.time ?? 0f) < _status.scoreEvent?.time && _status.scoreEvent is not null)
                         {
-                            Current.scoreEvent = _status.scoreEvent;
+                            this.Current.scoreEvent = _status.scoreEvent;
                         }
 
-                        if (CurrentMaxCombo < _status.scoreEvent.combo)
-                            CurrentMaxCombo = _status.scoreEvent.combo;
+                        if (this.CurrentMaxCombo < _status.scoreEvent.combo)
+                            this.CurrentMaxCombo = _status.scoreEvent.combo;
 
                         break;
                     }
@@ -143,11 +143,11 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                     {
                         _logger.LogInfo($"Song resumed.");
 
-                        if (Program.LoadedConfig.PauseRecordingOnIngamePause)
-                            Program.ObsClient.ResumeRecording();
+                        if (this.Program.LoadedConfig.PauseRecordingOnIngamePause)
+                            this.Program.ObsClient.ResumeRecording();
 
-                        if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                            Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
+                        if (!this.Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                            this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSIngameScene);
 
                         break;
                     }
@@ -155,11 +155,11 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                     {
                         _logger.LogInfo($"Song paused.");
 
-                        if (Program.LoadedConfig.PauseRecordingOnIngamePause)
-                            Program.ObsClient.PauseRecording();
+                        if (this.Program.LoadedConfig.PauseRecordingOnIngamePause)
+                            this.Program.ObsClient.PauseRecording();
 
-                        if (!Program.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
-                            Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSPauseScene);
+                        if (!this.Program.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
+                            this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSPauseScene);
 
                         break;
                     }
@@ -173,23 +173,23 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
     {
         try
         {
-            Process[] processCollection = Process.GetProcesses();
+            var processCollection = Process.GetProcesses();
 
             if (!processCollection.Any(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")))
             {
-                if (LastWarning != ConnectionTypeWarning.NoProcess)
+                if (this.LastWarning != ConnectionTypeWarning.NoProcess)
                 {
                     _logger.LogWarn($"Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
-                    Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
+                    this.Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
                 }
-                LastWarning = ConnectionTypeWarning.NoProcess;
+                this.LastWarning = ConnectionTypeWarning.NoProcess;
             }
             else
             {
-                bool FoundWebSocketDll = false;
+                var FoundWebSocketDll = false;
 
-                string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")).MainModule.FileName;
-                InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
+                var InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")).MainModule.FileName;
+                InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf('\\'), InstallationDirectory.Length - InstallationDirectory.LastIndexOf('\\'));
 
                 if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
                 {
@@ -200,32 +200,32 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
                 }
                 else
                 {
-                    if (LastWarning != ConnectionTypeWarning.NotModded)
+                    if (this.LastWarning != ConnectionTypeWarning.NotModded)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running but the BeatSaberPlus modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BeatSaberPlus: https://bit.ly/3wYX3Dd) ({msg.Type})");
-                        Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
+                        this.Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
                     }
-                    LastWarning = ConnectionTypeWarning.NotModded;
+                    this.LastWarning = ConnectionTypeWarning.NotModded;
                     return;
                 }
 
                 if (FoundWebSocketDll)
                 {
-                    if (LastWarning != ConnectionTypeWarning.ModInstalled)
+                    if (this.LastWarning != ConnectionTypeWarning.ModInstalled)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running and the BeatSaberPlus modifaction seems to be installed. Please make sure you put in the right port and you installed all of BeatSaberPlus' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
-                        Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
+                        this.Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
                     }
-                    LastWarning = ConnectionTypeWarning.ModInstalled;
+                    this.LastWarning = ConnectionTypeWarning.ModInstalled;
                 }
                 else
                 {
-                    if (LastWarning != ConnectionTypeWarning.ModNotInstalled)
+                    if (this.LastWarning != ConnectionTypeWarning.ModNotInstalled)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running but the BeatSaberPlus modifaction doesn't seem to be installed. Please make sure to install BeatSaberPlus! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
-                        Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
+                        this.Program.steamNotifications?.SendNotification("Disconnected from Beat Saber", 1000, MessageType.ERROR);
                     }
-                    LastWarning = ConnectionTypeWarning.ModNotInstalled;
+                    this.LastWarning = ConnectionTypeWarning.ModNotInstalled;
                 }
             }
         }
@@ -237,13 +237,13 @@ internal class BeatSaberPlusHandler : BaseBeatSaberHandler
 
     private void Reconnected(ReconnectionInfo msg)
     {
-        Program.steamNotifications?.SendNotification("Connected to Beat Saber", 1000, MessageType.INFO);
+        this.Program.steamNotifications?.SendNotification("Connected to Beat Saber", 1000, MessageType.INFO);
 
         if (msg.Type != ReconnectionType.Initial)
             _logger.LogInfo($"Beat Saber Connection via BeatSaberPlus re-established: {msg.Type}");
 
-        LastWarning = ConnectionTypeWarning.Connected;
+        this.LastWarning = ConnectionTypeWarning.Connected;
     }
 
-    internal override bool GetIsRunning() => socket?.IsRunning ?? false;
+    internal override bool GetIsRunning() => this.socket?.IsRunning ?? false;
 }

@@ -1,4 +1,4 @@
-﻿using Xorog.Logger.Enums;
+﻿using Xorog.Logger;
 
 namespace BeatRecorder.Entities;
 
@@ -12,7 +12,7 @@ internal class Config
     /// <summary>
     /// The current log level
     /// </summary>
-    public LogLevel ConsoleLogLevel { get; set; } = LogLevel.INFO;
+    public CustomLogLevel ConsoleLogLevel { get; set; } = CustomLogLevel.Info;
 
     /// <summary>
     /// What mod to connect to
@@ -149,5 +149,5 @@ internal class Config
     /// <summary>
     /// Migration value for deserializering
     /// </summary>
-    public string OBSPort { set { OBSPortLegacy = value; } }
+    public string OBSPort { set => this.OBSPortLegacy = value; }
 }

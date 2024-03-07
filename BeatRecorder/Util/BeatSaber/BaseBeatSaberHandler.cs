@@ -22,10 +22,10 @@ public abstract class BaseBeatSaberHandler
         _logger.LogTrace(RecordingLength.ToString());
         _logger.LogTrace(JsonConvert.SerializeObject(sharedStatus));
 
-        bool DeleteFile = false;
-        string NewName = program.LoadedConfig.FileFormat;
+        var DeleteFile = false;
+        var NewName = program.LoadedConfig.FileFormat;
 
-        string GeneratedAccuracy = "";
+        var GeneratedAccuracy = "";
 
         if (sharedStatus.PerformanceInfo.SoftFailed.Value)
         {
@@ -109,13 +109,13 @@ public abstract class BaseBeatSaberHandler
             return;
         }
 
-        foreach (char b in Path.GetInvalidFileNameChars())
+        foreach (var b in Path.GetInvalidFileNameChars())
         {
             NewName = NewName.Replace(b, '_');
         }
 
-        string FileExist = "";
-        int FileExistCount = 2;
+        var FileExist = "";
+        var FileExistCount = 2;
 
         FileInfo fileInfo = new(fileName);
 
@@ -125,7 +125,7 @@ public abstract class BaseBeatSaberHandler
             FileExistCount++;
         }
 
-        string NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}";
+        var NewFileName = $"{fileInfo.Directory.FullName}\\{NewName}{FileExist}{fileInfo.Extension}";
 
         try
         {

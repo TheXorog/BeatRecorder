@@ -36,7 +36,7 @@ public class SteamNotifications
                     if (instance.SteamNotificationId == 0)
                     {
                         _logger.LogDebug($"Initializing OpenVR..");
-                        bool Initialized = false;
+                        var Initialized = false;
 
                         while (!Initialized)
                         {
@@ -82,7 +82,7 @@ public class SteamNotifications
                             return;
 
                         Thread.Sleep(b.Delay);
-                        EasyOpenVRSingleton.Instance.DismissNotification(NotificationId, out var error);
+                        _ = EasyOpenVRSingleton.Instance.DismissNotification(NotificationId, out var error);
 
                         if (error != EVRNotificationError.OK)
                         {
@@ -91,7 +91,7 @@ public class SteamNotifications
 
                         _logger.LogDebug($"Dismissed Notification {NotificationId}");
 
-                        instance.NotificationList.Remove(b);
+                        _ = instance.NotificationList.Remove(b);
                     }
                 }
                 catch (Exception ex)
@@ -106,8 +106,5 @@ public class SteamNotifications
         return instance;
     }
 
-    public void SendNotification(string Text, int DisplayTime = 2000, MessageType messageType = MessageType.INFO)
-    {
-        NotificationList.Add(new NotificationEntry { Message = Text, Delay = DisplayTime, Type = messageType });
-    }
+    public void SendNotification(string Text, int DisplayTime = 2000, MessageType messageType = MessageType.INFO) => this.NotificationList.Add(new NotificationEntry { Message = Text, Delay = DisplayTime, Type = messageType });
 }

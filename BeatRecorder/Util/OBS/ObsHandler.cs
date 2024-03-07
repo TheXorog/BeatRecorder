@@ -44,9 +44,9 @@ internal class ObsHandler : BaseObsHandler
             IsReconnectionEnabled = false,
         };
 
-        obsHandler.socket.MessageReceived.Subscribe(msg => { _ = obsHandler.MessageReceived(msg); });
-        obsHandler.socket.ReconnectionHappened.Subscribe(type => { obsHandler.Reconnected(type); });
-        obsHandler.socket.DisconnectionHappened.Subscribe(type => { obsHandler.Disconnected(type); });
+        _ = obsHandler.socket.MessageReceived.Subscribe(msg => _ = obsHandler.MessageReceived(msg));
+        _ = obsHandler.socket.ReconnectionHappened.Subscribe(obsHandler.Reconnected);
+        _ = obsHandler.socket.DisconnectionHappened.Subscribe(obsHandler.Disconnected);
 
         obsHandler.socket.Start().Wait();
 
@@ -57,24 +57,24 @@ internal class ObsHandler : BaseObsHandler
     {
         _logger.LogTrace(msg.Text);
 
-        ObsResponse obsResponse = JsonConvert.DeserializeObject<ObsResponse>(msg.Text);
+        var obsResponse = JsonConvert.DeserializeObject<ObsResponse>(msg.Text);
 
         switch (obsResponse.op)
         {
             case 0:
             {
-                Hello required = JsonConvert.DeserializeObject<Hello>(msg.Text);
+                var required = JsonConvert.DeserializeObject<Hello>(msg.Text);
 
                 if (required.d.authentication is not null)
                 {
-                    if (Program.LoadedConfig.OBSPassword.IsNullOrWhiteSpace())
+                    if (this.Program.LoadedConfig.OBSPassword.IsNullOrWhiteSpace())
                     {
-                        if (Program.LoadedConfig.DisplayUI)
+                        if (this.Program.LoadedConfig.DisplayUI)
                         {
                             Thread.Sleep(3000);
 
-                            Program.GUI.ShowNotification("A password is required to log into your obs websocket.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                            Program.GUI.ShowSettings(true);
+                            this.Program.GUI.ShowNotification("A password is required to log into your obs websocket.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                            this.Program.GUI.ShowSettings(true);
                             return;
                         }
 
@@ -85,9 +85,9 @@ internal class ObsHandler : BaseObsHandler
 
                         // I was to lazy to write my own.. https://stackoverflow.com/questions/3404421/password-masking-console-application
 
-                        string Password = "";
+                        var Password = "";
 
-                        ConsoleKey key = ConsoleKey.A;
+                        var key = ConsoleKey.A;
 
                         while (key != ConsoleKey.Enter || key != ConsoleKey.Escape)
                         {
@@ -120,7 +120,7 @@ internal class ObsHandler : BaseObsHandler
 
                         if (key == ConsoleKey.Enter)
                         {
-                            if (Program.LoadedConfig.AskToSaveOBSPassword)
+                            if (this.Program.LoadedConfig.AskToSaveOBSPassword)
                             {
                                 key = ConsoleKey.A;
 
@@ -137,123 +137,123 @@ internal class ObsHandler : BaseObsHandler
                                     if (key == ConsoleKey.Escape)
                                     {
                                         _logger.LogWarn("Cancelled. Press any key to exit.");
-                                        Console.ReadKey();
+                                        _ = Console.ReadKey();
                                         Environment.Exit(0);
                                         return;
                                     }
                                     else if (key == ConsoleKey.Y)
                                     {
                                         _logger.LogInfo("Your password is now saved in the Settings.json.");
-                                        Program.LoadedConfig.OBSPassword = Password;
-                                        Program.LoadedConfig.AskToSaveOBSPassword = true;
+                                        this.Program.LoadedConfig.OBSPassword = Password;
+                                        this.Program.LoadedConfig.AskToSaveOBSPassword = true;
 
-                                        File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.LoadedConfig, Formatting.Indented));
+                                        File.WriteAllText("Settings.json", JsonConvert.SerializeObject(this.Program.LoadedConfig, Formatting.Indented));
                                         break;
                                     }
                                     else if (key == ConsoleKey.N || key == ConsoleKey.Enter)
                                     {
                                         _logger.LogInfo("Your password will not be saved. This wont be asked in the future.");
                                         _logger.LogInfo("To re-enable this prompt, set AskToSaveOBSPassword to true in the Settings.json.");
-                                        Program.LoadedConfig.OBSPassword = "";
-                                        Program.LoadedConfig.AskToSaveOBSPassword = false;
+                                        this.Program.LoadedConfig.OBSPassword = "";
+                                        this.Program.LoadedConfig.AskToSaveOBSPassword = false;
 
-                                        File.WriteAllText("Settings.json", JsonConvert.SerializeObject(Program.LoadedConfig, Formatting.Indented));
+                                        File.WriteAllText("Settings.json", JsonConvert.SerializeObject(this.Program.LoadedConfig, Formatting.Indented));
                                         break;
                                     }
                                 }
                             }
 
-                            Program.LoadedConfig.OBSPassword = Password;
+                            this.Program.LoadedConfig.OBSPassword = Password;
                         }
                     }
 
                     _logger.LogInfo("Connection with OBS requires authentication. Identifying..");
 
-                    string secret = Extensions.HashEncode(Program.LoadedConfig.OBSPassword + required.d.authentication.salt);
-                    string authResponse = Extensions.HashEncode(secret + required.d.authentication.challenge);
+                    var secret = Extensions.HashEncode(this.Program.LoadedConfig.OBSPassword + required.d.authentication.salt);
+                    var authResponse = Extensions.HashEncode(secret + required.d.authentication.challenge);
 
-                    AttemptedToIdentify = true;
-                    socket.Send(new Indentify(authResponse).Build());
+                    this.AttemptedToIdentify = true;
+                    _ = this.socket.Send(new Indentify(authResponse).Build());
                 }
                 else
                 {
                     _logger.LogInfo("Connection with OBS does not require authentication. Identifying..");
 
-                    AttemptedToIdentify = true;
-                    socket.Send(new Indentify().Build());
+                    this.AttemptedToIdentify = true;
+                    _ = this.socket.Send(new Indentify().Build());
                 }
 
                 break;
             }
             case 2:
             {
-                Indentified indentified = JsonConvert.DeserializeObject<Indentified>(msg.Text);
+                var indentified = JsonConvert.DeserializeObject<Indentified>(msg.Text);
                 if (indentified.d.negotiatedRpcVersion != 1)
                     _logger.LogWarn("Negotiated Rpc Version does not match 1. Please expect possible bugs.");
 
-                Program.steamNotifications?.SendNotification("Connected to OBS", 1000, MessageType.INFO);
+                this.Program.steamNotifications?.SendNotification("Connected to OBS", 1000, MessageType.INFO);
 
                 _logger.LogInfo("Successfully identified to websocket.");
-                AttemptedToIdentify = false;
+                this.AttemptedToIdentify = false;
                 break;
             }
             case 5:
             {
-                EventType eventType = JsonConvert.DeserializeObject<EventType>(msg.Text);
+                var eventType = JsonConvert.DeserializeObject<EventType>(msg.Text);
 
                 switch (eventType.d.eventType)
                 {
                     case "RecordStateChanged":
                     {
-                        RecordStateChanged recordStateChanged = JsonConvert.DeserializeObject<RecordStateChanged>(msg.Text);
+                        var recordStateChanged = JsonConvert.DeserializeObject<RecordStateChanged>(msg.Text);
 
                         switch (recordStateChanged.d.eventData.outputState)
                         {
                             case "OBS_WEBSOCKET_OUTPUT_STARTED":
                             {
-                                Program.steamNotifications?.SendNotification("Recording started", 1000, MessageType.INFO);
+                                this.Program.steamNotifications?.SendNotification("Recording started", 1000, MessageType.INFO);
 
-                                IsRecording = true;
+                                this.IsRecording = true;
 
                                 _logger.LogInfo("Recording started.");
 
-                                while (IsRecording)
+                                while (this.IsRecording)
                                 {
-                                    if (!IsPaused)
-                                        RecordingSeconds++;
+                                    if (!this.IsPaused)
+                                        this.RecordingSeconds++;
 
                                     await Task.Delay(1000);
                                 }
                                 await Task.Delay(2000);
-                                RecordingSeconds = 0;
+                                this.RecordingSeconds = 0;
                                 break;
                             }
                             case "OBS_WEBSOCKET_OUTPUT_STOPPED":
                             {
-                                Program.steamNotifications?.SendNotification("Recording stopped", 1000, MessageType.INFO);
+                                this.Program.steamNotifications?.SendNotification("Recording stopped", 1000, MessageType.INFO);
 
-                                IsRecording = false;
-                                IsPaused = false;
+                                this.IsRecording = false;
+                                this.IsPaused = false;
 
                                 _logger.LogInfo("Recording stopped.");
 
-                                Program.BeatSaberClient.HandleFile(recordStateChanged.d.eventData.outputPath, RecordingSeconds, Program.BeatSaberClient.GetLastCompletedStatus(), Program);
+                                this.Program.BeatSaberClient.HandleFile(recordStateChanged.d.eventData.outputPath, this.RecordingSeconds, this.Program.BeatSaberClient.GetLastCompletedStatus(), this.Program);
                                 break;
                             }
                             case "OBS_WEBSOCKET_OUTPUT_PAUSED":
                             {
-                                Program.steamNotifications?.SendNotification("Recording paused", 1000, MessageType.INFO);
+                                this.Program.steamNotifications?.SendNotification("Recording paused", 1000, MessageType.INFO);
 
-                                IsPaused = true;
+                                this.IsPaused = true;
 
                                 _logger.LogInfo("Recording paused.");
                                 break;
                             }
                             case "OBS_WEBSOCKET_OUTPUT_RESUMED":
                             {
-                                Program.steamNotifications?.SendNotification("Recording resumed", 1000, MessageType.INFO);
+                                this.Program.steamNotifications?.SendNotification("Recording resumed", 1000, MessageType.INFO);
 
-                                IsPaused = false;
+                                this.IsPaused = false;
 
                                 _logger.LogInfo("Recording resumed.");
                                 break;
@@ -268,43 +268,37 @@ internal class ObsHandler : BaseObsHandler
         }
     }
 
-    private void Reconnected(ReconnectionInfo msg)
-    {
-        LastWarning = ConnectionTypeWarning.Connected;
-    }
+    private void Reconnected(ReconnectionInfo msg) => this.LastWarning = ConnectionTypeWarning.Connected;
 
     private void Disconnected(DisconnectionInfo msg)
     {
-        Program.steamNotifications?.SendNotification("Disconnected from OBS", 1000, MessageType.ERROR);
+        this.Program.steamNotifications?.SendNotification("Disconnected from OBS", 1000, MessageType.ERROR);
 
         try
         {
-            _ = Task.Delay(2000).ContinueWith(_ =>
-            {
-                _ = socket.Start();
-            });
+            _ = Task.Delay(2000).ContinueWith(_ => _ = this.socket.Start());
 
-            if (AttemptedToIdentify)
+            if (this.AttemptedToIdentify)
             {
                 _logger.LogWarn("Failed to identify with websocket. Your password might be incorrect, retrying in 2 seconds..");
                 return;
             }
 
-            Process[] processCollection = Process.GetProcesses();
+            var processCollection = Process.GetProcesses();
 
-            if (!processCollection.Any(x => x.ProcessName.ToLower().StartsWith("obs64") || x.ProcessName.ToLower().StartsWith("obs32")))
+            if (!processCollection.Any(x => x.ProcessName.StartsWith("obs64", StringComparison.CurrentCultureIgnoreCase) || x.ProcessName.StartsWith("obs32", StringComparison.CurrentCultureIgnoreCase)))
             {
-                if (LastWarning != ConnectionTypeWarning.NoProcess)
+                if (this.LastWarning != ConnectionTypeWarning.NoProcess)
                 {
                     _logger.LogWarn($"Couldn't find an OBS process, is your OBS running? ({msg.Type})");
                 }
-                LastWarning = ConnectionTypeWarning.NoProcess;
+                this.LastWarning = ConnectionTypeWarning.NoProcess;
             }
             else
             {
-                bool FoundWebSocketDll = false;
+                var FoundWebSocketDll = false;
 
-                string OBSInstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().StartsWith("obs64") || x.ProcessName.ToLower().StartsWith("obs32")).MainModule.FileName;
+                var OBSInstallationDirectory = processCollection.First(x => x.ProcessName.StartsWith("obs64", StringComparison.CurrentCultureIgnoreCase) || x.ProcessName.StartsWith("obs32", StringComparison.CurrentCultureIgnoreCase)).MainModule.FileName;
                 OBSInstallationDirectory = OBSInstallationDirectory.Remove(OBSInstallationDirectory.LastIndexOf("\\bin"), OBSInstallationDirectory.Length - OBSInstallationDirectory.LastIndexOf("\\bin"));
 
                 if (Directory.GetDirectories(OBSInstallationDirectory).Any(x => x.ToLower().EndsWith("obs-plugins")))
@@ -321,19 +315,19 @@ internal class ObsHandler : BaseObsHandler
 
                 if (FoundWebSocketDll)
                 {
-                    if (LastWarning != ConnectionTypeWarning.ModInstalled)
+                    if (this.LastWarning != ConnectionTypeWarning.ModInstalled)
                     {
                         _logger.LogFatal($"OBS seems to be running but the obs-websocket server isn't running. Please make sure you have the obs-websocket server activated! (Tools -> WebSocket Server Settings) ({msg.Type})");
                     }
-                    LastWarning = ConnectionTypeWarning.ModInstalled;
+                    this.LastWarning = ConnectionTypeWarning.ModInstalled;
                 }
                 else
                 {
-                    if (LastWarning != ConnectionTypeWarning.ModNotInstalled)
+                    if (this.LastWarning != ConnectionTypeWarning.ModNotInstalled)
                     {
                         _logger.LogFatal($"OBS seems to be running but the obs-websocket server isn't installed. Please make sure you have the obs-websocket server installed! (To install, follow this link: https://bit.ly/3BCXfeS) ({msg.Type})");
                     }
-                    LastWarning = ConnectionTypeWarning.ModNotInstalled;
+                    this.LastWarning = ConnectionTypeWarning.ModNotInstalled;
                 }
             }
         }
@@ -345,51 +339,51 @@ internal class ObsHandler : BaseObsHandler
 
     internal override async Task StartRecording()
     {
-        if (!Program.LoadedConfig.AutomaticRecording)
+        if (!this.Program.LoadedConfig.AutomaticRecording)
             return;
 
-        if (!socket.IsRunning)
+        if (!this.socket.IsRunning)
             throw new ArgumentException("Connection with OBS is not established.");
 
-        if (IsRecording)
+        if (this.IsRecording)
         {
-            await StopRecording(true);
+            await this.StopRecording(true);
 
-            while (IsRecording)
+            while (this.IsRecording)
             {
                 Thread.Sleep(20);
             }
         }
 
-        if (Program.LoadedConfig.MininumWaitUntilRecordingCanStart < 200 || Program.LoadedConfig.MininumWaitUntilRecordingCanStart > 2000)
+        if (this.Program.LoadedConfig.MininumWaitUntilRecordingCanStart < 200 || this.Program.LoadedConfig.MininumWaitUntilRecordingCanStart > 2000)
         {
             _logger.LogWarn("MininumWaitUntilRecordingCanStart was reset to 800. Allowed range for value is between 200 and 2000");
-            Program.LoadedConfig.MininumWaitUntilRecordingCanStart = 800;
+            this.Program.LoadedConfig.MininumWaitUntilRecordingCanStart = 800;
         }
 
-        Thread.Sleep(Program.LoadedConfig.MininumWaitUntilRecordingCanStart);
-        socket.Send(new StartRecord().Build());
+        Thread.Sleep(this.Program.LoadedConfig.MininumWaitUntilRecordingCanStart);
+        _ = this.socket.Send(new StartRecord().Build());
     }
 
     internal override async Task StopRecording(bool ForceStop = false)
     {
-        if (!Program.LoadedConfig.AutomaticRecording)
+        if (!this.Program.LoadedConfig.AutomaticRecording)
             return;
 
-        if (!socket.IsRunning)
+        if (!this.socket.IsRunning)
             throw new ArgumentException("Connection with OBS is not established.");
 
         if (!ForceStop)
         {
-            if (Program.LoadedConfig.StopRecordingDelay < 0 || Program.LoadedConfig.StopRecordingDelay > 20)
+            if (this.Program.LoadedConfig.StopRecordingDelay < 0 || this.Program.LoadedConfig.StopRecordingDelay > 20)
             {
                 _logger.LogWarn("StopRecordingDelay was reset to 5. Allowed range for value is between 0 and 20");
-                Program.LoadedConfig.StopRecordingDelay = 5;
+                this.Program.LoadedConfig.StopRecordingDelay = 5;
             }
 
             try
             {
-                var millisecondsDelay = Program.LoadedConfig.StopRecordingDelay;
+                var millisecondsDelay = this.Program.LoadedConfig.StopRecordingDelay;
                 await Task.Delay((millisecondsDelay <= 0 ? 1 : millisecondsDelay) * 1000, this.StopRecordingDelayCancel.Token);
             }
             catch (OperationCanceledException)
@@ -399,33 +393,24 @@ internal class ObsHandler : BaseObsHandler
         }
         else
         {
-            StopRecordingDelayCancel.Cancel();
-            StopRecordingDelayCancel = new();
+            this.StopRecordingDelayCancel.Cancel();
+            this.StopRecordingDelayCancel = new();
         }
 
-        socket.Send(new StopRecord().Build());
+        _ = this.socket.Send(new StopRecord().Build());
     }
 
-    internal override void PauseRecording()
-    {
-        socket.Send(new PauseRecord().Build());
-    }
+    internal override void PauseRecording() => this.socket.Send(new PauseRecord().Build());
 
-    internal override void ResumeRecording()
-    {
-        socket.Send(new ResumeRecord().Build());
-    }
+    internal override void ResumeRecording() => this.socket.Send(new ResumeRecord().Build());
 
-    internal override void SetCurrentScene(string scene)
-    {
-        socket.Send(new SetCurrentProgramScene(scene).Build());
-    }
+    internal override void SetCurrentScene(string scene) => this.socket.Send(new SetCurrentProgramScene(scene).Build());
 
-    internal override bool GetIsRunning() => socket?.IsRunning ?? false;
+    internal override bool GetIsRunning() => this.socket?.IsRunning ?? false;
 
-    internal override bool GetIsRecording() => IsRecording;
+    internal override bool GetIsRecording() => this.IsRecording;
 
-    internal override bool GetIsPaused() => IsPaused;
+    internal override bool GetIsPaused() => this.IsPaused;
 
-    internal override int GetRecordingSeconds() => RecordingSeconds;
+    internal override int GetRecordingSeconds() => this.RecordingSeconds;
 }

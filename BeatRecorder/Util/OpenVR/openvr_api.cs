@@ -2011,11 +2011,11 @@ public class Utils
 			return IntPtr.Zero;
 		}
 
-		int size = System.Text.Encoding.UTF8.GetByteCount(managedString) + 1;
+		var size = System.Text.Encoding.UTF8.GetByteCount(managedString) + 1;
 		if (buffer.Length < size) buffer = new byte[size];
-		int written = System.Text.Encoding.UTF8.GetBytes(managedString, 0, managedString.Length, buffer, 0);
+		var written = System.Text.Encoding.UTF8.GetBytes(managedString, 0, managedString.Length, buffer, 0);
 		buffer[written] = 0x00; // null terminate
-		IntPtr nativeUtf8 = Marshal.AllocHGlobal(written+1);
+		var nativeUtf8 = Marshal.AllocHGlobal(written+1);
 		Marshal.Copy(buffer, 0, nativeUtf8, written+1);
 		return nativeUtf8;
 	}
@@ -2027,17 +2027,17 @@ public class CVRSystem
 	IVRSystem FnTable;
 	internal CVRSystem(IntPtr pInterface)
 	{
-		FnTable = (IVRSystem)Marshal.PtrToStructure(pInterface, typeof(IVRSystem));
+            this.FnTable = (IVRSystem)Marshal.PtrToStructure(pInterface, typeof(IVRSystem));
 	}
 	public void GetRecommendedRenderTargetSize(ref uint pnWidth,ref uint pnHeight)
 	{
 		pnWidth = 0;
 		pnHeight = 0;
-		FnTable.GetRecommendedRenderTargetSize(ref pnWidth,ref pnHeight);
+            this.FnTable.GetRecommendedRenderTargetSize(ref pnWidth,ref pnHeight);
 	}
 	public HmdMatrix44_t GetProjectionMatrix(EVREye eEye,float fNearZ,float fFarZ)
 	{
-		HmdMatrix44_t result = FnTable.GetProjectionMatrix(eEye,fNearZ,fFarZ);
+		var result = this.FnTable.GetProjectionMatrix(eEye,fNearZ,fFarZ);
 		return result;
 	}
 	public void GetProjectionRaw(EVREye eEye,ref float pfLeft,ref float pfRight,ref float pfTop,ref float pfBottom)
@@ -2046,136 +2046,130 @@ public class CVRSystem
 		pfRight = 0;
 		pfTop = 0;
 		pfBottom = 0;
-		FnTable.GetProjectionRaw(eEye,ref pfLeft,ref pfRight,ref pfTop,ref pfBottom);
+            this.FnTable.GetProjectionRaw(eEye,ref pfLeft,ref pfRight,ref pfTop,ref pfBottom);
 	}
 	public bool ComputeDistortion(EVREye eEye,float fU,float fV,ref DistortionCoordinates_t pDistortionCoordinates)
 	{
-		bool result = FnTable.ComputeDistortion(eEye,fU,fV,ref pDistortionCoordinates);
+		var result = this.FnTable.ComputeDistortion(eEye,fU,fV,ref pDistortionCoordinates);
 		return result;
 	}
 	public HmdMatrix34_t GetEyeToHeadTransform(EVREye eEye)
 	{
-		HmdMatrix34_t result = FnTable.GetEyeToHeadTransform(eEye);
+		var result = this.FnTable.GetEyeToHeadTransform(eEye);
 		return result;
 	}
 	public bool GetTimeSinceLastVsync(ref float pfSecondsSinceLastVsync,ref ulong pulFrameCounter)
 	{
 		pfSecondsSinceLastVsync = 0;
 		pulFrameCounter = 0;
-		bool result = FnTable.GetTimeSinceLastVsync(ref pfSecondsSinceLastVsync,ref pulFrameCounter);
+		var result = this.FnTable.GetTimeSinceLastVsync(ref pfSecondsSinceLastVsync,ref pulFrameCounter);
 		return result;
 	}
 	public int GetD3D9AdapterIndex()
 	{
-		int result = FnTable.GetD3D9AdapterIndex();
+		var result = this.FnTable.GetD3D9AdapterIndex();
 		return result;
 	}
 	public void GetDXGIOutputInfo(ref int pnAdapterIndex)
 	{
 		pnAdapterIndex = 0;
-		FnTable.GetDXGIOutputInfo(ref pnAdapterIndex);
+            this.FnTable.GetDXGIOutputInfo(ref pnAdapterIndex);
 	}
 	public void GetOutputDevice(ref ulong pnDevice,ETextureType textureType,IntPtr pInstance)
 	{
 		pnDevice = 0;
-		FnTable.GetOutputDevice(ref pnDevice,textureType,pInstance);
+            this.FnTable.GetOutputDevice(ref pnDevice,textureType,pInstance);
 	}
 	public bool IsDisplayOnDesktop()
 	{
-		bool result = FnTable.IsDisplayOnDesktop();
+		var result = this.FnTable.IsDisplayOnDesktop();
 		return result;
 	}
 	public bool SetDisplayVisibility(bool bIsVisibleOnDesktop)
 	{
-		bool result = FnTable.SetDisplayVisibility(bIsVisibleOnDesktop);
+		var result = this.FnTable.SetDisplayVisibility(bIsVisibleOnDesktop);
 		return result;
 	}
-	public void GetDeviceToAbsoluteTrackingPose(ETrackingUniverseOrigin eOrigin,float fPredictedSecondsToPhotonsFromNow,TrackedDevicePose_t [] pTrackedDevicePoseArray)
+        public void GetDeviceToAbsoluteTrackingPose(ETrackingUniverseOrigin eOrigin, float fPredictedSecondsToPhotonsFromNow, TrackedDevicePose_t[] pTrackedDevicePoseArray) => this.FnTable.GetDeviceToAbsoluteTrackingPose(eOrigin, fPredictedSecondsToPhotonsFromNow, pTrackedDevicePoseArray, (uint)pTrackedDevicePoseArray.Length);
+        public HmdMatrix34_t GetSeatedZeroPoseToStandingAbsoluteTrackingPose()
 	{
-		FnTable.GetDeviceToAbsoluteTrackingPose(eOrigin,fPredictedSecondsToPhotonsFromNow,pTrackedDevicePoseArray,(uint) pTrackedDevicePoseArray.Length);
-	}
-	public HmdMatrix34_t GetSeatedZeroPoseToStandingAbsoluteTrackingPose()
-	{
-		HmdMatrix34_t result = FnTable.GetSeatedZeroPoseToStandingAbsoluteTrackingPose();
+		var result = this.FnTable.GetSeatedZeroPoseToStandingAbsoluteTrackingPose();
 		return result;
 	}
 	public HmdMatrix34_t GetRawZeroPoseToStandingAbsoluteTrackingPose()
 	{
-		HmdMatrix34_t result = FnTable.GetRawZeroPoseToStandingAbsoluteTrackingPose();
+		var result = this.FnTable.GetRawZeroPoseToStandingAbsoluteTrackingPose();
 		return result;
 	}
 	public uint GetSortedTrackedDeviceIndicesOfClass(ETrackedDeviceClass eTrackedDeviceClass,uint [] punTrackedDeviceIndexArray,uint unRelativeToTrackedDeviceIndex)
 	{
-		uint result = FnTable.GetSortedTrackedDeviceIndicesOfClass(eTrackedDeviceClass,punTrackedDeviceIndexArray,(uint) punTrackedDeviceIndexArray.Length,unRelativeToTrackedDeviceIndex);
+		var result = this.FnTable.GetSortedTrackedDeviceIndicesOfClass(eTrackedDeviceClass,punTrackedDeviceIndexArray,(uint) punTrackedDeviceIndexArray.Length,unRelativeToTrackedDeviceIndex);
 		return result;
 	}
 	public EDeviceActivityLevel GetTrackedDeviceActivityLevel(uint unDeviceId)
 	{
-		EDeviceActivityLevel result = FnTable.GetTrackedDeviceActivityLevel(unDeviceId);
+		var result = this.FnTable.GetTrackedDeviceActivityLevel(unDeviceId);
 		return result;
 	}
-	public void ApplyTransform(ref TrackedDevicePose_t pOutputPose,ref TrackedDevicePose_t pTrackedDevicePose,ref HmdMatrix34_t pTransform)
+        public void ApplyTransform(ref TrackedDevicePose_t pOutputPose, ref TrackedDevicePose_t pTrackedDevicePose, ref HmdMatrix34_t pTransform) => this.FnTable.ApplyTransform(ref pOutputPose, ref pTrackedDevicePose, ref pTransform);
+        public uint GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole unDeviceType)
 	{
-		FnTable.ApplyTransform(ref pOutputPose,ref pTrackedDevicePose,ref pTransform);
-	}
-	public uint GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole unDeviceType)
-	{
-		uint result = FnTable.GetTrackedDeviceIndexForControllerRole(unDeviceType);
+		var result = this.FnTable.GetTrackedDeviceIndexForControllerRole(unDeviceType);
 		return result;
 	}
 	public ETrackedControllerRole GetControllerRoleForTrackedDeviceIndex(uint unDeviceIndex)
 	{
-		ETrackedControllerRole result = FnTable.GetControllerRoleForTrackedDeviceIndex(unDeviceIndex);
+		var result = this.FnTable.GetControllerRoleForTrackedDeviceIndex(unDeviceIndex);
 		return result;
 	}
 	public ETrackedDeviceClass GetTrackedDeviceClass(uint unDeviceIndex)
 	{
-		ETrackedDeviceClass result = FnTable.GetTrackedDeviceClass(unDeviceIndex);
+		var result = this.FnTable.GetTrackedDeviceClass(unDeviceIndex);
 		return result;
 	}
 	public bool IsTrackedDeviceConnected(uint unDeviceIndex)
 	{
-		bool result = FnTable.IsTrackedDeviceConnected(unDeviceIndex);
+		var result = this.FnTable.IsTrackedDeviceConnected(unDeviceIndex);
 		return result;
 	}
 	public bool GetBoolTrackedDeviceProperty(uint unDeviceIndex,ETrackedDeviceProperty prop,ref ETrackedPropertyError pError)
 	{
-		bool result = FnTable.GetBoolTrackedDeviceProperty(unDeviceIndex,prop,ref pError);
+		var result = this.FnTable.GetBoolTrackedDeviceProperty(unDeviceIndex,prop,ref pError);
 		return result;
 	}
 	public float GetFloatTrackedDeviceProperty(uint unDeviceIndex,ETrackedDeviceProperty prop,ref ETrackedPropertyError pError)
 	{
-		float result = FnTable.GetFloatTrackedDeviceProperty(unDeviceIndex,prop,ref pError);
+		var result = this.FnTable.GetFloatTrackedDeviceProperty(unDeviceIndex,prop,ref pError);
 		return result;
 	}
 	public int GetInt32TrackedDeviceProperty(uint unDeviceIndex,ETrackedDeviceProperty prop,ref ETrackedPropertyError pError)
 	{
-		int result = FnTable.GetInt32TrackedDeviceProperty(unDeviceIndex,prop,ref pError);
+		var result = this.FnTable.GetInt32TrackedDeviceProperty(unDeviceIndex,prop,ref pError);
 		return result;
 	}
 	public ulong GetUint64TrackedDeviceProperty(uint unDeviceIndex,ETrackedDeviceProperty prop,ref ETrackedPropertyError pError)
 	{
-		ulong result = FnTable.GetUint64TrackedDeviceProperty(unDeviceIndex,prop,ref pError);
+		var result = this.FnTable.GetUint64TrackedDeviceProperty(unDeviceIndex,prop,ref pError);
 		return result;
 	}
 	public HmdMatrix34_t GetMatrix34TrackedDeviceProperty(uint unDeviceIndex,ETrackedDeviceProperty prop,ref ETrackedPropertyError pError)
 	{
-		HmdMatrix34_t result = FnTable.GetMatrix34TrackedDeviceProperty(unDeviceIndex,prop,ref pError);
+		var result = this.FnTable.GetMatrix34TrackedDeviceProperty(unDeviceIndex,prop,ref pError);
 		return result;
 	}
 	public uint GetArrayTrackedDeviceProperty(uint unDeviceIndex,ETrackedDeviceProperty prop,uint propType,IntPtr pBuffer,uint unBufferSize,ref ETrackedPropertyError pError)
 	{
-		uint result = FnTable.GetArrayTrackedDeviceProperty(unDeviceIndex,prop,propType,pBuffer,unBufferSize,ref pError);
+		var result = this.FnTable.GetArrayTrackedDeviceProperty(unDeviceIndex,prop,propType,pBuffer,unBufferSize,ref pError);
 		return result;
 	}
 	public uint GetStringTrackedDeviceProperty(uint unDeviceIndex,ETrackedDeviceProperty prop,System.Text.StringBuilder pchValue,uint unBufferSize,ref ETrackedPropertyError pError)
 	{
-		uint result = FnTable.GetStringTrackedDeviceProperty(unDeviceIndex,prop,pchValue,unBufferSize,ref pError);
+		var result = this.FnTable.GetStringTrackedDeviceProperty(unDeviceIndex,prop,pchValue,unBufferSize,ref pError);
 		return result;
 	}
 	public string GetPropErrorNameFromEnum(ETrackedPropertyError error)
 	{
-		IntPtr result = FnTable.GetPropErrorNameFromEnum(error);
+		var result = this.FnTable.GetPropErrorNameFromEnum(error);
 		return Marshal.PtrToStringAnsi(result);
 	}
 // This is a terrible hack to workaround the fact that VRControllerState_t and VREvent_t were
@@ -2197,31 +2191,31 @@ public class CVRSystem
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			PollNextEventUnion u;
-			VREvent_t_Packed event_packed = new VREvent_t_Packed();
+			var event_packed = new VREvent_t_Packed();
 			u.pPollNextEventPacked = null;
-			u.pPollNextEvent = FnTable.PollNextEvent;
-			bool packed_result = u.pPollNextEventPacked(ref event_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VREvent_t_Packed)));
+			u.pPollNextEvent = this.FnTable.PollNextEvent;
+			var packed_result = u.pPollNextEventPacked(ref event_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VREvent_t_Packed)));
 
 			event_packed.Unpack(ref pEvent);
 			return packed_result;
 		}
 #endif
-		bool result = FnTable.PollNextEvent(ref pEvent,uncbVREvent);
+		var result = this.FnTable.PollNextEvent(ref pEvent,uncbVREvent);
 		return result;
 	}
 	public bool PollNextEventWithPose(ETrackingUniverseOrigin eOrigin,ref VREvent_t pEvent,uint uncbVREvent,ref TrackedDevicePose_t pTrackedDevicePose)
 	{
-		bool result = FnTable.PollNextEventWithPose(eOrigin,ref pEvent,uncbVREvent,ref pTrackedDevicePose);
+		var result = this.FnTable.PollNextEventWithPose(eOrigin,ref pEvent,uncbVREvent,ref pTrackedDevicePose);
 		return result;
 	}
 	public string GetEventTypeNameFromEnum(EVREventType eType)
 	{
-		IntPtr result = FnTable.GetEventTypeNameFromEnum(eType);
+		var result = this.FnTable.GetEventTypeNameFromEnum(eType);
 		return Marshal.PtrToStringAnsi(result);
 	}
 	public HiddenAreaMesh_t GetHiddenAreaMesh(EVREye eEye,EHiddenAreaMeshType type)
 	{
-		HiddenAreaMesh_t result = FnTable.GetHiddenAreaMesh(eEye,type);
+		var result = this.FnTable.GetHiddenAreaMesh(eEye,type);
 		return result;
 	}
 // This is a terrible hack to workaround the fact that VRControllerState_t and VREvent_t were
@@ -2243,16 +2237,16 @@ public class CVRSystem
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			GetControllerStateUnion u;
-			VRControllerState_t_Packed state_packed = new VRControllerState_t_Packed(pControllerState);
+			var state_packed = new VRControllerState_t_Packed(pControllerState);
 			u.pGetControllerStatePacked = null;
-			u.pGetControllerState = FnTable.GetControllerState;
-			bool packed_result = u.pGetControllerStatePacked(unControllerDeviceIndex,ref state_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VRControllerState_t_Packed)));
+			u.pGetControllerState = this.FnTable.GetControllerState;
+			var packed_result = u.pGetControllerStatePacked(unControllerDeviceIndex,ref state_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VRControllerState_t_Packed)));
 
 			state_packed.Unpack(ref pControllerState);
 			return packed_result;
 		}
 #endif
-		bool result = FnTable.GetControllerState(unControllerDeviceIndex,ref pControllerState,unControllerStateSize);
+		var result = this.FnTable.GetControllerState(unControllerDeviceIndex,ref pControllerState,unControllerStateSize);
 		return result;
 	}
 // This is a terrible hack to workaround the fact that VRControllerState_t and VREvent_t were
@@ -2274,69 +2268,63 @@ public class CVRSystem
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			GetControllerStateWithPoseUnion u;
-			VRControllerState_t_Packed state_packed = new VRControllerState_t_Packed(pControllerState);
+			var state_packed = new VRControllerState_t_Packed(pControllerState);
 			u.pGetControllerStateWithPosePacked = null;
-			u.pGetControllerStateWithPose = FnTable.GetControllerStateWithPose;
-			bool packed_result = u.pGetControllerStateWithPosePacked(eOrigin,unControllerDeviceIndex,ref state_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VRControllerState_t_Packed)),ref pTrackedDevicePose);
+			u.pGetControllerStateWithPose = this.FnTable.GetControllerStateWithPose;
+			var packed_result = u.pGetControllerStateWithPosePacked(eOrigin,unControllerDeviceIndex,ref state_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VRControllerState_t_Packed)),ref pTrackedDevicePose);
 
 			state_packed.Unpack(ref pControllerState);
 			return packed_result;
 		}
 #endif
-		bool result = FnTable.GetControllerStateWithPose(eOrigin,unControllerDeviceIndex,ref pControllerState,unControllerStateSize,ref pTrackedDevicePose);
+		var result = this.FnTable.GetControllerStateWithPose(eOrigin,unControllerDeviceIndex,ref pControllerState,unControllerStateSize,ref pTrackedDevicePose);
 		return result;
 	}
-	public void TriggerHapticPulse(uint unControllerDeviceIndex,uint unAxisId,ushort usDurationMicroSec)
+        public void TriggerHapticPulse(uint unControllerDeviceIndex, uint unAxisId, ushort usDurationMicroSec) => this.FnTable.TriggerHapticPulse(unControllerDeviceIndex, unAxisId, usDurationMicroSec);
+        public string GetButtonIdNameFromEnum(EVRButtonId eButtonId)
 	{
-		FnTable.TriggerHapticPulse(unControllerDeviceIndex,unAxisId,usDurationMicroSec);
-	}
-	public string GetButtonIdNameFromEnum(EVRButtonId eButtonId)
-	{
-		IntPtr result = FnTable.GetButtonIdNameFromEnum(eButtonId);
+		var result = this.FnTable.GetButtonIdNameFromEnum(eButtonId);
 		return Marshal.PtrToStringAnsi(result);
 	}
 	public string GetControllerAxisTypeNameFromEnum(EVRControllerAxisType eAxisType)
 	{
-		IntPtr result = FnTable.GetControllerAxisTypeNameFromEnum(eAxisType);
+		var result = this.FnTable.GetControllerAxisTypeNameFromEnum(eAxisType);
 		return Marshal.PtrToStringAnsi(result);
 	}
 	public bool IsInputAvailable()
 	{
-		bool result = FnTable.IsInputAvailable();
+		var result = this.FnTable.IsInputAvailable();
 		return result;
 	}
 	public bool IsSteamVRDrawingControllers()
 	{
-		bool result = FnTable.IsSteamVRDrawingControllers();
+		var result = this.FnTable.IsSteamVRDrawingControllers();
 		return result;
 	}
 	public bool ShouldApplicationPause()
 	{
-		bool result = FnTable.ShouldApplicationPause();
+		var result = this.FnTable.ShouldApplicationPause();
 		return result;
 	}
 	public bool ShouldApplicationReduceRenderingWork()
 	{
-		bool result = FnTable.ShouldApplicationReduceRenderingWork();
+		var result = this.FnTable.ShouldApplicationReduceRenderingWork();
 		return result;
 	}
 	public EVRFirmwareError PerformFirmwareUpdate(uint unDeviceIndex)
 	{
-		EVRFirmwareError result = FnTable.PerformFirmwareUpdate(unDeviceIndex);
+		var result = this.FnTable.PerformFirmwareUpdate(unDeviceIndex);
 		return result;
 	}
-	public void AcknowledgeQuit_Exiting()
+        public void AcknowledgeQuit_Exiting() => this.FnTable.AcknowledgeQuit_Exiting();
+        public uint GetAppContainerFilePaths(System.Text.StringBuilder pchBuffer,uint unBufferSize)
 	{
-		FnTable.AcknowledgeQuit_Exiting();
-	}
-	public uint GetAppContainerFilePaths(System.Text.StringBuilder pchBuffer,uint unBufferSize)
-	{
-		uint result = FnTable.GetAppContainerFilePaths(pchBuffer,unBufferSize);
+		var result = this.FnTable.GetAppContainerFilePaths(pchBuffer,unBufferSize);
 		return result;
 	}
 	public string GetRuntimeVersion()
 	{
-		IntPtr result = FnTable.GetRuntimeVersion();
+		var result = this.FnTable.GetRuntimeVersion();
 		return Marshal.PtrToStringAnsi(result);
 	}
 }
@@ -2347,7 +2335,7 @@ public class CVRExtendedDisplay
 	IVRExtendedDisplay FnTable;
 	internal CVRExtendedDisplay(IntPtr pInterface)
 	{
-		FnTable = (IVRExtendedDisplay)Marshal.PtrToStructure(pInterface, typeof(IVRExtendedDisplay));
+            this.FnTable = (IVRExtendedDisplay)Marshal.PtrToStructure(pInterface, typeof(IVRExtendedDisplay));
 	}
 	public void GetWindowBounds(ref int pnX,ref int pnY,ref uint pnWidth,ref uint pnHeight)
 	{
@@ -2355,7 +2343,7 @@ public class CVRExtendedDisplay
 		pnY = 0;
 		pnWidth = 0;
 		pnHeight = 0;
-		FnTable.GetWindowBounds(ref pnX,ref pnY,ref pnWidth,ref pnHeight);
+            this.FnTable.GetWindowBounds(ref pnX,ref pnY,ref pnWidth,ref pnHeight);
 	}
 	public void GetEyeOutputViewport(EVREye eEye,ref uint pnX,ref uint pnY,ref uint pnWidth,ref uint pnHeight)
 	{
@@ -2363,13 +2351,13 @@ public class CVRExtendedDisplay
 		pnY = 0;
 		pnWidth = 0;
 		pnHeight = 0;
-		FnTable.GetEyeOutputViewport(eEye,ref pnX,ref pnY,ref pnWidth,ref pnHeight);
+            this.FnTable.GetEyeOutputViewport(eEye,ref pnX,ref pnY,ref pnWidth,ref pnHeight);
 	}
 	public void GetDXGIOutputInfo(ref int pnAdapterIndex,ref int pnAdapterOutputIndex)
 	{
 		pnAdapterIndex = 0;
 		pnAdapterOutputIndex = 0;
-		FnTable.GetDXGIOutputInfo(ref pnAdapterIndex,ref pnAdapterOutputIndex);
+            this.FnTable.GetDXGIOutputInfo(ref pnAdapterIndex,ref pnAdapterOutputIndex);
 	}
 }
 
@@ -2379,17 +2367,17 @@ public class CVRTrackedCamera
 	IVRTrackedCamera FnTable;
 	internal CVRTrackedCamera(IntPtr pInterface)
 	{
-		FnTable = (IVRTrackedCamera)Marshal.PtrToStructure(pInterface, typeof(IVRTrackedCamera));
+            this.FnTable = (IVRTrackedCamera)Marshal.PtrToStructure(pInterface, typeof(IVRTrackedCamera));
 	}
 	public string GetCameraErrorNameFromEnum(EVRTrackedCameraError eCameraError)
 	{
-		IntPtr result = FnTable.GetCameraErrorNameFromEnum(eCameraError);
+		var result = this.FnTable.GetCameraErrorNameFromEnum(eCameraError);
 		return Marshal.PtrToStringAnsi(result);
 	}
 	public EVRTrackedCameraError HasCamera(uint nDeviceIndex,ref bool pHasCamera)
 	{
 		pHasCamera = false;
-		EVRTrackedCameraError result = FnTable.HasCamera(nDeviceIndex,ref pHasCamera);
+		var result = this.FnTable.HasCamera(nDeviceIndex,ref pHasCamera);
 		return result;
 	}
 	public EVRTrackedCameraError GetCameraFrameSize(uint nDeviceIndex,EVRTrackedCameraFrameType eFrameType,ref uint pnWidth,ref uint pnHeight,ref uint pnFrameBufferSize)
@@ -2397,65 +2385,62 @@ public class CVRTrackedCamera
 		pnWidth = 0;
 		pnHeight = 0;
 		pnFrameBufferSize = 0;
-		EVRTrackedCameraError result = FnTable.GetCameraFrameSize(nDeviceIndex,eFrameType,ref pnWidth,ref pnHeight,ref pnFrameBufferSize);
+		var result = this.FnTable.GetCameraFrameSize(nDeviceIndex,eFrameType,ref pnWidth,ref pnHeight,ref pnFrameBufferSize);
 		return result;
 	}
 	public EVRTrackedCameraError GetCameraIntrinsics(uint nDeviceIndex,uint nCameraIndex,EVRTrackedCameraFrameType eFrameType,ref HmdVector2_t pFocalLength,ref HmdVector2_t pCenter)
 	{
-		EVRTrackedCameraError result = FnTable.GetCameraIntrinsics(nDeviceIndex,nCameraIndex,eFrameType,ref pFocalLength,ref pCenter);
+		var result = this.FnTable.GetCameraIntrinsics(nDeviceIndex,nCameraIndex,eFrameType,ref pFocalLength,ref pCenter);
 		return result;
 	}
 	public EVRTrackedCameraError GetCameraProjection(uint nDeviceIndex,uint nCameraIndex,EVRTrackedCameraFrameType eFrameType,float flZNear,float flZFar,ref HmdMatrix44_t pProjection)
 	{
-		EVRTrackedCameraError result = FnTable.GetCameraProjection(nDeviceIndex,nCameraIndex,eFrameType,flZNear,flZFar,ref pProjection);
+		var result = this.FnTable.GetCameraProjection(nDeviceIndex,nCameraIndex,eFrameType,flZNear,flZFar,ref pProjection);
 		return result;
 	}
 	public EVRTrackedCameraError AcquireVideoStreamingService(uint nDeviceIndex,ref ulong pHandle)
 	{
 		pHandle = 0;
-		EVRTrackedCameraError result = FnTable.AcquireVideoStreamingService(nDeviceIndex,ref pHandle);
+		var result = this.FnTable.AcquireVideoStreamingService(nDeviceIndex,ref pHandle);
 		return result;
 	}
 	public EVRTrackedCameraError ReleaseVideoStreamingService(ulong hTrackedCamera)
 	{
-		EVRTrackedCameraError result = FnTable.ReleaseVideoStreamingService(hTrackedCamera);
+		var result = this.FnTable.ReleaseVideoStreamingService(hTrackedCamera);
 		return result;
 	}
 	public EVRTrackedCameraError GetVideoStreamFrameBuffer(ulong hTrackedCamera,EVRTrackedCameraFrameType eFrameType,IntPtr pFrameBuffer,uint nFrameBufferSize,ref CameraVideoStreamFrameHeader_t pFrameHeader,uint nFrameHeaderSize)
 	{
-		EVRTrackedCameraError result = FnTable.GetVideoStreamFrameBuffer(hTrackedCamera,eFrameType,pFrameBuffer,nFrameBufferSize,ref pFrameHeader,nFrameHeaderSize);
+		var result = this.FnTable.GetVideoStreamFrameBuffer(hTrackedCamera,eFrameType,pFrameBuffer,nFrameBufferSize,ref pFrameHeader,nFrameHeaderSize);
 		return result;
 	}
 	public EVRTrackedCameraError GetVideoStreamTextureSize(uint nDeviceIndex,EVRTrackedCameraFrameType eFrameType,ref VRTextureBounds_t pTextureBounds,ref uint pnWidth,ref uint pnHeight)
 	{
 		pnWidth = 0;
 		pnHeight = 0;
-		EVRTrackedCameraError result = FnTable.GetVideoStreamTextureSize(nDeviceIndex,eFrameType,ref pTextureBounds,ref pnWidth,ref pnHeight);
+		var result = this.FnTable.GetVideoStreamTextureSize(nDeviceIndex,eFrameType,ref pTextureBounds,ref pnWidth,ref pnHeight);
 		return result;
 	}
 	public EVRTrackedCameraError GetVideoStreamTextureD3D11(ulong hTrackedCamera,EVRTrackedCameraFrameType eFrameType,IntPtr pD3D11DeviceOrResource,ref IntPtr ppD3D11ShaderResourceView,ref CameraVideoStreamFrameHeader_t pFrameHeader,uint nFrameHeaderSize)
 	{
-		EVRTrackedCameraError result = FnTable.GetVideoStreamTextureD3D11(hTrackedCamera,eFrameType,pD3D11DeviceOrResource,ref ppD3D11ShaderResourceView,ref pFrameHeader,nFrameHeaderSize);
+		var result = this.FnTable.GetVideoStreamTextureD3D11(hTrackedCamera,eFrameType,pD3D11DeviceOrResource,ref ppD3D11ShaderResourceView,ref pFrameHeader,nFrameHeaderSize);
 		return result;
 	}
 	public EVRTrackedCameraError GetVideoStreamTextureGL(ulong hTrackedCamera,EVRTrackedCameraFrameType eFrameType,ref uint pglTextureId,ref CameraVideoStreamFrameHeader_t pFrameHeader,uint nFrameHeaderSize)
 	{
 		pglTextureId = 0;
-		EVRTrackedCameraError result = FnTable.GetVideoStreamTextureGL(hTrackedCamera,eFrameType,ref pglTextureId,ref pFrameHeader,nFrameHeaderSize);
+		var result = this.FnTable.GetVideoStreamTextureGL(hTrackedCamera,eFrameType,ref pglTextureId,ref pFrameHeader,nFrameHeaderSize);
 		return result;
 	}
 	public EVRTrackedCameraError ReleaseVideoStreamTextureGL(ulong hTrackedCamera,uint glTextureId)
 	{
-		EVRTrackedCameraError result = FnTable.ReleaseVideoStreamTextureGL(hTrackedCamera,glTextureId);
+		var result = this.FnTable.ReleaseVideoStreamTextureGL(hTrackedCamera,glTextureId);
 		return result;
 	}
-	public void SetCameraTrackingSpace(ETrackingUniverseOrigin eUniverse)
+        public void SetCameraTrackingSpace(ETrackingUniverseOrigin eUniverse) => this.FnTable.SetCameraTrackingSpace(eUniverse);
+        public ETrackingUniverseOrigin GetCameraTrackingSpace()
 	{
-		FnTable.SetCameraTrackingSpace(eUniverse);
-	}
-	public ETrackingUniverseOrigin GetCameraTrackingSpace()
-	{
-		ETrackingUniverseOrigin result = FnTable.GetCameraTrackingSpace();
+		var result = this.FnTable.GetCameraTrackingSpace();
 		return result;
 	}
 }
@@ -2466,200 +2451,200 @@ public class CVRApplications
 	IVRApplications FnTable;
 	internal CVRApplications(IntPtr pInterface)
 	{
-		FnTable = (IVRApplications)Marshal.PtrToStructure(pInterface, typeof(IVRApplications));
+            this.FnTable = (IVRApplications)Marshal.PtrToStructure(pInterface, typeof(IVRApplications));
 	}
 	public EVRApplicationError AddApplicationManifest(string pchApplicationManifestFullPath,bool bTemporary)
 	{
-		IntPtr pchApplicationManifestFullPathUtf8 = Utils.ToUtf8(pchApplicationManifestFullPath);
-		EVRApplicationError result = FnTable.AddApplicationManifest(pchApplicationManifestFullPathUtf8,bTemporary);
+		var pchApplicationManifestFullPathUtf8 = Utils.ToUtf8(pchApplicationManifestFullPath);
+		var result = this.FnTable.AddApplicationManifest(pchApplicationManifestFullPathUtf8,bTemporary);
 		Marshal.FreeHGlobal(pchApplicationManifestFullPathUtf8);
 		return result;
 	}
 	public EVRApplicationError RemoveApplicationManifest(string pchApplicationManifestFullPath)
 	{
-		IntPtr pchApplicationManifestFullPathUtf8 = Utils.ToUtf8(pchApplicationManifestFullPath);
-		EVRApplicationError result = FnTable.RemoveApplicationManifest(pchApplicationManifestFullPathUtf8);
+		var pchApplicationManifestFullPathUtf8 = Utils.ToUtf8(pchApplicationManifestFullPath);
+		var result = this.FnTable.RemoveApplicationManifest(pchApplicationManifestFullPathUtf8);
 		Marshal.FreeHGlobal(pchApplicationManifestFullPathUtf8);
 		return result;
 	}
 	public bool IsApplicationInstalled(string pchAppKey)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		bool result = FnTable.IsApplicationInstalled(pchAppKeyUtf8);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.IsApplicationInstalled(pchAppKeyUtf8);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public uint GetApplicationCount()
 	{
-		uint result = FnTable.GetApplicationCount();
+		var result = this.FnTable.GetApplicationCount();
 		return result;
 	}
 	public EVRApplicationError GetApplicationKeyByIndex(uint unApplicationIndex,System.Text.StringBuilder pchAppKeyBuffer,uint unAppKeyBufferLen)
 	{
-		EVRApplicationError result = FnTable.GetApplicationKeyByIndex(unApplicationIndex,pchAppKeyBuffer,unAppKeyBufferLen);
+		var result = this.FnTable.GetApplicationKeyByIndex(unApplicationIndex,pchAppKeyBuffer,unAppKeyBufferLen);
 		return result;
 	}
 	public EVRApplicationError GetApplicationKeyByProcessId(uint unProcessId,System.Text.StringBuilder pchAppKeyBuffer,uint unAppKeyBufferLen)
 	{
-		EVRApplicationError result = FnTable.GetApplicationKeyByProcessId(unProcessId,pchAppKeyBuffer,unAppKeyBufferLen);
+		var result = this.FnTable.GetApplicationKeyByProcessId(unProcessId,pchAppKeyBuffer,unAppKeyBufferLen);
 		return result;
 	}
 	public EVRApplicationError LaunchApplication(string pchAppKey)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		EVRApplicationError result = FnTable.LaunchApplication(pchAppKeyUtf8);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.LaunchApplication(pchAppKeyUtf8);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public EVRApplicationError LaunchTemplateApplication(string pchTemplateAppKey,string pchNewAppKey,AppOverrideKeys_t [] pKeys)
 	{
-		IntPtr pchTemplateAppKeyUtf8 = Utils.ToUtf8(pchTemplateAppKey);
-		IntPtr pchNewAppKeyUtf8 = Utils.ToUtf8(pchNewAppKey);
-		EVRApplicationError result = FnTable.LaunchTemplateApplication(pchTemplateAppKeyUtf8,pchNewAppKeyUtf8,pKeys,(uint) pKeys.Length);
+		var pchTemplateAppKeyUtf8 = Utils.ToUtf8(pchTemplateAppKey);
+		var pchNewAppKeyUtf8 = Utils.ToUtf8(pchNewAppKey);
+		var result = this.FnTable.LaunchTemplateApplication(pchTemplateAppKeyUtf8,pchNewAppKeyUtf8,pKeys,(uint) pKeys.Length);
 		Marshal.FreeHGlobal(pchTemplateAppKeyUtf8);
 		Marshal.FreeHGlobal(pchNewAppKeyUtf8);
 		return result;
 	}
 	public EVRApplicationError LaunchApplicationFromMimeType(string pchMimeType,string pchArgs)
 	{
-		IntPtr pchMimeTypeUtf8 = Utils.ToUtf8(pchMimeType);
-		IntPtr pchArgsUtf8 = Utils.ToUtf8(pchArgs);
-		EVRApplicationError result = FnTable.LaunchApplicationFromMimeType(pchMimeTypeUtf8,pchArgsUtf8);
+		var pchMimeTypeUtf8 = Utils.ToUtf8(pchMimeType);
+		var pchArgsUtf8 = Utils.ToUtf8(pchArgs);
+		var result = this.FnTable.LaunchApplicationFromMimeType(pchMimeTypeUtf8,pchArgsUtf8);
 		Marshal.FreeHGlobal(pchMimeTypeUtf8);
 		Marshal.FreeHGlobal(pchArgsUtf8);
 		return result;
 	}
 	public EVRApplicationError LaunchDashboardOverlay(string pchAppKey)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		EVRApplicationError result = FnTable.LaunchDashboardOverlay(pchAppKeyUtf8);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.LaunchDashboardOverlay(pchAppKeyUtf8);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public bool CancelApplicationLaunch(string pchAppKey)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		bool result = FnTable.CancelApplicationLaunch(pchAppKeyUtf8);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.CancelApplicationLaunch(pchAppKeyUtf8);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public EVRApplicationError IdentifyApplication(uint unProcessId,string pchAppKey)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		EVRApplicationError result = FnTable.IdentifyApplication(unProcessId,pchAppKeyUtf8);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.IdentifyApplication(unProcessId,pchAppKeyUtf8);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public uint GetApplicationProcessId(string pchAppKey)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		uint result = FnTable.GetApplicationProcessId(pchAppKeyUtf8);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.GetApplicationProcessId(pchAppKeyUtf8);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public string GetApplicationsErrorNameFromEnum(EVRApplicationError error)
 	{
-		IntPtr result = FnTable.GetApplicationsErrorNameFromEnum(error);
+		var result = this.FnTable.GetApplicationsErrorNameFromEnum(error);
 		return Marshal.PtrToStringAnsi(result);
 	}
 	public uint GetApplicationPropertyString(string pchAppKey,EVRApplicationProperty eProperty,System.Text.StringBuilder pchPropertyValueBuffer,uint unPropertyValueBufferLen,ref EVRApplicationError peError)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		uint result = FnTable.GetApplicationPropertyString(pchAppKeyUtf8,eProperty,pchPropertyValueBuffer,unPropertyValueBufferLen,ref peError);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.GetApplicationPropertyString(pchAppKeyUtf8,eProperty,pchPropertyValueBuffer,unPropertyValueBufferLen,ref peError);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public bool GetApplicationPropertyBool(string pchAppKey,EVRApplicationProperty eProperty,ref EVRApplicationError peError)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		bool result = FnTable.GetApplicationPropertyBool(pchAppKeyUtf8,eProperty,ref peError);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.GetApplicationPropertyBool(pchAppKeyUtf8,eProperty,ref peError);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public ulong GetApplicationPropertyUint64(string pchAppKey,EVRApplicationProperty eProperty,ref EVRApplicationError peError)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		ulong result = FnTable.GetApplicationPropertyUint64(pchAppKeyUtf8,eProperty,ref peError);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.GetApplicationPropertyUint64(pchAppKeyUtf8,eProperty,ref peError);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public EVRApplicationError SetApplicationAutoLaunch(string pchAppKey,bool bAutoLaunch)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		EVRApplicationError result = FnTable.SetApplicationAutoLaunch(pchAppKeyUtf8,bAutoLaunch);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.SetApplicationAutoLaunch(pchAppKeyUtf8,bAutoLaunch);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public bool GetApplicationAutoLaunch(string pchAppKey)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		bool result = FnTable.GetApplicationAutoLaunch(pchAppKeyUtf8);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.GetApplicationAutoLaunch(pchAppKeyUtf8);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public EVRApplicationError SetDefaultApplicationForMimeType(string pchAppKey,string pchMimeType)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		IntPtr pchMimeTypeUtf8 = Utils.ToUtf8(pchMimeType);
-		EVRApplicationError result = FnTable.SetDefaultApplicationForMimeType(pchAppKeyUtf8,pchMimeTypeUtf8);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var pchMimeTypeUtf8 = Utils.ToUtf8(pchMimeType);
+		var result = this.FnTable.SetDefaultApplicationForMimeType(pchAppKeyUtf8,pchMimeTypeUtf8);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		Marshal.FreeHGlobal(pchMimeTypeUtf8);
 		return result;
 	}
 	public bool GetDefaultApplicationForMimeType(string pchMimeType,System.Text.StringBuilder pchAppKeyBuffer,uint unAppKeyBufferLen)
 	{
-		IntPtr pchMimeTypeUtf8 = Utils.ToUtf8(pchMimeType);
-		bool result = FnTable.GetDefaultApplicationForMimeType(pchMimeTypeUtf8,pchAppKeyBuffer,unAppKeyBufferLen);
+		var pchMimeTypeUtf8 = Utils.ToUtf8(pchMimeType);
+		var result = this.FnTable.GetDefaultApplicationForMimeType(pchMimeTypeUtf8,pchAppKeyBuffer,unAppKeyBufferLen);
 		Marshal.FreeHGlobal(pchMimeTypeUtf8);
 		return result;
 	}
 	public bool GetApplicationSupportedMimeTypes(string pchAppKey,System.Text.StringBuilder pchMimeTypesBuffer,uint unMimeTypesBuffer)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		bool result = FnTable.GetApplicationSupportedMimeTypes(pchAppKeyUtf8,pchMimeTypesBuffer,unMimeTypesBuffer);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.GetApplicationSupportedMimeTypes(pchAppKeyUtf8,pchMimeTypesBuffer,unMimeTypesBuffer);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public uint GetApplicationsThatSupportMimeType(string pchMimeType,System.Text.StringBuilder pchAppKeysThatSupportBuffer,uint unAppKeysThatSupportBuffer)
 	{
-		IntPtr pchMimeTypeUtf8 = Utils.ToUtf8(pchMimeType);
-		uint result = FnTable.GetApplicationsThatSupportMimeType(pchMimeTypeUtf8,pchAppKeysThatSupportBuffer,unAppKeysThatSupportBuffer);
+		var pchMimeTypeUtf8 = Utils.ToUtf8(pchMimeType);
+		var result = this.FnTable.GetApplicationsThatSupportMimeType(pchMimeTypeUtf8,pchAppKeysThatSupportBuffer,unAppKeysThatSupportBuffer);
 		Marshal.FreeHGlobal(pchMimeTypeUtf8);
 		return result;
 	}
 	public uint GetApplicationLaunchArguments(uint unHandle,System.Text.StringBuilder pchArgs,uint unArgs)
 	{
-		uint result = FnTable.GetApplicationLaunchArguments(unHandle,pchArgs,unArgs);
+		var result = this.FnTable.GetApplicationLaunchArguments(unHandle,pchArgs,unArgs);
 		return result;
 	}
 	public EVRApplicationError GetStartingApplication(System.Text.StringBuilder pchAppKeyBuffer,uint unAppKeyBufferLen)
 	{
-		EVRApplicationError result = FnTable.GetStartingApplication(pchAppKeyBuffer,unAppKeyBufferLen);
+		var result = this.FnTable.GetStartingApplication(pchAppKeyBuffer,unAppKeyBufferLen);
 		return result;
 	}
 	public EVRSceneApplicationState GetSceneApplicationState()
 	{
-		EVRSceneApplicationState result = FnTable.GetSceneApplicationState();
+		var result = this.FnTable.GetSceneApplicationState();
 		return result;
 	}
 	public EVRApplicationError PerformApplicationPrelaunchCheck(string pchAppKey)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		EVRApplicationError result = FnTable.PerformApplicationPrelaunchCheck(pchAppKeyUtf8);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.PerformApplicationPrelaunchCheck(pchAppKeyUtf8);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public string GetSceneApplicationStateNameFromEnum(EVRSceneApplicationState state)
 	{
-		IntPtr result = FnTable.GetSceneApplicationStateNameFromEnum(state);
+		var result = this.FnTable.GetSceneApplicationStateNameFromEnum(state);
 		return Marshal.PtrToStringAnsi(result);
 	}
 	public EVRApplicationError LaunchInternalProcess(string pchBinaryPath,string pchArguments,string pchWorkingDirectory)
 	{
-		IntPtr pchBinaryPathUtf8 = Utils.ToUtf8(pchBinaryPath);
-		IntPtr pchArgumentsUtf8 = Utils.ToUtf8(pchArguments);
-		IntPtr pchWorkingDirectoryUtf8 = Utils.ToUtf8(pchWorkingDirectory);
-		EVRApplicationError result = FnTable.LaunchInternalProcess(pchBinaryPathUtf8,pchArgumentsUtf8,pchWorkingDirectoryUtf8);
+		var pchBinaryPathUtf8 = Utils.ToUtf8(pchBinaryPath);
+		var pchArgumentsUtf8 = Utils.ToUtf8(pchArguments);
+		var pchWorkingDirectoryUtf8 = Utils.ToUtf8(pchWorkingDirectory);
+		var result = this.FnTable.LaunchInternalProcess(pchBinaryPathUtf8,pchArgumentsUtf8,pchWorkingDirectoryUtf8);
 		Marshal.FreeHGlobal(pchBinaryPathUtf8);
 		Marshal.FreeHGlobal(pchArgumentsUtf8);
 		Marshal.FreeHGlobal(pchWorkingDirectoryUtf8);
@@ -2667,7 +2652,7 @@ public class CVRApplications
 	}
 	public uint GetCurrentSceneProcessId()
 	{
-		uint result = FnTable.GetCurrentSceneProcessId();
+		var result = this.FnTable.GetCurrentSceneProcessId();
 		return result;
 	}
 }
@@ -2678,51 +2663,36 @@ public class CVRChaperone
 	IVRChaperone FnTable;
 	internal CVRChaperone(IntPtr pInterface)
 	{
-		FnTable = (IVRChaperone)Marshal.PtrToStructure(pInterface, typeof(IVRChaperone));
+            this.FnTable = (IVRChaperone)Marshal.PtrToStructure(pInterface, typeof(IVRChaperone));
 	}
 	public ChaperoneCalibrationState GetCalibrationState()
 	{
-		ChaperoneCalibrationState result = FnTable.GetCalibrationState();
+		var result = this.FnTable.GetCalibrationState();
 		return result;
 	}
 	public bool GetPlayAreaSize(ref float pSizeX,ref float pSizeZ)
 	{
 		pSizeX = 0;
 		pSizeZ = 0;
-		bool result = FnTable.GetPlayAreaSize(ref pSizeX,ref pSizeZ);
+		var result = this.FnTable.GetPlayAreaSize(ref pSizeX,ref pSizeZ);
 		return result;
 	}
 	public bool GetPlayAreaRect(ref HmdQuad_t rect)
 	{
-		bool result = FnTable.GetPlayAreaRect(ref rect);
+		var result = this.FnTable.GetPlayAreaRect(ref rect);
 		return result;
 	}
-	public void ReloadInfo()
+        public void ReloadInfo() => this.FnTable.ReloadInfo();
+        public void SetSceneColor(HmdColor_t color) => this.FnTable.SetSceneColor(color);
+        public void GetBoundsColor(ref HmdColor_t pOutputColorArray, int nNumOutputColors, float flCollisionBoundsFadeDistance, ref HmdColor_t pOutputCameraColor) => this.FnTable.GetBoundsColor(ref pOutputColorArray, nNumOutputColors, flCollisionBoundsFadeDistance, ref pOutputCameraColor);
+        public bool AreBoundsVisible()
 	{
-		FnTable.ReloadInfo();
-	}
-	public void SetSceneColor(HmdColor_t color)
-	{
-		FnTable.SetSceneColor(color);
-	}
-	public void GetBoundsColor(ref HmdColor_t pOutputColorArray,int nNumOutputColors,float flCollisionBoundsFadeDistance,ref HmdColor_t pOutputCameraColor)
-	{
-		FnTable.GetBoundsColor(ref pOutputColorArray,nNumOutputColors,flCollisionBoundsFadeDistance,ref pOutputCameraColor);
-	}
-	public bool AreBoundsVisible()
-	{
-		bool result = FnTable.AreBoundsVisible();
+		var result = this.FnTable.AreBoundsVisible();
 		return result;
 	}
-	public void ForceBoundsVisible(bool bForce)
-	{
-		FnTable.ForceBoundsVisible(bForce);
-	}
-	public void ResetZeroPose(ETrackingUniverseOrigin eTrackingUniverseOrigin)
-	{
-		FnTable.ResetZeroPose(eTrackingUniverseOrigin);
-	}
-}
+        public void ForceBoundsVisible(bool bForce) => this.FnTable.ForceBoundsVisible(bForce);
+        public void ResetZeroPose(ETrackingUniverseOrigin eTrackingUniverseOrigin) => this.FnTable.ResetZeroPose(eTrackingUniverseOrigin);
+    }
 
 
 public class CVRChaperoneSetup
@@ -2730,110 +2700,80 @@ public class CVRChaperoneSetup
 	IVRChaperoneSetup FnTable;
 	internal CVRChaperoneSetup(IntPtr pInterface)
 	{
-		FnTable = (IVRChaperoneSetup)Marshal.PtrToStructure(pInterface, typeof(IVRChaperoneSetup));
+            this.FnTable = (IVRChaperoneSetup)Marshal.PtrToStructure(pInterface, typeof(IVRChaperoneSetup));
 	}
 	public bool CommitWorkingCopy(EChaperoneConfigFile configFile)
 	{
-		bool result = FnTable.CommitWorkingCopy(configFile);
+		var result = this.FnTable.CommitWorkingCopy(configFile);
 		return result;
 	}
-	public void RevertWorkingCopy()
-	{
-		FnTable.RevertWorkingCopy();
-	}
-	public bool GetWorkingPlayAreaSize(ref float pSizeX,ref float pSizeZ)
+        public void RevertWorkingCopy() => this.FnTable.RevertWorkingCopy();
+        public bool GetWorkingPlayAreaSize(ref float pSizeX,ref float pSizeZ)
 	{
 		pSizeX = 0;
 		pSizeZ = 0;
-		bool result = FnTable.GetWorkingPlayAreaSize(ref pSizeX,ref pSizeZ);
+		var result = this.FnTable.GetWorkingPlayAreaSize(ref pSizeX,ref pSizeZ);
 		return result;
 	}
 	public bool GetWorkingPlayAreaRect(ref HmdQuad_t rect)
 	{
-		bool result = FnTable.GetWorkingPlayAreaRect(ref rect);
+		var result = this.FnTable.GetWorkingPlayAreaRect(ref rect);
 		return result;
 	}
 	public bool GetWorkingCollisionBoundsInfo(out HmdQuad_t [] pQuadsBuffer)
 	{
 		uint punQuadsCount = 0;
-		bool result = FnTable.GetWorkingCollisionBoundsInfo(null,ref punQuadsCount);
+		var result = this.FnTable.GetWorkingCollisionBoundsInfo(null,ref punQuadsCount);
 		pQuadsBuffer= new HmdQuad_t[punQuadsCount];
-		result = FnTable.GetWorkingCollisionBoundsInfo(pQuadsBuffer,ref punQuadsCount);
+		result = this.FnTable.GetWorkingCollisionBoundsInfo(pQuadsBuffer,ref punQuadsCount);
 		return result;
 	}
 	public bool GetLiveCollisionBoundsInfo(out HmdQuad_t [] pQuadsBuffer)
 	{
 		uint punQuadsCount = 0;
-		bool result = FnTable.GetLiveCollisionBoundsInfo(null,ref punQuadsCount);
+		var result = this.FnTable.GetLiveCollisionBoundsInfo(null,ref punQuadsCount);
 		pQuadsBuffer= new HmdQuad_t[punQuadsCount];
-		result = FnTable.GetLiveCollisionBoundsInfo(pQuadsBuffer,ref punQuadsCount);
+		result = this.FnTable.GetLiveCollisionBoundsInfo(pQuadsBuffer,ref punQuadsCount);
 		return result;
 	}
 	public bool GetWorkingSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatSeatedZeroPoseToRawTrackingPose)
 	{
-		bool result = FnTable.GetWorkingSeatedZeroPoseToRawTrackingPose(ref pmatSeatedZeroPoseToRawTrackingPose);
+		var result = this.FnTable.GetWorkingSeatedZeroPoseToRawTrackingPose(ref pmatSeatedZeroPoseToRawTrackingPose);
 		return result;
 	}
 	public bool GetWorkingStandingZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatStandingZeroPoseToRawTrackingPose)
 	{
-		bool result = FnTable.GetWorkingStandingZeroPoseToRawTrackingPose(ref pmatStandingZeroPoseToRawTrackingPose);
+		var result = this.FnTable.GetWorkingStandingZeroPoseToRawTrackingPose(ref pmatStandingZeroPoseToRawTrackingPose);
 		return result;
 	}
-	public void SetWorkingPlayAreaSize(float sizeX,float sizeZ)
+        public void SetWorkingPlayAreaSize(float sizeX, float sizeZ) => this.FnTable.SetWorkingPlayAreaSize(sizeX, sizeZ);
+        public void SetWorkingCollisionBoundsInfo(HmdQuad_t[] pQuadsBuffer) => this.FnTable.SetWorkingCollisionBoundsInfo(pQuadsBuffer, (uint)pQuadsBuffer.Length);
+        public void SetWorkingPerimeter(HmdVector2_t[] pPointBuffer) => this.FnTable.SetWorkingPerimeter(pPointBuffer, (uint)pPointBuffer.Length);
+        public void SetWorkingSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pMatSeatedZeroPoseToRawTrackingPose) => this.FnTable.SetWorkingSeatedZeroPoseToRawTrackingPose(ref pMatSeatedZeroPoseToRawTrackingPose);
+        public void SetWorkingStandingZeroPoseToRawTrackingPose(ref HmdMatrix34_t pMatStandingZeroPoseToRawTrackingPose) => this.FnTable.SetWorkingStandingZeroPoseToRawTrackingPose(ref pMatStandingZeroPoseToRawTrackingPose);
+        public void ReloadFromDisk(EChaperoneConfigFile configFile) => this.FnTable.ReloadFromDisk(configFile);
+        public bool GetLiveSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatSeatedZeroPoseToRawTrackingPose)
 	{
-		FnTable.SetWorkingPlayAreaSize(sizeX,sizeZ);
-	}
-	public void SetWorkingCollisionBoundsInfo(HmdQuad_t [] pQuadsBuffer)
-	{
-		FnTable.SetWorkingCollisionBoundsInfo(pQuadsBuffer,(uint) pQuadsBuffer.Length);
-	}
-	public void SetWorkingPerimeter(HmdVector2_t [] pPointBuffer)
-	{
-		FnTable.SetWorkingPerimeter(pPointBuffer,(uint) pPointBuffer.Length);
-	}
-	public void SetWorkingSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pMatSeatedZeroPoseToRawTrackingPose)
-	{
-		FnTable.SetWorkingSeatedZeroPoseToRawTrackingPose(ref pMatSeatedZeroPoseToRawTrackingPose);
-	}
-	public void SetWorkingStandingZeroPoseToRawTrackingPose(ref HmdMatrix34_t pMatStandingZeroPoseToRawTrackingPose)
-	{
-		FnTable.SetWorkingStandingZeroPoseToRawTrackingPose(ref pMatStandingZeroPoseToRawTrackingPose);
-	}
-	public void ReloadFromDisk(EChaperoneConfigFile configFile)
-	{
-		FnTable.ReloadFromDisk(configFile);
-	}
-	public bool GetLiveSeatedZeroPoseToRawTrackingPose(ref HmdMatrix34_t pmatSeatedZeroPoseToRawTrackingPose)
-	{
-		bool result = FnTable.GetLiveSeatedZeroPoseToRawTrackingPose(ref pmatSeatedZeroPoseToRawTrackingPose);
+		var result = this.FnTable.GetLiveSeatedZeroPoseToRawTrackingPose(ref pmatSeatedZeroPoseToRawTrackingPose);
 		return result;
 	}
 	public bool ExportLiveToBuffer(System.Text.StringBuilder pBuffer,ref uint pnBufferLength)
 	{
 		pnBufferLength = 0;
-		bool result = FnTable.ExportLiveToBuffer(pBuffer,ref pnBufferLength);
+		var result = this.FnTable.ExportLiveToBuffer(pBuffer,ref pnBufferLength);
 		return result;
 	}
 	public bool ImportFromBufferToWorking(string pBuffer,uint nImportFlags)
 	{
-		IntPtr pBufferUtf8 = Utils.ToUtf8(pBuffer);
-		bool result = FnTable.ImportFromBufferToWorking(pBufferUtf8,nImportFlags);
+		var pBufferUtf8 = Utils.ToUtf8(pBuffer);
+		var result = this.FnTable.ImportFromBufferToWorking(pBufferUtf8,nImportFlags);
 		Marshal.FreeHGlobal(pBufferUtf8);
 		return result;
 	}
-	public void ShowWorkingSetPreview()
-	{
-		FnTable.ShowWorkingSetPreview();
-	}
-	public void HideWorkingSetPreview()
-	{
-		FnTable.HideWorkingSetPreview();
-	}
-	public void RoomSetupStarting()
-	{
-		FnTable.RoomSetupStarting();
-	}
-}
+        public void ShowWorkingSetPreview() => this.FnTable.ShowWorkingSetPreview();
+        public void HideWorkingSetPreview() => this.FnTable.HideWorkingSetPreview();
+        public void RoomSetupStarting() => this.FnTable.RoomSetupStarting();
+    }
 
 
 public class CVRCompositor
@@ -2841,245 +2781,182 @@ public class CVRCompositor
 	IVRCompositor FnTable;
 	internal CVRCompositor(IntPtr pInterface)
 	{
-		FnTable = (IVRCompositor)Marshal.PtrToStructure(pInterface, typeof(IVRCompositor));
+            this.FnTable = (IVRCompositor)Marshal.PtrToStructure(pInterface, typeof(IVRCompositor));
 	}
-	public void SetTrackingSpace(ETrackingUniverseOrigin eOrigin)
+        public void SetTrackingSpace(ETrackingUniverseOrigin eOrigin) => this.FnTable.SetTrackingSpace(eOrigin);
+        public ETrackingUniverseOrigin GetTrackingSpace()
 	{
-		FnTable.SetTrackingSpace(eOrigin);
-	}
-	public ETrackingUniverseOrigin GetTrackingSpace()
-	{
-		ETrackingUniverseOrigin result = FnTable.GetTrackingSpace();
+		var result = this.FnTable.GetTrackingSpace();
 		return result;
 	}
 	public EVRCompositorError WaitGetPoses(TrackedDevicePose_t [] pRenderPoseArray,TrackedDevicePose_t [] pGamePoseArray)
 	{
-		EVRCompositorError result = FnTable.WaitGetPoses(pRenderPoseArray,(uint) pRenderPoseArray.Length,pGamePoseArray,(uint) pGamePoseArray.Length);
+		var result = this.FnTable.WaitGetPoses(pRenderPoseArray,(uint) pRenderPoseArray.Length,pGamePoseArray,(uint) pGamePoseArray.Length);
 		return result;
 	}
 	public EVRCompositorError GetLastPoses(TrackedDevicePose_t [] pRenderPoseArray,TrackedDevicePose_t [] pGamePoseArray)
 	{
-		EVRCompositorError result = FnTable.GetLastPoses(pRenderPoseArray,(uint) pRenderPoseArray.Length,pGamePoseArray,(uint) pGamePoseArray.Length);
+		var result = this.FnTable.GetLastPoses(pRenderPoseArray,(uint) pRenderPoseArray.Length,pGamePoseArray,(uint) pGamePoseArray.Length);
 		return result;
 	}
 	public EVRCompositorError GetLastPoseForTrackedDeviceIndex(uint unDeviceIndex,ref TrackedDevicePose_t pOutputPose,ref TrackedDevicePose_t pOutputGamePose)
 	{
-		EVRCompositorError result = FnTable.GetLastPoseForTrackedDeviceIndex(unDeviceIndex,ref pOutputPose,ref pOutputGamePose);
+		var result = this.FnTable.GetLastPoseForTrackedDeviceIndex(unDeviceIndex,ref pOutputPose,ref pOutputGamePose);
 		return result;
 	}
 	public EVRCompositorError Submit(EVREye eEye,ref Texture_t pTexture,ref VRTextureBounds_t pBounds,EVRSubmitFlags nSubmitFlags)
 	{
-		EVRCompositorError result = FnTable.Submit(eEye,ref pTexture,ref pBounds,nSubmitFlags);
+		var result = this.FnTable.Submit(eEye,ref pTexture,ref pBounds,nSubmitFlags);
 		return result;
 	}
-	public void ClearLastSubmittedFrame()
+        public void ClearLastSubmittedFrame() => this.FnTable.ClearLastSubmittedFrame();
+        public void PostPresentHandoff() => this.FnTable.PostPresentHandoff();
+        public bool GetFrameTiming(ref Compositor_FrameTiming pTiming,uint unFramesAgo)
 	{
-		FnTable.ClearLastSubmittedFrame();
-	}
-	public void PostPresentHandoff()
-	{
-		FnTable.PostPresentHandoff();
-	}
-	public bool GetFrameTiming(ref Compositor_FrameTiming pTiming,uint unFramesAgo)
-	{
-		bool result = FnTable.GetFrameTiming(ref pTiming,unFramesAgo);
+		var result = this.FnTable.GetFrameTiming(ref pTiming,unFramesAgo);
 		return result;
 	}
 	public uint GetFrameTimings(Compositor_FrameTiming [] pTiming)
 	{
-		uint result = FnTable.GetFrameTimings(pTiming,(uint) pTiming.Length);
+		var result = this.FnTable.GetFrameTimings(pTiming,(uint) pTiming.Length);
 		return result;
 	}
 	public float GetFrameTimeRemaining()
 	{
-		float result = FnTable.GetFrameTimeRemaining();
+		var result = this.FnTable.GetFrameTimeRemaining();
 		return result;
 	}
-	public void GetCumulativeStats(ref Compositor_CumulativeStats pStats,uint nStatsSizeInBytes)
+        public void GetCumulativeStats(ref Compositor_CumulativeStats pStats, uint nStatsSizeInBytes) => this.FnTable.GetCumulativeStats(ref pStats, nStatsSizeInBytes);
+        public void FadeToColor(float fSeconds, float fRed, float fGreen, float fBlue, float fAlpha, bool bBackground) => this.FnTable.FadeToColor(fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground);
+        public HmdColor_t GetCurrentFadeColor(bool bBackground)
 	{
-		FnTable.GetCumulativeStats(ref pStats,nStatsSizeInBytes);
-	}
-	public void FadeToColor(float fSeconds,float fRed,float fGreen,float fBlue,float fAlpha,bool bBackground)
-	{
-		FnTable.FadeToColor(fSeconds,fRed,fGreen,fBlue,fAlpha,bBackground);
-	}
-	public HmdColor_t GetCurrentFadeColor(bool bBackground)
-	{
-		HmdColor_t result = FnTable.GetCurrentFadeColor(bBackground);
+		var result = this.FnTable.GetCurrentFadeColor(bBackground);
 		return result;
 	}
-	public void FadeGrid(float fSeconds,bool bFadeGridIn)
+        public void FadeGrid(float fSeconds, bool bFadeGridIn) => this.FnTable.FadeGrid(fSeconds, bFadeGridIn);
+        public float GetCurrentGridAlpha()
 	{
-		FnTable.FadeGrid(fSeconds,bFadeGridIn);
-	}
-	public float GetCurrentGridAlpha()
-	{
-		float result = FnTable.GetCurrentGridAlpha();
+		var result = this.FnTable.GetCurrentGridAlpha();
 		return result;
 	}
 	public EVRCompositorError SetSkyboxOverride(Texture_t [] pTextures)
 	{
-		EVRCompositorError result = FnTable.SetSkyboxOverride(pTextures,(uint) pTextures.Length);
+		var result = this.FnTable.SetSkyboxOverride(pTextures,(uint) pTextures.Length);
 		return result;
 	}
-	public void ClearSkyboxOverride()
+        public void ClearSkyboxOverride() => this.FnTable.ClearSkyboxOverride();
+        public void CompositorBringToFront() => this.FnTable.CompositorBringToFront();
+        public void CompositorGoToBack() => this.FnTable.CompositorGoToBack();
+        public void CompositorQuit() => this.FnTable.CompositorQuit();
+        public bool IsFullscreen()
 	{
-		FnTable.ClearSkyboxOverride();
-	}
-	public void CompositorBringToFront()
-	{
-		FnTable.CompositorBringToFront();
-	}
-	public void CompositorGoToBack()
-	{
-		FnTable.CompositorGoToBack();
-	}
-	public void CompositorQuit()
-	{
-		FnTable.CompositorQuit();
-	}
-	public bool IsFullscreen()
-	{
-		bool result = FnTable.IsFullscreen();
+		var result = this.FnTable.IsFullscreen();
 		return result;
 	}
 	public uint GetCurrentSceneFocusProcess()
 	{
-		uint result = FnTable.GetCurrentSceneFocusProcess();
+		var result = this.FnTable.GetCurrentSceneFocusProcess();
 		return result;
 	}
 	public uint GetLastFrameRenderer()
 	{
-		uint result = FnTable.GetLastFrameRenderer();
+		var result = this.FnTable.GetLastFrameRenderer();
 		return result;
 	}
 	public bool CanRenderScene()
 	{
-		bool result = FnTable.CanRenderScene();
+		var result = this.FnTable.CanRenderScene();
 		return result;
 	}
-	public void ShowMirrorWindow()
+        public void ShowMirrorWindow() => this.FnTable.ShowMirrorWindow();
+        public void HideMirrorWindow() => this.FnTable.HideMirrorWindow();
+        public bool IsMirrorWindowVisible()
 	{
-		FnTable.ShowMirrorWindow();
-	}
-	public void HideMirrorWindow()
-	{
-		FnTable.HideMirrorWindow();
-	}
-	public bool IsMirrorWindowVisible()
-	{
-		bool result = FnTable.IsMirrorWindowVisible();
+		var result = this.FnTable.IsMirrorWindowVisible();
 		return result;
 	}
-	public void CompositorDumpImages()
+        public void CompositorDumpImages() => this.FnTable.CompositorDumpImages();
+        public bool ShouldAppRenderWithLowResources()
 	{
-		FnTable.CompositorDumpImages();
-	}
-	public bool ShouldAppRenderWithLowResources()
-	{
-		bool result = FnTable.ShouldAppRenderWithLowResources();
+		var result = this.FnTable.ShouldAppRenderWithLowResources();
 		return result;
 	}
-	public void ForceInterleavedReprojectionOn(bool bOverride)
+        public void ForceInterleavedReprojectionOn(bool bOverride) => this.FnTable.ForceInterleavedReprojectionOn(bOverride);
+        public void ForceReconnectProcess() => this.FnTable.ForceReconnectProcess();
+        public void SuspendRendering(bool bSuspend) => this.FnTable.SuspendRendering(bSuspend);
+        public EVRCompositorError GetMirrorTextureD3D11(EVREye eEye,IntPtr pD3D11DeviceOrResource,ref IntPtr ppD3D11ShaderResourceView)
 	{
-		FnTable.ForceInterleavedReprojectionOn(bOverride);
-	}
-	public void ForceReconnectProcess()
-	{
-		FnTable.ForceReconnectProcess();
-	}
-	public void SuspendRendering(bool bSuspend)
-	{
-		FnTable.SuspendRendering(bSuspend);
-	}
-	public EVRCompositorError GetMirrorTextureD3D11(EVREye eEye,IntPtr pD3D11DeviceOrResource,ref IntPtr ppD3D11ShaderResourceView)
-	{
-		EVRCompositorError result = FnTable.GetMirrorTextureD3D11(eEye,pD3D11DeviceOrResource,ref ppD3D11ShaderResourceView);
+		var result = this.FnTable.GetMirrorTextureD3D11(eEye,pD3D11DeviceOrResource,ref ppD3D11ShaderResourceView);
 		return result;
 	}
-	public void ReleaseMirrorTextureD3D11(IntPtr pD3D11ShaderResourceView)
-	{
-		FnTable.ReleaseMirrorTextureD3D11(pD3D11ShaderResourceView);
-	}
-	public EVRCompositorError GetMirrorTextureGL(EVREye eEye,ref uint pglTextureId,IntPtr pglSharedTextureHandle)
+        public void ReleaseMirrorTextureD3D11(IntPtr pD3D11ShaderResourceView) => this.FnTable.ReleaseMirrorTextureD3D11(pD3D11ShaderResourceView);
+        public EVRCompositorError GetMirrorTextureGL(EVREye eEye,ref uint pglTextureId,IntPtr pglSharedTextureHandle)
 	{
 		pglTextureId = 0;
-		EVRCompositorError result = FnTable.GetMirrorTextureGL(eEye,ref pglTextureId,pglSharedTextureHandle);
+		var result = this.FnTable.GetMirrorTextureGL(eEye,ref pglTextureId,pglSharedTextureHandle);
 		return result;
 	}
 	public bool ReleaseSharedGLTexture(uint glTextureId,IntPtr glSharedTextureHandle)
 	{
-		bool result = FnTable.ReleaseSharedGLTexture(glTextureId,glSharedTextureHandle);
+		var result = this.FnTable.ReleaseSharedGLTexture(glTextureId,glSharedTextureHandle);
 		return result;
 	}
-	public void LockGLSharedTextureForAccess(IntPtr glSharedTextureHandle)
+        public void LockGLSharedTextureForAccess(IntPtr glSharedTextureHandle) => this.FnTable.LockGLSharedTextureForAccess(glSharedTextureHandle);
+        public void UnlockGLSharedTextureForAccess(IntPtr glSharedTextureHandle) => this.FnTable.UnlockGLSharedTextureForAccess(glSharedTextureHandle);
+        public uint GetVulkanInstanceExtensionsRequired(System.Text.StringBuilder pchValue,uint unBufferSize)
 	{
-		FnTable.LockGLSharedTextureForAccess(glSharedTextureHandle);
-	}
-	public void UnlockGLSharedTextureForAccess(IntPtr glSharedTextureHandle)
-	{
-		FnTable.UnlockGLSharedTextureForAccess(glSharedTextureHandle);
-	}
-	public uint GetVulkanInstanceExtensionsRequired(System.Text.StringBuilder pchValue,uint unBufferSize)
-	{
-		uint result = FnTable.GetVulkanInstanceExtensionsRequired(pchValue,unBufferSize);
+		var result = this.FnTable.GetVulkanInstanceExtensionsRequired(pchValue,unBufferSize);
 		return result;
 	}
 	public uint GetVulkanDeviceExtensionsRequired(IntPtr pPhysicalDevice,System.Text.StringBuilder pchValue,uint unBufferSize)
 	{
-		uint result = FnTable.GetVulkanDeviceExtensionsRequired(pPhysicalDevice,pchValue,unBufferSize);
+		var result = this.FnTable.GetVulkanDeviceExtensionsRequired(pPhysicalDevice,pchValue,unBufferSize);
 		return result;
 	}
-	public void SetExplicitTimingMode(EVRCompositorTimingMode eTimingMode)
+        public void SetExplicitTimingMode(EVRCompositorTimingMode eTimingMode) => this.FnTable.SetExplicitTimingMode(eTimingMode);
+        public EVRCompositorError SubmitExplicitTimingData()
 	{
-		FnTable.SetExplicitTimingMode(eTimingMode);
-	}
-	public EVRCompositorError SubmitExplicitTimingData()
-	{
-		EVRCompositorError result = FnTable.SubmitExplicitTimingData();
+		var result = this.FnTable.SubmitExplicitTimingData();
 		return result;
 	}
 	public bool IsMotionSmoothingEnabled()
 	{
-		bool result = FnTable.IsMotionSmoothingEnabled();
+		var result = this.FnTable.IsMotionSmoothingEnabled();
 		return result;
 	}
 	public bool IsMotionSmoothingSupported()
 	{
-		bool result = FnTable.IsMotionSmoothingSupported();
+		var result = this.FnTable.IsMotionSmoothingSupported();
 		return result;
 	}
 	public bool IsCurrentSceneFocusAppLoading()
 	{
-		bool result = FnTable.IsCurrentSceneFocusAppLoading();
+		var result = this.FnTable.IsCurrentSceneFocusAppLoading();
 		return result;
 	}
 	public EVRCompositorError SetStageOverride_Async(string pchRenderModelPath,ref HmdMatrix34_t pTransform,ref Compositor_StageRenderSettings pRenderSettings,uint nSizeOfRenderSettings)
 	{
-		IntPtr pchRenderModelPathUtf8 = Utils.ToUtf8(pchRenderModelPath);
-		EVRCompositorError result = FnTable.SetStageOverride_Async(pchRenderModelPathUtf8,ref pTransform,ref pRenderSettings,nSizeOfRenderSettings);
+		var pchRenderModelPathUtf8 = Utils.ToUtf8(pchRenderModelPath);
+		var result = this.FnTable.SetStageOverride_Async(pchRenderModelPathUtf8,ref pTransform,ref pRenderSettings,nSizeOfRenderSettings);
 		Marshal.FreeHGlobal(pchRenderModelPathUtf8);
 		return result;
 	}
-	public void ClearStageOverride()
+        public void ClearStageOverride() => this.FnTable.ClearStageOverride();
+        public bool GetCompositorBenchmarkResults(ref Compositor_BenchmarkResults pBenchmarkResults,uint nSizeOfBenchmarkResults)
 	{
-		FnTable.ClearStageOverride();
-	}
-	public bool GetCompositorBenchmarkResults(ref Compositor_BenchmarkResults pBenchmarkResults,uint nSizeOfBenchmarkResults)
-	{
-		bool result = FnTable.GetCompositorBenchmarkResults(ref pBenchmarkResults,nSizeOfBenchmarkResults);
+		var result = this.FnTable.GetCompositorBenchmarkResults(ref pBenchmarkResults,nSizeOfBenchmarkResults);
 		return result;
 	}
 	public EVRCompositorError GetLastPosePredictionIDs(ref uint pRenderPosePredictionID,ref uint pGamePosePredictionID)
 	{
 		pRenderPosePredictionID = 0;
 		pGamePosePredictionID = 0;
-		EVRCompositorError result = FnTable.GetLastPosePredictionIDs(ref pRenderPosePredictionID,ref pGamePosePredictionID);
+		var result = this.FnTable.GetLastPosePredictionIDs(ref pRenderPosePredictionID,ref pGamePosePredictionID);
 		return result;
 	}
 	public EVRCompositorError GetPosesForFrame(uint unPosePredictionID,TrackedDevicePose_t [] pPoseArray)
 	{
-		EVRCompositorError result = FnTable.GetPosesForFrame(unPosePredictionID,pPoseArray,(uint) pPoseArray.Length);
+		var result = this.FnTable.GetPosesForFrame(unPosePredictionID,pPoseArray,(uint) pPoseArray.Length);
 		return result;
 	}
 }
@@ -3090,45 +2967,45 @@ public class CVROverlay
 	IVROverlay FnTable;
 	internal CVROverlay(IntPtr pInterface)
 	{
-		FnTable = (IVROverlay)Marshal.PtrToStructure(pInterface, typeof(IVROverlay));
+            this.FnTable = (IVROverlay)Marshal.PtrToStructure(pInterface, typeof(IVROverlay));
 	}
 	public EVROverlayError FindOverlay(string pchOverlayKey,ref ulong pOverlayHandle)
 	{
-		IntPtr pchOverlayKeyUtf8 = Utils.ToUtf8(pchOverlayKey);
+		var pchOverlayKeyUtf8 = Utils.ToUtf8(pchOverlayKey);
 		pOverlayHandle = 0;
-		EVROverlayError result = FnTable.FindOverlay(pchOverlayKeyUtf8,ref pOverlayHandle);
+		var result = this.FnTable.FindOverlay(pchOverlayKeyUtf8,ref pOverlayHandle);
 		Marshal.FreeHGlobal(pchOverlayKeyUtf8);
 		return result;
 	}
 	public EVROverlayError CreateOverlay(string pchOverlayKey,string pchOverlayName,ref ulong pOverlayHandle)
 	{
-		IntPtr pchOverlayKeyUtf8 = Utils.ToUtf8(pchOverlayKey);
-		IntPtr pchOverlayNameUtf8 = Utils.ToUtf8(pchOverlayName);
+		var pchOverlayKeyUtf8 = Utils.ToUtf8(pchOverlayKey);
+		var pchOverlayNameUtf8 = Utils.ToUtf8(pchOverlayName);
 		pOverlayHandle = 0;
-		EVROverlayError result = FnTable.CreateOverlay(pchOverlayKeyUtf8,pchOverlayNameUtf8,ref pOverlayHandle);
+		var result = this.FnTable.CreateOverlay(pchOverlayKeyUtf8,pchOverlayNameUtf8,ref pOverlayHandle);
 		Marshal.FreeHGlobal(pchOverlayKeyUtf8);
 		Marshal.FreeHGlobal(pchOverlayNameUtf8);
 		return result;
 	}
 	public EVROverlayError DestroyOverlay(ulong ulOverlayHandle)
 	{
-		EVROverlayError result = FnTable.DestroyOverlay(ulOverlayHandle);
+		var result = this.FnTable.DestroyOverlay(ulOverlayHandle);
 		return result;
 	}
 	public uint GetOverlayKey(ulong ulOverlayHandle,System.Text.StringBuilder pchValue,uint unBufferSize,ref EVROverlayError pError)
 	{
-		uint result = FnTable.GetOverlayKey(ulOverlayHandle,pchValue,unBufferSize,ref pError);
+		var result = this.FnTable.GetOverlayKey(ulOverlayHandle,pchValue,unBufferSize,ref pError);
 		return result;
 	}
 	public uint GetOverlayName(ulong ulOverlayHandle,System.Text.StringBuilder pchValue,uint unBufferSize,ref EVROverlayError pError)
 	{
-		uint result = FnTable.GetOverlayName(ulOverlayHandle,pchValue,unBufferSize,ref pError);
+		var result = this.FnTable.GetOverlayName(ulOverlayHandle,pchValue,unBufferSize,ref pError);
 		return result;
 	}
 	public EVROverlayError SetOverlayName(ulong ulOverlayHandle,string pchName)
 	{
-		IntPtr pchNameUtf8 = Utils.ToUtf8(pchName);
-		EVROverlayError result = FnTable.SetOverlayName(ulOverlayHandle,pchNameUtf8);
+		var pchNameUtf8 = Utils.ToUtf8(pchName);
+		var result = this.FnTable.SetOverlayName(ulOverlayHandle,pchNameUtf8);
 		Marshal.FreeHGlobal(pchNameUtf8);
 		return result;
 	}
@@ -3136,44 +3013,44 @@ public class CVROverlay
 	{
 		punWidth = 0;
 		punHeight = 0;
-		EVROverlayError result = FnTable.GetOverlayImageData(ulOverlayHandle,pvBuffer,unBufferSize,ref punWidth,ref punHeight);
+		var result = this.FnTable.GetOverlayImageData(ulOverlayHandle,pvBuffer,unBufferSize,ref punWidth,ref punHeight);
 		return result;
 	}
 	public string GetOverlayErrorNameFromEnum(EVROverlayError error)
 	{
-		IntPtr result = FnTable.GetOverlayErrorNameFromEnum(error);
+		var result = this.FnTable.GetOverlayErrorNameFromEnum(error);
 		return Marshal.PtrToStringAnsi(result);
 	}
 	public EVROverlayError SetOverlayRenderingPid(ulong ulOverlayHandle,uint unPID)
 	{
-		EVROverlayError result = FnTable.SetOverlayRenderingPid(ulOverlayHandle,unPID);
+		var result = this.FnTable.SetOverlayRenderingPid(ulOverlayHandle,unPID);
 		return result;
 	}
 	public uint GetOverlayRenderingPid(ulong ulOverlayHandle)
 	{
-		uint result = FnTable.GetOverlayRenderingPid(ulOverlayHandle);
+		var result = this.FnTable.GetOverlayRenderingPid(ulOverlayHandle);
 		return result;
 	}
 	public EVROverlayError SetOverlayFlag(ulong ulOverlayHandle,VROverlayFlags eOverlayFlag,bool bEnabled)
 	{
-		EVROverlayError result = FnTable.SetOverlayFlag(ulOverlayHandle,eOverlayFlag,bEnabled);
+		var result = this.FnTable.SetOverlayFlag(ulOverlayHandle,eOverlayFlag,bEnabled);
 		return result;
 	}
 	public EVROverlayError GetOverlayFlag(ulong ulOverlayHandle,VROverlayFlags eOverlayFlag,ref bool pbEnabled)
 	{
 		pbEnabled = false;
-		EVROverlayError result = FnTable.GetOverlayFlag(ulOverlayHandle,eOverlayFlag,ref pbEnabled);
+		var result = this.FnTable.GetOverlayFlag(ulOverlayHandle,eOverlayFlag,ref pbEnabled);
 		return result;
 	}
 	public EVROverlayError GetOverlayFlags(ulong ulOverlayHandle,ref uint pFlags)
 	{
 		pFlags = 0;
-		EVROverlayError result = FnTable.GetOverlayFlags(ulOverlayHandle,ref pFlags);
+		var result = this.FnTable.GetOverlayFlags(ulOverlayHandle,ref pFlags);
 		return result;
 	}
 	public EVROverlayError SetOverlayColor(ulong ulOverlayHandle,float fRed,float fGreen,float fBlue)
 	{
-		EVROverlayError result = FnTable.SetOverlayColor(ulOverlayHandle,fRed,fGreen,fBlue);
+		var result = this.FnTable.SetOverlayColor(ulOverlayHandle,fRed,fGreen,fBlue);
 		return result;
 	}
 	public EVROverlayError GetOverlayColor(ulong ulOverlayHandle,ref float pfRed,ref float pfGreen,ref float pfBlue)
@@ -3181,167 +3058,167 @@ public class CVROverlay
 		pfRed = 0;
 		pfGreen = 0;
 		pfBlue = 0;
-		EVROverlayError result = FnTable.GetOverlayColor(ulOverlayHandle,ref pfRed,ref pfGreen,ref pfBlue);
+		var result = this.FnTable.GetOverlayColor(ulOverlayHandle,ref pfRed,ref pfGreen,ref pfBlue);
 		return result;
 	}
 	public EVROverlayError SetOverlayAlpha(ulong ulOverlayHandle,float fAlpha)
 	{
-		EVROverlayError result = FnTable.SetOverlayAlpha(ulOverlayHandle,fAlpha);
+		var result = this.FnTable.SetOverlayAlpha(ulOverlayHandle,fAlpha);
 		return result;
 	}
 	public EVROverlayError GetOverlayAlpha(ulong ulOverlayHandle,ref float pfAlpha)
 	{
 		pfAlpha = 0;
-		EVROverlayError result = FnTable.GetOverlayAlpha(ulOverlayHandle,ref pfAlpha);
+		var result = this.FnTable.GetOverlayAlpha(ulOverlayHandle,ref pfAlpha);
 		return result;
 	}
 	public EVROverlayError SetOverlayTexelAspect(ulong ulOverlayHandle,float fTexelAspect)
 	{
-		EVROverlayError result = FnTable.SetOverlayTexelAspect(ulOverlayHandle,fTexelAspect);
+		var result = this.FnTable.SetOverlayTexelAspect(ulOverlayHandle,fTexelAspect);
 		return result;
 	}
 	public EVROverlayError GetOverlayTexelAspect(ulong ulOverlayHandle,ref float pfTexelAspect)
 	{
 		pfTexelAspect = 0;
-		EVROverlayError result = FnTable.GetOverlayTexelAspect(ulOverlayHandle,ref pfTexelAspect);
+		var result = this.FnTable.GetOverlayTexelAspect(ulOverlayHandle,ref pfTexelAspect);
 		return result;
 	}
 	public EVROverlayError SetOverlaySortOrder(ulong ulOverlayHandle,uint unSortOrder)
 	{
-		EVROverlayError result = FnTable.SetOverlaySortOrder(ulOverlayHandle,unSortOrder);
+		var result = this.FnTable.SetOverlaySortOrder(ulOverlayHandle,unSortOrder);
 		return result;
 	}
 	public EVROverlayError GetOverlaySortOrder(ulong ulOverlayHandle,ref uint punSortOrder)
 	{
 		punSortOrder = 0;
-		EVROverlayError result = FnTable.GetOverlaySortOrder(ulOverlayHandle,ref punSortOrder);
+		var result = this.FnTable.GetOverlaySortOrder(ulOverlayHandle,ref punSortOrder);
 		return result;
 	}
 	public EVROverlayError SetOverlayWidthInMeters(ulong ulOverlayHandle,float fWidthInMeters)
 	{
-		EVROverlayError result = FnTable.SetOverlayWidthInMeters(ulOverlayHandle,fWidthInMeters);
+		var result = this.FnTable.SetOverlayWidthInMeters(ulOverlayHandle,fWidthInMeters);
 		return result;
 	}
 	public EVROverlayError GetOverlayWidthInMeters(ulong ulOverlayHandle,ref float pfWidthInMeters)
 	{
 		pfWidthInMeters = 0;
-		EVROverlayError result = FnTable.GetOverlayWidthInMeters(ulOverlayHandle,ref pfWidthInMeters);
+		var result = this.FnTable.GetOverlayWidthInMeters(ulOverlayHandle,ref pfWidthInMeters);
 		return result;
 	}
 	public EVROverlayError SetOverlayCurvature(ulong ulOverlayHandle,float fCurvature)
 	{
-		EVROverlayError result = FnTable.SetOverlayCurvature(ulOverlayHandle,fCurvature);
+		var result = this.FnTable.SetOverlayCurvature(ulOverlayHandle,fCurvature);
 		return result;
 	}
 	public EVROverlayError GetOverlayCurvature(ulong ulOverlayHandle,ref float pfCurvature)
 	{
 		pfCurvature = 0;
-		EVROverlayError result = FnTable.GetOverlayCurvature(ulOverlayHandle,ref pfCurvature);
+		var result = this.FnTable.GetOverlayCurvature(ulOverlayHandle,ref pfCurvature);
 		return result;
 	}
 	public EVROverlayError SetOverlayTextureColorSpace(ulong ulOverlayHandle,EColorSpace eTextureColorSpace)
 	{
-		EVROverlayError result = FnTable.SetOverlayTextureColorSpace(ulOverlayHandle,eTextureColorSpace);
+		var result = this.FnTable.SetOverlayTextureColorSpace(ulOverlayHandle,eTextureColorSpace);
 		return result;
 	}
 	public EVROverlayError GetOverlayTextureColorSpace(ulong ulOverlayHandle,ref EColorSpace peTextureColorSpace)
 	{
-		EVROverlayError result = FnTable.GetOverlayTextureColorSpace(ulOverlayHandle,ref peTextureColorSpace);
+		var result = this.FnTable.GetOverlayTextureColorSpace(ulOverlayHandle,ref peTextureColorSpace);
 		return result;
 	}
 	public EVROverlayError SetOverlayTextureBounds(ulong ulOverlayHandle,ref VRTextureBounds_t pOverlayTextureBounds)
 	{
-		EVROverlayError result = FnTable.SetOverlayTextureBounds(ulOverlayHandle,ref pOverlayTextureBounds);
+		var result = this.FnTable.SetOverlayTextureBounds(ulOverlayHandle,ref pOverlayTextureBounds);
 		return result;
 	}
 	public EVROverlayError GetOverlayTextureBounds(ulong ulOverlayHandle,ref VRTextureBounds_t pOverlayTextureBounds)
 	{
-		EVROverlayError result = FnTable.GetOverlayTextureBounds(ulOverlayHandle,ref pOverlayTextureBounds);
+		var result = this.FnTable.GetOverlayTextureBounds(ulOverlayHandle,ref pOverlayTextureBounds);
 		return result;
 	}
 	public EVROverlayError GetOverlayTransformType(ulong ulOverlayHandle,ref VROverlayTransformType peTransformType)
 	{
-		EVROverlayError result = FnTable.GetOverlayTransformType(ulOverlayHandle,ref peTransformType);
+		var result = this.FnTable.GetOverlayTransformType(ulOverlayHandle,ref peTransformType);
 		return result;
 	}
 	public EVROverlayError SetOverlayTransformAbsolute(ulong ulOverlayHandle,ETrackingUniverseOrigin eTrackingOrigin,ref HmdMatrix34_t pmatTrackingOriginToOverlayTransform)
 	{
-		EVROverlayError result = FnTable.SetOverlayTransformAbsolute(ulOverlayHandle,eTrackingOrigin,ref pmatTrackingOriginToOverlayTransform);
+		var result = this.FnTable.SetOverlayTransformAbsolute(ulOverlayHandle,eTrackingOrigin,ref pmatTrackingOriginToOverlayTransform);
 		return result;
 	}
 	public EVROverlayError GetOverlayTransformAbsolute(ulong ulOverlayHandle,ref ETrackingUniverseOrigin peTrackingOrigin,ref HmdMatrix34_t pmatTrackingOriginToOverlayTransform)
 	{
-		EVROverlayError result = FnTable.GetOverlayTransformAbsolute(ulOverlayHandle,ref peTrackingOrigin,ref pmatTrackingOriginToOverlayTransform);
+		var result = this.FnTable.GetOverlayTransformAbsolute(ulOverlayHandle,ref peTrackingOrigin,ref pmatTrackingOriginToOverlayTransform);
 		return result;
 	}
 	public EVROverlayError SetOverlayTransformTrackedDeviceRelative(ulong ulOverlayHandle,uint unTrackedDevice,ref HmdMatrix34_t pmatTrackedDeviceToOverlayTransform)
 	{
-		EVROverlayError result = FnTable.SetOverlayTransformTrackedDeviceRelative(ulOverlayHandle,unTrackedDevice,ref pmatTrackedDeviceToOverlayTransform);
+		var result = this.FnTable.SetOverlayTransformTrackedDeviceRelative(ulOverlayHandle,unTrackedDevice,ref pmatTrackedDeviceToOverlayTransform);
 		return result;
 	}
 	public EVROverlayError GetOverlayTransformTrackedDeviceRelative(ulong ulOverlayHandle,ref uint punTrackedDevice,ref HmdMatrix34_t pmatTrackedDeviceToOverlayTransform)
 	{
 		punTrackedDevice = 0;
-		EVROverlayError result = FnTable.GetOverlayTransformTrackedDeviceRelative(ulOverlayHandle,ref punTrackedDevice,ref pmatTrackedDeviceToOverlayTransform);
+		var result = this.FnTable.GetOverlayTransformTrackedDeviceRelative(ulOverlayHandle,ref punTrackedDevice,ref pmatTrackedDeviceToOverlayTransform);
 		return result;
 	}
 	public EVROverlayError SetOverlayTransformTrackedDeviceComponent(ulong ulOverlayHandle,uint unDeviceIndex,string pchComponentName)
 	{
-		IntPtr pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
-		EVROverlayError result = FnTable.SetOverlayTransformTrackedDeviceComponent(ulOverlayHandle,unDeviceIndex,pchComponentNameUtf8);
+		var pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
+		var result = this.FnTable.SetOverlayTransformTrackedDeviceComponent(ulOverlayHandle,unDeviceIndex,pchComponentNameUtf8);
 		Marshal.FreeHGlobal(pchComponentNameUtf8);
 		return result;
 	}
 	public EVROverlayError GetOverlayTransformTrackedDeviceComponent(ulong ulOverlayHandle,ref uint punDeviceIndex,System.Text.StringBuilder pchComponentName,uint unComponentNameSize)
 	{
 		punDeviceIndex = 0;
-		EVROverlayError result = FnTable.GetOverlayTransformTrackedDeviceComponent(ulOverlayHandle,ref punDeviceIndex,pchComponentName,unComponentNameSize);
+		var result = this.FnTable.GetOverlayTransformTrackedDeviceComponent(ulOverlayHandle,ref punDeviceIndex,pchComponentName,unComponentNameSize);
 		return result;
 	}
 	public EVROverlayError GetOverlayTransformOverlayRelative(ulong ulOverlayHandle,ref ulong ulOverlayHandleParent,ref HmdMatrix34_t pmatParentOverlayToOverlayTransform)
 	{
 		ulOverlayHandleParent = 0;
-		EVROverlayError result = FnTable.GetOverlayTransformOverlayRelative(ulOverlayHandle,ref ulOverlayHandleParent,ref pmatParentOverlayToOverlayTransform);
+		var result = this.FnTable.GetOverlayTransformOverlayRelative(ulOverlayHandle,ref ulOverlayHandleParent,ref pmatParentOverlayToOverlayTransform);
 		return result;
 	}
 	public EVROverlayError SetOverlayTransformOverlayRelative(ulong ulOverlayHandle,ulong ulOverlayHandleParent,ref HmdMatrix34_t pmatParentOverlayToOverlayTransform)
 	{
-		EVROverlayError result = FnTable.SetOverlayTransformOverlayRelative(ulOverlayHandle,ulOverlayHandleParent,ref pmatParentOverlayToOverlayTransform);
+		var result = this.FnTable.SetOverlayTransformOverlayRelative(ulOverlayHandle,ulOverlayHandleParent,ref pmatParentOverlayToOverlayTransform);
 		return result;
 	}
 	public EVROverlayError SetOverlayTransformCursor(ulong ulCursorOverlayHandle,ref HmdVector2_t pvHotspot)
 	{
-		EVROverlayError result = FnTable.SetOverlayTransformCursor(ulCursorOverlayHandle,ref pvHotspot);
+		var result = this.FnTable.SetOverlayTransformCursor(ulCursorOverlayHandle,ref pvHotspot);
 		return result;
 	}
 	public EVROverlayError GetOverlayTransformCursor(ulong ulOverlayHandle,ref HmdVector2_t pvHotspot)
 	{
-		EVROverlayError result = FnTable.GetOverlayTransformCursor(ulOverlayHandle,ref pvHotspot);
+		var result = this.FnTable.GetOverlayTransformCursor(ulOverlayHandle,ref pvHotspot);
 		return result;
 	}
 	public EVROverlayError SetOverlayTransformProjection(ulong ulOverlayHandle,ETrackingUniverseOrigin eTrackingOrigin,ref HmdMatrix34_t pmatTrackingOriginToOverlayTransform,ref VROverlayProjection_t pProjection,EVREye eEye)
 	{
-		EVROverlayError result = FnTable.SetOverlayTransformProjection(ulOverlayHandle,eTrackingOrigin,ref pmatTrackingOriginToOverlayTransform,ref pProjection,eEye);
+		var result = this.FnTable.SetOverlayTransformProjection(ulOverlayHandle,eTrackingOrigin,ref pmatTrackingOriginToOverlayTransform,ref pProjection,eEye);
 		return result;
 	}
 	public EVROverlayError ShowOverlay(ulong ulOverlayHandle)
 	{
-		EVROverlayError result = FnTable.ShowOverlay(ulOverlayHandle);
+		var result = this.FnTable.ShowOverlay(ulOverlayHandle);
 		return result;
 	}
 	public EVROverlayError HideOverlay(ulong ulOverlayHandle)
 	{
-		EVROverlayError result = FnTable.HideOverlay(ulOverlayHandle);
+		var result = this.FnTable.HideOverlay(ulOverlayHandle);
 		return result;
 	}
 	public bool IsOverlayVisible(ulong ulOverlayHandle)
 	{
-		bool result = FnTable.IsOverlayVisible(ulOverlayHandle);
+		var result = this.FnTable.IsOverlayVisible(ulOverlayHandle);
 		return result;
 	}
 	public EVROverlayError GetTransformForOverlayCoordinates(ulong ulOverlayHandle,ETrackingUniverseOrigin eTrackingOrigin,HmdVector2_t coordinatesInOverlay,ref HmdMatrix34_t pmatTransform)
 	{
-		EVROverlayError result = FnTable.GetTransformForOverlayCoordinates(ulOverlayHandle,eTrackingOrigin,coordinatesInOverlay,ref pmatTransform);
+		var result = this.FnTable.GetTransformForOverlayCoordinates(ulOverlayHandle,eTrackingOrigin,coordinatesInOverlay,ref pmatTransform);
 		return result;
 	}
 // This is a terrible hack to workaround the fact that VRControllerState_t and VREvent_t were
@@ -3363,92 +3240,92 @@ public class CVROverlay
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			PollNextOverlayEventUnion u;
-			VREvent_t_Packed event_packed = new VREvent_t_Packed();
+			var event_packed = new VREvent_t_Packed();
 			u.pPollNextOverlayEventPacked = null;
-			u.pPollNextOverlayEvent = FnTable.PollNextOverlayEvent;
-			bool packed_result = u.pPollNextOverlayEventPacked(ulOverlayHandle,ref event_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VREvent_t_Packed)));
+			u.pPollNextOverlayEvent = this.FnTable.PollNextOverlayEvent;
+			var packed_result = u.pPollNextOverlayEventPacked(ulOverlayHandle,ref event_packed,(uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VREvent_t_Packed)));
 
 			event_packed.Unpack(ref pEvent);
 			return packed_result;
 		}
 #endif
-		bool result = FnTable.PollNextOverlayEvent(ulOverlayHandle,ref pEvent,uncbVREvent);
+		var result = this.FnTable.PollNextOverlayEvent(ulOverlayHandle,ref pEvent,uncbVREvent);
 		return result;
 	}
 	public EVROverlayError GetOverlayInputMethod(ulong ulOverlayHandle,ref VROverlayInputMethod peInputMethod)
 	{
-		EVROverlayError result = FnTable.GetOverlayInputMethod(ulOverlayHandle,ref peInputMethod);
+		var result = this.FnTable.GetOverlayInputMethod(ulOverlayHandle,ref peInputMethod);
 		return result;
 	}
 	public EVROverlayError SetOverlayInputMethod(ulong ulOverlayHandle,VROverlayInputMethod eInputMethod)
 	{
-		EVROverlayError result = FnTable.SetOverlayInputMethod(ulOverlayHandle,eInputMethod);
+		var result = this.FnTable.SetOverlayInputMethod(ulOverlayHandle,eInputMethod);
 		return result;
 	}
 	public EVROverlayError GetOverlayMouseScale(ulong ulOverlayHandle,ref HmdVector2_t pvecMouseScale)
 	{
-		EVROverlayError result = FnTable.GetOverlayMouseScale(ulOverlayHandle,ref pvecMouseScale);
+		var result = this.FnTable.GetOverlayMouseScale(ulOverlayHandle,ref pvecMouseScale);
 		return result;
 	}
 	public EVROverlayError SetOverlayMouseScale(ulong ulOverlayHandle,ref HmdVector2_t pvecMouseScale)
 	{
-		EVROverlayError result = FnTable.SetOverlayMouseScale(ulOverlayHandle,ref pvecMouseScale);
+		var result = this.FnTable.SetOverlayMouseScale(ulOverlayHandle,ref pvecMouseScale);
 		return result;
 	}
 	public bool ComputeOverlayIntersection(ulong ulOverlayHandle,ref VROverlayIntersectionParams_t pParams,ref VROverlayIntersectionResults_t pResults)
 	{
-		bool result = FnTable.ComputeOverlayIntersection(ulOverlayHandle,ref pParams,ref pResults);
+		var result = this.FnTable.ComputeOverlayIntersection(ulOverlayHandle,ref pParams,ref pResults);
 		return result;
 	}
 	public bool IsHoverTargetOverlay(ulong ulOverlayHandle)
 	{
-		bool result = FnTable.IsHoverTargetOverlay(ulOverlayHandle);
+		var result = this.FnTable.IsHoverTargetOverlay(ulOverlayHandle);
 		return result;
 	}
 	public EVROverlayError SetOverlayIntersectionMask(ulong ulOverlayHandle,ref VROverlayIntersectionMaskPrimitive_t pMaskPrimitives,uint unNumMaskPrimitives,uint unPrimitiveSize)
 	{
-		EVROverlayError result = FnTable.SetOverlayIntersectionMask(ulOverlayHandle,ref pMaskPrimitives,unNumMaskPrimitives,unPrimitiveSize);
+		var result = this.FnTable.SetOverlayIntersectionMask(ulOverlayHandle,ref pMaskPrimitives,unNumMaskPrimitives,unPrimitiveSize);
 		return result;
 	}
 	public EVROverlayError TriggerLaserMouseHapticVibration(ulong ulOverlayHandle,float fDurationSeconds,float fFrequency,float fAmplitude)
 	{
-		EVROverlayError result = FnTable.TriggerLaserMouseHapticVibration(ulOverlayHandle,fDurationSeconds,fFrequency,fAmplitude);
+		var result = this.FnTable.TriggerLaserMouseHapticVibration(ulOverlayHandle,fDurationSeconds,fFrequency,fAmplitude);
 		return result;
 	}
 	public EVROverlayError SetOverlayCursor(ulong ulOverlayHandle,ulong ulCursorHandle)
 	{
-		EVROverlayError result = FnTable.SetOverlayCursor(ulOverlayHandle,ulCursorHandle);
+		var result = this.FnTable.SetOverlayCursor(ulOverlayHandle,ulCursorHandle);
 		return result;
 	}
 	public EVROverlayError SetOverlayCursorPositionOverride(ulong ulOverlayHandle,ref HmdVector2_t pvCursor)
 	{
-		EVROverlayError result = FnTable.SetOverlayCursorPositionOverride(ulOverlayHandle,ref pvCursor);
+		var result = this.FnTable.SetOverlayCursorPositionOverride(ulOverlayHandle,ref pvCursor);
 		return result;
 	}
 	public EVROverlayError ClearOverlayCursorPositionOverride(ulong ulOverlayHandle)
 	{
-		EVROverlayError result = FnTable.ClearOverlayCursorPositionOverride(ulOverlayHandle);
+		var result = this.FnTable.ClearOverlayCursorPositionOverride(ulOverlayHandle);
 		return result;
 	}
 	public EVROverlayError SetOverlayTexture(ulong ulOverlayHandle,ref Texture_t pTexture)
 	{
-		EVROverlayError result = FnTable.SetOverlayTexture(ulOverlayHandle,ref pTexture);
+		var result = this.FnTable.SetOverlayTexture(ulOverlayHandle,ref pTexture);
 		return result;
 	}
 	public EVROverlayError ClearOverlayTexture(ulong ulOverlayHandle)
 	{
-		EVROverlayError result = FnTable.ClearOverlayTexture(ulOverlayHandle);
+		var result = this.FnTable.ClearOverlayTexture(ulOverlayHandle);
 		return result;
 	}
 	public EVROverlayError SetOverlayRaw(ulong ulOverlayHandle,IntPtr pvBuffer,uint unWidth,uint unHeight,uint unBytesPerPixel)
 	{
-		EVROverlayError result = FnTable.SetOverlayRaw(ulOverlayHandle,pvBuffer,unWidth,unHeight,unBytesPerPixel);
+		var result = this.FnTable.SetOverlayRaw(ulOverlayHandle,pvBuffer,unWidth,unHeight,unBytesPerPixel);
 		return result;
 	}
 	public EVROverlayError SetOverlayFromFile(ulong ulOverlayHandle,string pchFilePath)
 	{
-		IntPtr pchFilePathUtf8 = Utils.ToUtf8(pchFilePath);
-		EVROverlayError result = FnTable.SetOverlayFromFile(ulOverlayHandle,pchFilePathUtf8);
+		var pchFilePathUtf8 = Utils.ToUtf8(pchFilePath);
+		var result = this.FnTable.SetOverlayFromFile(ulOverlayHandle,pchFilePathUtf8);
 		Marshal.FreeHGlobal(pchFilePathUtf8);
 		return result;
 	}
@@ -3457,108 +3334,99 @@ public class CVROverlay
 		pWidth = 0;
 		pHeight = 0;
 		pNativeFormat = 0;
-		EVROverlayError result = FnTable.GetOverlayTexture(ulOverlayHandle,ref pNativeTextureHandle,pNativeTextureRef,ref pWidth,ref pHeight,ref pNativeFormat,ref pAPIType,ref pColorSpace,ref pTextureBounds);
+		var result = this.FnTable.GetOverlayTexture(ulOverlayHandle,ref pNativeTextureHandle,pNativeTextureRef,ref pWidth,ref pHeight,ref pNativeFormat,ref pAPIType,ref pColorSpace,ref pTextureBounds);
 		return result;
 	}
 	public EVROverlayError ReleaseNativeOverlayHandle(ulong ulOverlayHandle,IntPtr pNativeTextureHandle)
 	{
-		EVROverlayError result = FnTable.ReleaseNativeOverlayHandle(ulOverlayHandle,pNativeTextureHandle);
+		var result = this.FnTable.ReleaseNativeOverlayHandle(ulOverlayHandle,pNativeTextureHandle);
 		return result;
 	}
 	public EVROverlayError GetOverlayTextureSize(ulong ulOverlayHandle,ref uint pWidth,ref uint pHeight)
 	{
 		pWidth = 0;
 		pHeight = 0;
-		EVROverlayError result = FnTable.GetOverlayTextureSize(ulOverlayHandle,ref pWidth,ref pHeight);
+		var result = this.FnTable.GetOverlayTextureSize(ulOverlayHandle,ref pWidth,ref pHeight);
 		return result;
 	}
 	public EVROverlayError CreateDashboardOverlay(string pchOverlayKey,string pchOverlayFriendlyName,ref ulong pMainHandle,ref ulong pThumbnailHandle)
 	{
-		IntPtr pchOverlayKeyUtf8 = Utils.ToUtf8(pchOverlayKey);
-		IntPtr pchOverlayFriendlyNameUtf8 = Utils.ToUtf8(pchOverlayFriendlyName);
+		var pchOverlayKeyUtf8 = Utils.ToUtf8(pchOverlayKey);
+		var pchOverlayFriendlyNameUtf8 = Utils.ToUtf8(pchOverlayFriendlyName);
 		pMainHandle = 0;
 		pThumbnailHandle = 0;
-		EVROverlayError result = FnTable.CreateDashboardOverlay(pchOverlayKeyUtf8,pchOverlayFriendlyNameUtf8,ref pMainHandle,ref pThumbnailHandle);
+		var result = this.FnTable.CreateDashboardOverlay(pchOverlayKeyUtf8,pchOverlayFriendlyNameUtf8,ref pMainHandle,ref pThumbnailHandle);
 		Marshal.FreeHGlobal(pchOverlayKeyUtf8);
 		Marshal.FreeHGlobal(pchOverlayFriendlyNameUtf8);
 		return result;
 	}
 	public bool IsDashboardVisible()
 	{
-		bool result = FnTable.IsDashboardVisible();
+		var result = this.FnTable.IsDashboardVisible();
 		return result;
 	}
 	public bool IsActiveDashboardOverlay(ulong ulOverlayHandle)
 	{
-		bool result = FnTable.IsActiveDashboardOverlay(ulOverlayHandle);
+		var result = this.FnTable.IsActiveDashboardOverlay(ulOverlayHandle);
 		return result;
 	}
 	public EVROverlayError SetDashboardOverlaySceneProcess(ulong ulOverlayHandle,uint unProcessId)
 	{
-		EVROverlayError result = FnTable.SetDashboardOverlaySceneProcess(ulOverlayHandle,unProcessId);
+		var result = this.FnTable.SetDashboardOverlaySceneProcess(ulOverlayHandle,unProcessId);
 		return result;
 	}
 	public EVROverlayError GetDashboardOverlaySceneProcess(ulong ulOverlayHandle,ref uint punProcessId)
 	{
 		punProcessId = 0;
-		EVROverlayError result = FnTable.GetDashboardOverlaySceneProcess(ulOverlayHandle,ref punProcessId);
+		var result = this.FnTable.GetDashboardOverlaySceneProcess(ulOverlayHandle,ref punProcessId);
 		return result;
 	}
 	public void ShowDashboard(string pchOverlayToShow)
 	{
-		IntPtr pchOverlayToShowUtf8 = Utils.ToUtf8(pchOverlayToShow);
-		FnTable.ShowDashboard(pchOverlayToShowUtf8);
+		var pchOverlayToShowUtf8 = Utils.ToUtf8(pchOverlayToShow);
+            this.FnTable.ShowDashboard(pchOverlayToShowUtf8);
 		Marshal.FreeHGlobal(pchOverlayToShowUtf8);
 	}
 	public uint GetPrimaryDashboardDevice()
 	{
-		uint result = FnTable.GetPrimaryDashboardDevice();
+		var result = this.FnTable.GetPrimaryDashboardDevice();
 		return result;
 	}
 	public EVROverlayError ShowKeyboard(int eInputMode,int eLineInputMode,uint unFlags,string pchDescription,uint unCharMax,string pchExistingText,ulong uUserValue)
 	{
-		IntPtr pchDescriptionUtf8 = Utils.ToUtf8(pchDescription);
-		IntPtr pchExistingTextUtf8 = Utils.ToUtf8(pchExistingText);
-		EVROverlayError result = FnTable.ShowKeyboard(eInputMode,eLineInputMode,unFlags,pchDescriptionUtf8,unCharMax,pchExistingTextUtf8,uUserValue);
+		var pchDescriptionUtf8 = Utils.ToUtf8(pchDescription);
+		var pchExistingTextUtf8 = Utils.ToUtf8(pchExistingText);
+		var result = this.FnTable.ShowKeyboard(eInputMode,eLineInputMode,unFlags,pchDescriptionUtf8,unCharMax,pchExistingTextUtf8,uUserValue);
 		Marshal.FreeHGlobal(pchDescriptionUtf8);
 		Marshal.FreeHGlobal(pchExistingTextUtf8);
 		return result;
 	}
 	public EVROverlayError ShowKeyboardForOverlay(ulong ulOverlayHandle,int eInputMode,int eLineInputMode,uint unFlags,string pchDescription,uint unCharMax,string pchExistingText,ulong uUserValue)
 	{
-		IntPtr pchDescriptionUtf8 = Utils.ToUtf8(pchDescription);
-		IntPtr pchExistingTextUtf8 = Utils.ToUtf8(pchExistingText);
-		EVROverlayError result = FnTable.ShowKeyboardForOverlay(ulOverlayHandle,eInputMode,eLineInputMode,unFlags,pchDescriptionUtf8,unCharMax,pchExistingTextUtf8,uUserValue);
+		var pchDescriptionUtf8 = Utils.ToUtf8(pchDescription);
+		var pchExistingTextUtf8 = Utils.ToUtf8(pchExistingText);
+		var result = this.FnTable.ShowKeyboardForOverlay(ulOverlayHandle,eInputMode,eLineInputMode,unFlags,pchDescriptionUtf8,unCharMax,pchExistingTextUtf8,uUserValue);
 		Marshal.FreeHGlobal(pchDescriptionUtf8);
 		Marshal.FreeHGlobal(pchExistingTextUtf8);
 		return result;
 	}
 	public uint GetKeyboardText(System.Text.StringBuilder pchText,uint cchText)
 	{
-		uint result = FnTable.GetKeyboardText(pchText,cchText);
+		var result = this.FnTable.GetKeyboardText(pchText,cchText);
 		return result;
 	}
-	public void HideKeyboard()
+        public void HideKeyboard() => this.FnTable.HideKeyboard();
+        public void SetKeyboardTransformAbsolute(ETrackingUniverseOrigin eTrackingOrigin, ref HmdMatrix34_t pmatTrackingOriginToKeyboardTransform) => this.FnTable.SetKeyboardTransformAbsolute(eTrackingOrigin, ref pmatTrackingOriginToKeyboardTransform);
+        public void SetKeyboardPositionForOverlay(ulong ulOverlayHandle, HmdRect2_t avoidRect) => this.FnTable.SetKeyboardPositionForOverlay(ulOverlayHandle, avoidRect);
+        public VRMessageOverlayResponse ShowMessageOverlay(string pchText,string pchCaption,string pchButton0Text,string pchButton1Text,string pchButton2Text,string pchButton3Text)
 	{
-		FnTable.HideKeyboard();
-	}
-	public void SetKeyboardTransformAbsolute(ETrackingUniverseOrigin eTrackingOrigin,ref HmdMatrix34_t pmatTrackingOriginToKeyboardTransform)
-	{
-		FnTable.SetKeyboardTransformAbsolute(eTrackingOrigin,ref pmatTrackingOriginToKeyboardTransform);
-	}
-	public void SetKeyboardPositionForOverlay(ulong ulOverlayHandle,HmdRect2_t avoidRect)
-	{
-		FnTable.SetKeyboardPositionForOverlay(ulOverlayHandle,avoidRect);
-	}
-	public VRMessageOverlayResponse ShowMessageOverlay(string pchText,string pchCaption,string pchButton0Text,string pchButton1Text,string pchButton2Text,string pchButton3Text)
-	{
-		IntPtr pchTextUtf8 = Utils.ToUtf8(pchText);
-		IntPtr pchCaptionUtf8 = Utils.ToUtf8(pchCaption);
-		IntPtr pchButton0TextUtf8 = Utils.ToUtf8(pchButton0Text);
-		IntPtr pchButton1TextUtf8 = Utils.ToUtf8(pchButton1Text);
-		IntPtr pchButton2TextUtf8 = Utils.ToUtf8(pchButton2Text);
-		IntPtr pchButton3TextUtf8 = Utils.ToUtf8(pchButton3Text);
-		VRMessageOverlayResponse result = FnTable.ShowMessageOverlay(pchTextUtf8,pchCaptionUtf8,pchButton0TextUtf8,pchButton1TextUtf8,pchButton2TextUtf8,pchButton3TextUtf8);
+		var pchTextUtf8 = Utils.ToUtf8(pchText);
+		var pchCaptionUtf8 = Utils.ToUtf8(pchCaption);
+		var pchButton0TextUtf8 = Utils.ToUtf8(pchButton0Text);
+		var pchButton1TextUtf8 = Utils.ToUtf8(pchButton1Text);
+		var pchButton2TextUtf8 = Utils.ToUtf8(pchButton2Text);
+		var pchButton3TextUtf8 = Utils.ToUtf8(pchButton3Text);
+		var result = this.FnTable.ShowMessageOverlay(pchTextUtf8,pchCaptionUtf8,pchButton0TextUtf8,pchButton1TextUtf8,pchButton2TextUtf8,pchButton3TextUtf8);
 		Marshal.FreeHGlobal(pchTextUtf8);
 		Marshal.FreeHGlobal(pchCaptionUtf8);
 		Marshal.FreeHGlobal(pchButton0TextUtf8);
@@ -3567,11 +3435,8 @@ public class CVROverlay
 		Marshal.FreeHGlobal(pchButton3TextUtf8);
 		return result;
 	}
-	public void CloseMessageOverlay()
-	{
-		FnTable.CloseMessageOverlay();
-	}
-}
+        public void CloseMessageOverlay() => this.FnTable.CloseMessageOverlay();
+    }
 
 
 public class CVROverlayView
@@ -3579,25 +3444,22 @@ public class CVROverlayView
 	IVROverlayView FnTable;
 	internal CVROverlayView(IntPtr pInterface)
 	{
-		FnTable = (IVROverlayView)Marshal.PtrToStructure(pInterface, typeof(IVROverlayView));
+            this.FnTable = (IVROverlayView)Marshal.PtrToStructure(pInterface, typeof(IVROverlayView));
 	}
 	public EVROverlayError AcquireOverlayView(ulong ulOverlayHandle,ref VRNativeDevice_t pNativeDevice,ref VROverlayView_t pOverlayView,uint unOverlayViewSize)
 	{
-		EVROverlayError result = FnTable.AcquireOverlayView(ulOverlayHandle,ref pNativeDevice,ref pOverlayView,unOverlayViewSize);
+		var result = this.FnTable.AcquireOverlayView(ulOverlayHandle,ref pNativeDevice,ref pOverlayView,unOverlayViewSize);
 		return result;
 	}
 	public EVROverlayError ReleaseOverlayView(ref VROverlayView_t pOverlayView)
 	{
-		EVROverlayError result = FnTable.ReleaseOverlayView(ref pOverlayView);
+		var result = this.FnTable.ReleaseOverlayView(ref pOverlayView);
 		return result;
 	}
-	public void PostOverlayEvent(ulong ulOverlayHandle,ref VREvent_t pvrEvent)
+        public void PostOverlayEvent(ulong ulOverlayHandle, ref VREvent_t pvrEvent) => this.FnTable.PostOverlayEvent(ulOverlayHandle, ref pvrEvent);
+        public bool IsViewingPermitted(ulong ulOverlayHandle)
 	{
-		FnTable.PostOverlayEvent(ulOverlayHandle,ref pvrEvent);
-	}
-	public bool IsViewingPermitted(ulong ulOverlayHandle)
-	{
-		bool result = FnTable.IsViewingPermitted(ulOverlayHandle);
+		var result = this.FnTable.IsViewingPermitted(ulOverlayHandle);
 		return result;
 	}
 }
@@ -3608,50 +3470,38 @@ public class CVRHeadsetView
 	IVRHeadsetView FnTable;
 	internal CVRHeadsetView(IntPtr pInterface)
 	{
-		FnTable = (IVRHeadsetView)Marshal.PtrToStructure(pInterface, typeof(IVRHeadsetView));
+            this.FnTable = (IVRHeadsetView)Marshal.PtrToStructure(pInterface, typeof(IVRHeadsetView));
 	}
-	public void SetHeadsetViewSize(uint nWidth,uint nHeight)
-	{
-		FnTable.SetHeadsetViewSize(nWidth,nHeight);
-	}
-	public void GetHeadsetViewSize(ref uint pnWidth,ref uint pnHeight)
+        public void SetHeadsetViewSize(uint nWidth, uint nHeight) => this.FnTable.SetHeadsetViewSize(nWidth, nHeight);
+        public void GetHeadsetViewSize(ref uint pnWidth,ref uint pnHeight)
 	{
 		pnWidth = 0;
 		pnHeight = 0;
-		FnTable.GetHeadsetViewSize(ref pnWidth,ref pnHeight);
+            this.FnTable.GetHeadsetViewSize(ref pnWidth,ref pnHeight);
 	}
-	public void SetHeadsetViewMode(uint eHeadsetViewMode)
+        public void SetHeadsetViewMode(uint eHeadsetViewMode) => this.FnTable.SetHeadsetViewMode(eHeadsetViewMode);
+        public uint GetHeadsetViewMode()
 	{
-		FnTable.SetHeadsetViewMode(eHeadsetViewMode);
-	}
-	public uint GetHeadsetViewMode()
-	{
-		uint result = FnTable.GetHeadsetViewMode();
+		var result = this.FnTable.GetHeadsetViewMode();
 		return result;
 	}
-	public void SetHeadsetViewCropped(bool bCropped)
+        public void SetHeadsetViewCropped(bool bCropped) => this.FnTable.SetHeadsetViewCropped(bCropped);
+        public bool GetHeadsetViewCropped()
 	{
-		FnTable.SetHeadsetViewCropped(bCropped);
-	}
-	public bool GetHeadsetViewCropped()
-	{
-		bool result = FnTable.GetHeadsetViewCropped();
+		var result = this.FnTable.GetHeadsetViewCropped();
 		return result;
 	}
 	public float GetHeadsetViewAspectRatio()
 	{
-		float result = FnTable.GetHeadsetViewAspectRatio();
+		var result = this.FnTable.GetHeadsetViewAspectRatio();
 		return result;
 	}
-	public void SetHeadsetViewBlendRange(float flStartPct,float flEndPct)
-	{
-		FnTable.SetHeadsetViewBlendRange(flStartPct,flEndPct);
-	}
-	public void GetHeadsetViewBlendRange(ref float pStartPct,ref float pEndPct)
+        public void SetHeadsetViewBlendRange(float flStartPct, float flEndPct) => this.FnTable.SetHeadsetViewBlendRange(flStartPct, flEndPct);
+        public void GetHeadsetViewBlendRange(ref float pStartPct,ref float pEndPct)
 	{
 		pStartPct = 0;
 		pEndPct = 0;
-		FnTable.GetHeadsetViewBlendRange(ref pStartPct,ref pEndPct);
+            this.FnTable.GetHeadsetViewBlendRange(ref pStartPct,ref pEndPct);
 	}
 }
 
@@ -3661,89 +3511,80 @@ public class CVRRenderModels
 	IVRRenderModels FnTable;
 	internal CVRRenderModels(IntPtr pInterface)
 	{
-		FnTable = (IVRRenderModels)Marshal.PtrToStructure(pInterface, typeof(IVRRenderModels));
+            this.FnTable = (IVRRenderModels)Marshal.PtrToStructure(pInterface, typeof(IVRRenderModels));
 	}
 	public EVRRenderModelError LoadRenderModel_Async(string pchRenderModelName,ref IntPtr ppRenderModel)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		EVRRenderModelError result = FnTable.LoadRenderModel_Async(pchRenderModelNameUtf8,ref ppRenderModel);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var result = this.FnTable.LoadRenderModel_Async(pchRenderModelNameUtf8,ref ppRenderModel);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		return result;
 	}
-	public void FreeRenderModel(IntPtr pRenderModel)
+        public void FreeRenderModel(IntPtr pRenderModel) => this.FnTable.FreeRenderModel(pRenderModel);
+        public EVRRenderModelError LoadTexture_Async(int textureId,ref IntPtr ppTexture)
 	{
-		FnTable.FreeRenderModel(pRenderModel);
-	}
-	public EVRRenderModelError LoadTexture_Async(int textureId,ref IntPtr ppTexture)
-	{
-		EVRRenderModelError result = FnTable.LoadTexture_Async(textureId,ref ppTexture);
+		var result = this.FnTable.LoadTexture_Async(textureId,ref ppTexture);
 		return result;
 	}
-	public void FreeTexture(IntPtr pTexture)
+        public void FreeTexture(IntPtr pTexture) => this.FnTable.FreeTexture(pTexture);
+        public EVRRenderModelError LoadTextureD3D11_Async(int textureId,IntPtr pD3D11Device,ref IntPtr ppD3D11Texture2D)
 	{
-		FnTable.FreeTexture(pTexture);
-	}
-	public EVRRenderModelError LoadTextureD3D11_Async(int textureId,IntPtr pD3D11Device,ref IntPtr ppD3D11Texture2D)
-	{
-		EVRRenderModelError result = FnTable.LoadTextureD3D11_Async(textureId,pD3D11Device,ref ppD3D11Texture2D);
+		var result = this.FnTable.LoadTextureD3D11_Async(textureId,pD3D11Device,ref ppD3D11Texture2D);
 		return result;
 	}
 	public EVRRenderModelError LoadIntoTextureD3D11_Async(int textureId,IntPtr pDstTexture)
 	{
-		EVRRenderModelError result = FnTable.LoadIntoTextureD3D11_Async(textureId,pDstTexture);
+		var result = this.FnTable.LoadIntoTextureD3D11_Async(textureId,pDstTexture);
 		return result;
 	}
-	public void FreeTextureD3D11(IntPtr pD3D11Texture2D)
+        public void FreeTextureD3D11(IntPtr pD3D11Texture2D) => this.FnTable.FreeTextureD3D11(pD3D11Texture2D);
+        public uint GetRenderModelName(uint unRenderModelIndex,System.Text.StringBuilder pchRenderModelName,uint unRenderModelNameLen)
 	{
-		FnTable.FreeTextureD3D11(pD3D11Texture2D);
-	}
-	public uint GetRenderModelName(uint unRenderModelIndex,System.Text.StringBuilder pchRenderModelName,uint unRenderModelNameLen)
-	{
-		uint result = FnTable.GetRenderModelName(unRenderModelIndex,pchRenderModelName,unRenderModelNameLen);
+		var result = this.FnTable.GetRenderModelName(unRenderModelIndex,pchRenderModelName,unRenderModelNameLen);
 		return result;
 	}
 	public uint GetRenderModelCount()
 	{
-		uint result = FnTable.GetRenderModelCount();
+		var result = this.FnTable.GetRenderModelCount();
 		return result;
 	}
 	public uint GetComponentCount(string pchRenderModelName)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		uint result = FnTable.GetComponentCount(pchRenderModelNameUtf8);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var result = this.FnTable.GetComponentCount(pchRenderModelNameUtf8);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		return result;
 	}
 	public uint GetComponentName(string pchRenderModelName,uint unComponentIndex,System.Text.StringBuilder pchComponentName,uint unComponentNameLen)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		uint result = FnTable.GetComponentName(pchRenderModelNameUtf8,unComponentIndex,pchComponentName,unComponentNameLen);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var result = this.FnTable.GetComponentName(pchRenderModelNameUtf8,unComponentIndex,pchComponentName,unComponentNameLen);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		return result;
 	}
 	public ulong GetComponentButtonMask(string pchRenderModelName,string pchComponentName)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		IntPtr pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
-		ulong result = FnTable.GetComponentButtonMask(pchRenderModelNameUtf8,pchComponentNameUtf8);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
+		var result = this.FnTable.GetComponentButtonMask(pchRenderModelNameUtf8,pchComponentNameUtf8);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		Marshal.FreeHGlobal(pchComponentNameUtf8);
 		return result;
 	}
 	public uint GetComponentRenderModelName(string pchRenderModelName,string pchComponentName,System.Text.StringBuilder pchComponentRenderModelName,uint unComponentRenderModelNameLen)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		IntPtr pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
-		uint result = FnTable.GetComponentRenderModelName(pchRenderModelNameUtf8,pchComponentNameUtf8,pchComponentRenderModelName,unComponentRenderModelNameLen);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
+		var result = this.FnTable.GetComponentRenderModelName(pchRenderModelNameUtf8,pchComponentNameUtf8,pchComponentRenderModelName,unComponentRenderModelNameLen);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		Marshal.FreeHGlobal(pchComponentNameUtf8);
 		return result;
 	}
 	public bool GetComponentStateForDevicePath(string pchRenderModelName,string pchComponentName,ulong devicePath,ref RenderModel_ControllerMode_State_t pState,ref RenderModel_ComponentState_t pComponentState)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		IntPtr pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
-		bool result = FnTable.GetComponentStateForDevicePath(pchRenderModelNameUtf8,pchComponentNameUtf8,devicePath,ref pState,ref pComponentState);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
+		var result = this.FnTable.GetComponentStateForDevicePath(pchRenderModelNameUtf8,pchComponentNameUtf8,devicePath,ref pState,ref pComponentState);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		Marshal.FreeHGlobal(pchComponentNameUtf8);
 		return result;
@@ -3762,53 +3603,53 @@ public class CVRRenderModels
 	}
 	public bool GetComponentState(string pchRenderModelName,string pchComponentName,ref VRControllerState_t pControllerState,ref RenderModel_ControllerMode_State_t pState,ref RenderModel_ComponentState_t pComponentState)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		IntPtr pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
 #if !UNITY_METRO
 		if ((System.Environment.OSVersion.Platform == System.PlatformID.MacOSX) ||
 				(System.Environment.OSVersion.Platform == System.PlatformID.Unix))
 		{
 			GetComponentStateUnion u;
-			VRControllerState_t_Packed state_packed = new VRControllerState_t_Packed(pControllerState);
+			var state_packed = new VRControllerState_t_Packed(pControllerState);
 			u.pGetComponentStatePacked = null;
-			u.pGetComponentState = FnTable.GetComponentState;
-			bool packed_result = u.pGetComponentStatePacked(pchRenderModelNameUtf8,pchComponentNameUtf8,ref state_packed,ref pState,ref pComponentState);
+			u.pGetComponentState = this.FnTable.GetComponentState;
+			var packed_result = u.pGetComponentStatePacked(pchRenderModelNameUtf8,pchComponentNameUtf8,ref state_packed,ref pState,ref pComponentState);
 
 			state_packed.Unpack(ref pControllerState);
 			return packed_result;
 		}
 #endif
-		bool result = FnTable.GetComponentState(pchRenderModelNameUtf8,pchComponentNameUtf8,ref pControllerState,ref pState,ref pComponentState);
+		var result = this.FnTable.GetComponentState(pchRenderModelNameUtf8,pchComponentNameUtf8,ref pControllerState,ref pState,ref pComponentState);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		Marshal.FreeHGlobal(pchComponentNameUtf8);
 		return result;
 	}
 	public bool RenderModelHasComponent(string pchRenderModelName,string pchComponentName)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		IntPtr pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
-		bool result = FnTable.RenderModelHasComponent(pchRenderModelNameUtf8,pchComponentNameUtf8);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
+		var result = this.FnTable.RenderModelHasComponent(pchRenderModelNameUtf8,pchComponentNameUtf8);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		Marshal.FreeHGlobal(pchComponentNameUtf8);
 		return result;
 	}
 	public uint GetRenderModelThumbnailURL(string pchRenderModelName,System.Text.StringBuilder pchThumbnailURL,uint unThumbnailURLLen,ref EVRRenderModelError peError)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		uint result = FnTable.GetRenderModelThumbnailURL(pchRenderModelNameUtf8,pchThumbnailURL,unThumbnailURLLen,ref peError);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var result = this.FnTable.GetRenderModelThumbnailURL(pchRenderModelNameUtf8,pchThumbnailURL,unThumbnailURLLen,ref peError);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		return result;
 	}
 	public uint GetRenderModelOriginalPath(string pchRenderModelName,System.Text.StringBuilder pchOriginalPath,uint unOriginalPathLen,ref EVRRenderModelError peError)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		uint result = FnTable.GetRenderModelOriginalPath(pchRenderModelNameUtf8,pchOriginalPath,unOriginalPathLen,ref peError);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var result = this.FnTable.GetRenderModelOriginalPath(pchRenderModelNameUtf8,pchOriginalPath,unOriginalPathLen,ref peError);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		return result;
 	}
 	public string GetRenderModelErrorNameFromEnum(EVRRenderModelError error)
 	{
-		IntPtr result = FnTable.GetRenderModelErrorNameFromEnum(error);
+		var result = this.FnTable.GetRenderModelErrorNameFromEnum(error);
 		return Marshal.PtrToStringAnsi(result);
 	}
 }
@@ -3819,19 +3660,19 @@ public class CVRNotifications
 	IVRNotifications FnTable;
 	internal CVRNotifications(IntPtr pInterface)
 	{
-		FnTable = (IVRNotifications)Marshal.PtrToStructure(pInterface, typeof(IVRNotifications));
+            this.FnTable = (IVRNotifications)Marshal.PtrToStructure(pInterface, typeof(IVRNotifications));
 	}
 	public EVRNotificationError CreateNotification(ulong ulOverlayHandle,ulong ulUserValue,EVRNotificationType type,string pchText,EVRNotificationStyle style,ref NotificationBitmap_t pImage,ref uint pNotificationId)
 	{
-		IntPtr pchTextUtf8 = Utils.ToUtf8(pchText);
+		var pchTextUtf8 = Utils.ToUtf8(pchText);
 		pNotificationId = 0;
-		EVRNotificationError result = FnTable.CreateNotification(ulOverlayHandle,ulUserValue,type,pchTextUtf8,style,ref pImage,ref pNotificationId);
+		var result = this.FnTable.CreateNotification(ulOverlayHandle,ulUserValue,type,pchTextUtf8,style,ref pImage,ref pNotificationId);
 		Marshal.FreeHGlobal(pchTextUtf8);
 		return result;
 	}
 	public EVRNotificationError RemoveNotification(uint notificationId)
 	{
-		EVRNotificationError result = FnTable.RemoveNotification(notificationId);
+		var result = this.FnTable.RemoveNotification(notificationId);
 		return result;
 	}
 }
@@ -3842,93 +3683,93 @@ public class CVRSettings
 	IVRSettings FnTable;
 	internal CVRSettings(IntPtr pInterface)
 	{
-		FnTable = (IVRSettings)Marshal.PtrToStructure(pInterface, typeof(IVRSettings));
+            this.FnTable = (IVRSettings)Marshal.PtrToStructure(pInterface, typeof(IVRSettings));
 	}
 	public string GetSettingsErrorNameFromEnum(EVRSettingsError eError)
 	{
-		IntPtr result = FnTable.GetSettingsErrorNameFromEnum(eError);
+		var result = this.FnTable.GetSettingsErrorNameFromEnum(eError);
 		return Marshal.PtrToStringAnsi(result);
 	}
 	public void SetBool(string pchSection,string pchSettingsKey,bool bValue,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		IntPtr pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
-		FnTable.SetBool(pchSectionUtf8,pchSettingsKeyUtf8,bValue,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+		var pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
+            this.FnTable.SetBool(pchSectionUtf8,pchSettingsKeyUtf8,bValue,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 		Marshal.FreeHGlobal(pchSettingsKeyUtf8);
 	}
 	public void SetInt32(string pchSection,string pchSettingsKey,int nValue,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		IntPtr pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
-		FnTable.SetInt32(pchSectionUtf8,pchSettingsKeyUtf8,nValue,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+		var pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
+            this.FnTable.SetInt32(pchSectionUtf8,pchSettingsKeyUtf8,nValue,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 		Marshal.FreeHGlobal(pchSettingsKeyUtf8);
 	}
 	public void SetFloat(string pchSection,string pchSettingsKey,float flValue,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		IntPtr pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
-		FnTable.SetFloat(pchSectionUtf8,pchSettingsKeyUtf8,flValue,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+		var pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
+            this.FnTable.SetFloat(pchSectionUtf8,pchSettingsKeyUtf8,flValue,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 		Marshal.FreeHGlobal(pchSettingsKeyUtf8);
 	}
 	public void SetString(string pchSection,string pchSettingsKey,string pchValue,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		IntPtr pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
-		IntPtr pchValueUtf8 = Utils.ToUtf8(pchValue);
-		FnTable.SetString(pchSectionUtf8,pchSettingsKeyUtf8,pchValueUtf8,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+		var pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
+		var pchValueUtf8 = Utils.ToUtf8(pchValue);
+            this.FnTable.SetString(pchSectionUtf8,pchSettingsKeyUtf8,pchValueUtf8,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 		Marshal.FreeHGlobal(pchSettingsKeyUtf8);
 		Marshal.FreeHGlobal(pchValueUtf8);
 	}
 	public bool GetBool(string pchSection,string pchSettingsKey,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		IntPtr pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
-		bool result = FnTable.GetBool(pchSectionUtf8,pchSettingsKeyUtf8,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+		var pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
+		var result = this.FnTable.GetBool(pchSectionUtf8,pchSettingsKeyUtf8,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 		Marshal.FreeHGlobal(pchSettingsKeyUtf8);
 		return result;
 	}
 	public int GetInt32(string pchSection,string pchSettingsKey,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		IntPtr pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
-		int result = FnTable.GetInt32(pchSectionUtf8,pchSettingsKeyUtf8,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+		var pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
+		var result = this.FnTable.GetInt32(pchSectionUtf8,pchSettingsKeyUtf8,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 		Marshal.FreeHGlobal(pchSettingsKeyUtf8);
 		return result;
 	}
 	public float GetFloat(string pchSection,string pchSettingsKey,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		IntPtr pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
-		float result = FnTable.GetFloat(pchSectionUtf8,pchSettingsKeyUtf8,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+		var pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
+		var result = this.FnTable.GetFloat(pchSectionUtf8,pchSettingsKeyUtf8,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 		Marshal.FreeHGlobal(pchSettingsKeyUtf8);
 		return result;
 	}
 	public void GetString(string pchSection,string pchSettingsKey,System.Text.StringBuilder pchValue,uint unValueLen,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		IntPtr pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
-		FnTable.GetString(pchSectionUtf8,pchSettingsKeyUtf8,pchValue,unValueLen,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+		var pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
+            this.FnTable.GetString(pchSectionUtf8,pchSettingsKeyUtf8,pchValue,unValueLen,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 		Marshal.FreeHGlobal(pchSettingsKeyUtf8);
 	}
 	public void RemoveSection(string pchSection,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		FnTable.RemoveSection(pchSectionUtf8,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+            this.FnTable.RemoveSection(pchSectionUtf8,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 	}
 	public void RemoveKeyInSection(string pchSection,string pchSettingsKey,ref EVRSettingsError peError)
 	{
-		IntPtr pchSectionUtf8 = Utils.ToUtf8(pchSection);
-		IntPtr pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
-		FnTable.RemoveKeyInSection(pchSectionUtf8,pchSettingsKeyUtf8,ref peError);
+		var pchSectionUtf8 = Utils.ToUtf8(pchSection);
+		var pchSettingsKeyUtf8 = Utils.ToUtf8(pchSettingsKey);
+            this.FnTable.RemoveKeyInSection(pchSectionUtf8,pchSettingsKeyUtf8,ref peError);
 		Marshal.FreeHGlobal(pchSectionUtf8);
 		Marshal.FreeHGlobal(pchSettingsKeyUtf8);
 	}
@@ -3940,53 +3781,53 @@ public class CVRScreenshots
 	IVRScreenshots FnTable;
 	internal CVRScreenshots(IntPtr pInterface)
 	{
-		FnTable = (IVRScreenshots)Marshal.PtrToStructure(pInterface, typeof(IVRScreenshots));
+            this.FnTable = (IVRScreenshots)Marshal.PtrToStructure(pInterface, typeof(IVRScreenshots));
 	}
 	public EVRScreenshotError RequestScreenshot(ref uint pOutScreenshotHandle,EVRScreenshotType type,string pchPreviewFilename,string pchVRFilename)
 	{
 		pOutScreenshotHandle = 0;
-		IntPtr pchPreviewFilenameUtf8 = Utils.ToUtf8(pchPreviewFilename);
-		IntPtr pchVRFilenameUtf8 = Utils.ToUtf8(pchVRFilename);
-		EVRScreenshotError result = FnTable.RequestScreenshot(ref pOutScreenshotHandle,type,pchPreviewFilenameUtf8,pchVRFilenameUtf8);
+		var pchPreviewFilenameUtf8 = Utils.ToUtf8(pchPreviewFilename);
+		var pchVRFilenameUtf8 = Utils.ToUtf8(pchVRFilename);
+		var result = this.FnTable.RequestScreenshot(ref pOutScreenshotHandle,type,pchPreviewFilenameUtf8,pchVRFilenameUtf8);
 		Marshal.FreeHGlobal(pchPreviewFilenameUtf8);
 		Marshal.FreeHGlobal(pchVRFilenameUtf8);
 		return result;
 	}
 	public EVRScreenshotError HookScreenshot(EVRScreenshotType [] pSupportedTypes)
 	{
-		EVRScreenshotError result = FnTable.HookScreenshot(pSupportedTypes,(int) pSupportedTypes.Length);
+		var result = this.FnTable.HookScreenshot(pSupportedTypes,(int) pSupportedTypes.Length);
 		return result;
 	}
 	public EVRScreenshotType GetScreenshotPropertyType(uint screenshotHandle,ref EVRScreenshotError pError)
 	{
-		EVRScreenshotType result = FnTable.GetScreenshotPropertyType(screenshotHandle,ref pError);
+		var result = this.FnTable.GetScreenshotPropertyType(screenshotHandle,ref pError);
 		return result;
 	}
 	public uint GetScreenshotPropertyFilename(uint screenshotHandle,EVRScreenshotPropertyFilenames filenameType,System.Text.StringBuilder pchFilename,uint cchFilename,ref EVRScreenshotError pError)
 	{
-		uint result = FnTable.GetScreenshotPropertyFilename(screenshotHandle,filenameType,pchFilename,cchFilename,ref pError);
+		var result = this.FnTable.GetScreenshotPropertyFilename(screenshotHandle,filenameType,pchFilename,cchFilename,ref pError);
 		return result;
 	}
 	public EVRScreenshotError UpdateScreenshotProgress(uint screenshotHandle,float flProgress)
 	{
-		EVRScreenshotError result = FnTable.UpdateScreenshotProgress(screenshotHandle,flProgress);
+		var result = this.FnTable.UpdateScreenshotProgress(screenshotHandle,flProgress);
 		return result;
 	}
 	public EVRScreenshotError TakeStereoScreenshot(ref uint pOutScreenshotHandle,string pchPreviewFilename,string pchVRFilename)
 	{
 		pOutScreenshotHandle = 0;
-		IntPtr pchPreviewFilenameUtf8 = Utils.ToUtf8(pchPreviewFilename);
-		IntPtr pchVRFilenameUtf8 = Utils.ToUtf8(pchVRFilename);
-		EVRScreenshotError result = FnTable.TakeStereoScreenshot(ref pOutScreenshotHandle,pchPreviewFilenameUtf8,pchVRFilenameUtf8);
+		var pchPreviewFilenameUtf8 = Utils.ToUtf8(pchPreviewFilename);
+		var pchVRFilenameUtf8 = Utils.ToUtf8(pchVRFilename);
+		var result = this.FnTable.TakeStereoScreenshot(ref pOutScreenshotHandle,pchPreviewFilenameUtf8,pchVRFilenameUtf8);
 		Marshal.FreeHGlobal(pchPreviewFilenameUtf8);
 		Marshal.FreeHGlobal(pchVRFilenameUtf8);
 		return result;
 	}
 	public EVRScreenshotError SubmitScreenshot(uint screenshotHandle,EVRScreenshotType type,string pchSourcePreviewFilename,string pchSourceVRFilename)
 	{
-		IntPtr pchSourcePreviewFilenameUtf8 = Utils.ToUtf8(pchSourcePreviewFilename);
-		IntPtr pchSourceVRFilenameUtf8 = Utils.ToUtf8(pchSourceVRFilename);
-		EVRScreenshotError result = FnTable.SubmitScreenshot(screenshotHandle,type,pchSourcePreviewFilenameUtf8,pchSourceVRFilenameUtf8);
+		var pchSourcePreviewFilenameUtf8 = Utils.ToUtf8(pchSourcePreviewFilename);
+		var pchSourceVRFilenameUtf8 = Utils.ToUtf8(pchSourceVRFilename);
+		var result = this.FnTable.SubmitScreenshot(screenshotHandle,type,pchSourcePreviewFilenameUtf8,pchSourceVRFilenameUtf8);
 		Marshal.FreeHGlobal(pchSourcePreviewFilenameUtf8);
 		Marshal.FreeHGlobal(pchSourceVRFilenameUtf8);
 		return result;
@@ -3999,20 +3840,20 @@ public class CVRResources
 	IVRResources FnTable;
 	internal CVRResources(IntPtr pInterface)
 	{
-		FnTable = (IVRResources)Marshal.PtrToStructure(pInterface, typeof(IVRResources));
+            this.FnTable = (IVRResources)Marshal.PtrToStructure(pInterface, typeof(IVRResources));
 	}
 	public uint LoadSharedResource(string pchResourceName,string pchBuffer,uint unBufferLen)
 	{
-		IntPtr pchResourceNameUtf8 = Utils.ToUtf8(pchResourceName);
-		uint result = FnTable.LoadSharedResource(pchResourceNameUtf8,pchBuffer,unBufferLen);
+		var pchResourceNameUtf8 = Utils.ToUtf8(pchResourceName);
+		var result = this.FnTable.LoadSharedResource(pchResourceNameUtf8,pchBuffer,unBufferLen);
 		Marshal.FreeHGlobal(pchResourceNameUtf8);
 		return result;
 	}
 	public uint GetResourceFullPath(string pchResourceName,string pchResourceTypeDirectory,System.Text.StringBuilder pchPathBuffer,uint unBufferLen)
 	{
-		IntPtr pchResourceNameUtf8 = Utils.ToUtf8(pchResourceName);
-		IntPtr pchResourceTypeDirectoryUtf8 = Utils.ToUtf8(pchResourceTypeDirectory);
-		uint result = FnTable.GetResourceFullPath(pchResourceNameUtf8,pchResourceTypeDirectoryUtf8,pchPathBuffer,unBufferLen);
+		var pchResourceNameUtf8 = Utils.ToUtf8(pchResourceName);
+		var pchResourceTypeDirectoryUtf8 = Utils.ToUtf8(pchResourceTypeDirectory);
+		var result = this.FnTable.GetResourceFullPath(pchResourceNameUtf8,pchResourceTypeDirectoryUtf8,pchPathBuffer,unBufferLen);
 		Marshal.FreeHGlobal(pchResourceNameUtf8);
 		Marshal.FreeHGlobal(pchResourceTypeDirectoryUtf8);
 		return result;
@@ -4025,28 +3866,28 @@ public class CVRDriverManager
 	IVRDriverManager FnTable;
 	internal CVRDriverManager(IntPtr pInterface)
 	{
-		FnTable = (IVRDriverManager)Marshal.PtrToStructure(pInterface, typeof(IVRDriverManager));
+            this.FnTable = (IVRDriverManager)Marshal.PtrToStructure(pInterface, typeof(IVRDriverManager));
 	}
 	public uint GetDriverCount()
 	{
-		uint result = FnTable.GetDriverCount();
+		var result = this.FnTable.GetDriverCount();
 		return result;
 	}
 	public uint GetDriverName(uint nDriver,System.Text.StringBuilder pchValue,uint unBufferSize)
 	{
-		uint result = FnTable.GetDriverName(nDriver,pchValue,unBufferSize);
+		var result = this.FnTable.GetDriverName(nDriver,pchValue,unBufferSize);
 		return result;
 	}
 	public ulong GetDriverHandle(string pchDriverName)
 	{
-		IntPtr pchDriverNameUtf8 = Utils.ToUtf8(pchDriverName);
-		ulong result = FnTable.GetDriverHandle(pchDriverNameUtf8);
+		var pchDriverNameUtf8 = Utils.ToUtf8(pchDriverName);
+		var result = this.FnTable.GetDriverHandle(pchDriverNameUtf8);
 		Marshal.FreeHGlobal(pchDriverNameUtf8);
 		return result;
 	}
 	public bool IsEnabled(uint nDriver)
 	{
-		bool result = FnTable.IsEnabled(nDriver);
+		var result = this.FnTable.IsEnabled(nDriver);
 		return result;
 	}
 }
@@ -4057,186 +3898,186 @@ public class CVRInput
 	IVRInput FnTable;
 	internal CVRInput(IntPtr pInterface)
 	{
-		FnTable = (IVRInput)Marshal.PtrToStructure(pInterface, typeof(IVRInput));
+            this.FnTable = (IVRInput)Marshal.PtrToStructure(pInterface, typeof(IVRInput));
 	}
 	public EVRInputError SetActionManifestPath(string pchActionManifestPath)
 	{
-		IntPtr pchActionManifestPathUtf8 = Utils.ToUtf8(pchActionManifestPath);
-		EVRInputError result = FnTable.SetActionManifestPath(pchActionManifestPathUtf8);
+		var pchActionManifestPathUtf8 = Utils.ToUtf8(pchActionManifestPath);
+		var result = this.FnTable.SetActionManifestPath(pchActionManifestPathUtf8);
 		Marshal.FreeHGlobal(pchActionManifestPathUtf8);
 		return result;
 	}
 	public EVRInputError GetActionSetHandle(string pchActionSetName,ref ulong pHandle)
 	{
-		IntPtr pchActionSetNameUtf8 = Utils.ToUtf8(pchActionSetName);
+		var pchActionSetNameUtf8 = Utils.ToUtf8(pchActionSetName);
 		pHandle = 0;
-		EVRInputError result = FnTable.GetActionSetHandle(pchActionSetNameUtf8,ref pHandle);
+		var result = this.FnTable.GetActionSetHandle(pchActionSetNameUtf8,ref pHandle);
 		Marshal.FreeHGlobal(pchActionSetNameUtf8);
 		return result;
 	}
 	public EVRInputError GetActionHandle(string pchActionName,ref ulong pHandle)
 	{
-		IntPtr pchActionNameUtf8 = Utils.ToUtf8(pchActionName);
+		var pchActionNameUtf8 = Utils.ToUtf8(pchActionName);
 		pHandle = 0;
-		EVRInputError result = FnTable.GetActionHandle(pchActionNameUtf8,ref pHandle);
+		var result = this.FnTable.GetActionHandle(pchActionNameUtf8,ref pHandle);
 		Marshal.FreeHGlobal(pchActionNameUtf8);
 		return result;
 	}
 	public EVRInputError GetInputSourceHandle(string pchInputSourcePath,ref ulong pHandle)
 	{
-		IntPtr pchInputSourcePathUtf8 = Utils.ToUtf8(pchInputSourcePath);
+		var pchInputSourcePathUtf8 = Utils.ToUtf8(pchInputSourcePath);
 		pHandle = 0;
-		EVRInputError result = FnTable.GetInputSourceHandle(pchInputSourcePathUtf8,ref pHandle);
+		var result = this.FnTable.GetInputSourceHandle(pchInputSourcePathUtf8,ref pHandle);
 		Marshal.FreeHGlobal(pchInputSourcePathUtf8);
 		return result;
 	}
 	public EVRInputError UpdateActionState(VRActiveActionSet_t [] pSets,uint unSizeOfVRSelectedActionSet_t)
 	{
-		EVRInputError result = FnTable.UpdateActionState(pSets,unSizeOfVRSelectedActionSet_t,(uint) pSets.Length);
+		var result = this.FnTable.UpdateActionState(pSets,unSizeOfVRSelectedActionSet_t,(uint) pSets.Length);
 		return result;
 	}
 	public EVRInputError GetDigitalActionData(ulong action,ref InputDigitalActionData_t pActionData,uint unActionDataSize,ulong ulRestrictToDevice)
 	{
-		EVRInputError result = FnTable.GetDigitalActionData(action,ref pActionData,unActionDataSize,ulRestrictToDevice);
+		var result = this.FnTable.GetDigitalActionData(action,ref pActionData,unActionDataSize,ulRestrictToDevice);
 		return result;
 	}
 	public EVRInputError GetAnalogActionData(ulong action,ref InputAnalogActionData_t pActionData,uint unActionDataSize,ulong ulRestrictToDevice)
 	{
-		EVRInputError result = FnTable.GetAnalogActionData(action,ref pActionData,unActionDataSize,ulRestrictToDevice);
+		var result = this.FnTable.GetAnalogActionData(action,ref pActionData,unActionDataSize,ulRestrictToDevice);
 		return result;
 	}
 	public EVRInputError GetPoseActionDataRelativeToNow(ulong action,ETrackingUniverseOrigin eOrigin,float fPredictedSecondsFromNow,ref InputPoseActionData_t pActionData,uint unActionDataSize,ulong ulRestrictToDevice)
 	{
-		EVRInputError result = FnTable.GetPoseActionDataRelativeToNow(action,eOrigin,fPredictedSecondsFromNow,ref pActionData,unActionDataSize,ulRestrictToDevice);
+		var result = this.FnTable.GetPoseActionDataRelativeToNow(action,eOrigin,fPredictedSecondsFromNow,ref pActionData,unActionDataSize,ulRestrictToDevice);
 		return result;
 	}
 	public EVRInputError GetPoseActionDataForNextFrame(ulong action,ETrackingUniverseOrigin eOrigin,ref InputPoseActionData_t pActionData,uint unActionDataSize,ulong ulRestrictToDevice)
 	{
-		EVRInputError result = FnTable.GetPoseActionDataForNextFrame(action,eOrigin,ref pActionData,unActionDataSize,ulRestrictToDevice);
+		var result = this.FnTable.GetPoseActionDataForNextFrame(action,eOrigin,ref pActionData,unActionDataSize,ulRestrictToDevice);
 		return result;
 	}
 	public EVRInputError GetSkeletalActionData(ulong action,ref InputSkeletalActionData_t pActionData,uint unActionDataSize)
 	{
-		EVRInputError result = FnTable.GetSkeletalActionData(action,ref pActionData,unActionDataSize);
+		var result = this.FnTable.GetSkeletalActionData(action,ref pActionData,unActionDataSize);
 		return result;
 	}
 	public EVRInputError GetDominantHand(ref ETrackedControllerRole peDominantHand)
 	{
-		EVRInputError result = FnTable.GetDominantHand(ref peDominantHand);
+		var result = this.FnTable.GetDominantHand(ref peDominantHand);
 		return result;
 	}
 	public EVRInputError SetDominantHand(ETrackedControllerRole eDominantHand)
 	{
-		EVRInputError result = FnTable.SetDominantHand(eDominantHand);
+		var result = this.FnTable.SetDominantHand(eDominantHand);
 		return result;
 	}
 	public EVRInputError GetBoneCount(ulong action,ref uint pBoneCount)
 	{
 		pBoneCount = 0;
-		EVRInputError result = FnTable.GetBoneCount(action,ref pBoneCount);
+		var result = this.FnTable.GetBoneCount(action,ref pBoneCount);
 		return result;
 	}
 	public EVRInputError GetBoneHierarchy(ulong action,int [] pParentIndices)
 	{
-		EVRInputError result = FnTable.GetBoneHierarchy(action,pParentIndices,(uint) pParentIndices.Length);
+		var result = this.FnTable.GetBoneHierarchy(action,pParentIndices,(uint) pParentIndices.Length);
 		return result;
 	}
 	public EVRInputError GetBoneName(ulong action,int nBoneIndex,System.Text.StringBuilder pchBoneName,uint unNameBufferSize)
 	{
-		EVRInputError result = FnTable.GetBoneName(action,nBoneIndex,pchBoneName,unNameBufferSize);
+		var result = this.FnTable.GetBoneName(action,nBoneIndex,pchBoneName,unNameBufferSize);
 		return result;
 	}
 	public EVRInputError GetSkeletalReferenceTransforms(ulong action,EVRSkeletalTransformSpace eTransformSpace,EVRSkeletalReferencePose eReferencePose,VRBoneTransform_t [] pTransformArray)
 	{
-		EVRInputError result = FnTable.GetSkeletalReferenceTransforms(action,eTransformSpace,eReferencePose,pTransformArray,(uint) pTransformArray.Length);
+		var result = this.FnTable.GetSkeletalReferenceTransforms(action,eTransformSpace,eReferencePose,pTransformArray,(uint) pTransformArray.Length);
 		return result;
 	}
 	public EVRInputError GetSkeletalTrackingLevel(ulong action,ref EVRSkeletalTrackingLevel pSkeletalTrackingLevel)
 	{
-		EVRInputError result = FnTable.GetSkeletalTrackingLevel(action,ref pSkeletalTrackingLevel);
+		var result = this.FnTable.GetSkeletalTrackingLevel(action,ref pSkeletalTrackingLevel);
 		return result;
 	}
 	public EVRInputError GetSkeletalBoneData(ulong action,EVRSkeletalTransformSpace eTransformSpace,EVRSkeletalMotionRange eMotionRange,VRBoneTransform_t [] pTransformArray)
 	{
-		EVRInputError result = FnTable.GetSkeletalBoneData(action,eTransformSpace,eMotionRange,pTransformArray,(uint) pTransformArray.Length);
+		var result = this.FnTable.GetSkeletalBoneData(action,eTransformSpace,eMotionRange,pTransformArray,(uint) pTransformArray.Length);
 		return result;
 	}
 	public EVRInputError GetSkeletalSummaryData(ulong action,EVRSummaryType eSummaryType,ref VRSkeletalSummaryData_t pSkeletalSummaryData)
 	{
-		EVRInputError result = FnTable.GetSkeletalSummaryData(action,eSummaryType,ref pSkeletalSummaryData);
+		var result = this.FnTable.GetSkeletalSummaryData(action,eSummaryType,ref pSkeletalSummaryData);
 		return result;
 	}
 	public EVRInputError GetSkeletalBoneDataCompressed(ulong action,EVRSkeletalMotionRange eMotionRange,IntPtr pvCompressedData,uint unCompressedSize,ref uint punRequiredCompressedSize)
 	{
 		punRequiredCompressedSize = 0;
-		EVRInputError result = FnTable.GetSkeletalBoneDataCompressed(action,eMotionRange,pvCompressedData,unCompressedSize,ref punRequiredCompressedSize);
+		var result = this.FnTable.GetSkeletalBoneDataCompressed(action,eMotionRange,pvCompressedData,unCompressedSize,ref punRequiredCompressedSize);
 		return result;
 	}
 	public EVRInputError DecompressSkeletalBoneData(IntPtr pvCompressedBuffer,uint unCompressedBufferSize,EVRSkeletalTransformSpace eTransformSpace,VRBoneTransform_t [] pTransformArray)
 	{
-		EVRInputError result = FnTable.DecompressSkeletalBoneData(pvCompressedBuffer,unCompressedBufferSize,eTransformSpace,pTransformArray,(uint) pTransformArray.Length);
+		var result = this.FnTable.DecompressSkeletalBoneData(pvCompressedBuffer,unCompressedBufferSize,eTransformSpace,pTransformArray,(uint) pTransformArray.Length);
 		return result;
 	}
 	public EVRInputError TriggerHapticVibrationAction(ulong action,float fStartSecondsFromNow,float fDurationSeconds,float fFrequency,float fAmplitude,ulong ulRestrictToDevice)
 	{
-		EVRInputError result = FnTable.TriggerHapticVibrationAction(action,fStartSecondsFromNow,fDurationSeconds,fFrequency,fAmplitude,ulRestrictToDevice);
+		var result = this.FnTable.TriggerHapticVibrationAction(action,fStartSecondsFromNow,fDurationSeconds,fFrequency,fAmplitude,ulRestrictToDevice);
 		return result;
 	}
 	public EVRInputError GetActionOrigins(ulong actionSetHandle,ulong digitalActionHandle,ulong [] originsOut)
 	{
-		EVRInputError result = FnTable.GetActionOrigins(actionSetHandle,digitalActionHandle,originsOut,(uint) originsOut.Length);
+		var result = this.FnTable.GetActionOrigins(actionSetHandle,digitalActionHandle,originsOut,(uint) originsOut.Length);
 		return result;
 	}
 	public EVRInputError GetOriginLocalizedName(ulong origin,System.Text.StringBuilder pchNameArray,uint unNameArraySize,int unStringSectionsToInclude)
 	{
-		EVRInputError result = FnTable.GetOriginLocalizedName(origin,pchNameArray,unNameArraySize,unStringSectionsToInclude);
+		var result = this.FnTable.GetOriginLocalizedName(origin,pchNameArray,unNameArraySize,unStringSectionsToInclude);
 		return result;
 	}
 	public EVRInputError GetOriginTrackedDeviceInfo(ulong origin,ref InputOriginInfo_t pOriginInfo,uint unOriginInfoSize)
 	{
-		EVRInputError result = FnTable.GetOriginTrackedDeviceInfo(origin,ref pOriginInfo,unOriginInfoSize);
+		var result = this.FnTable.GetOriginTrackedDeviceInfo(origin,ref pOriginInfo,unOriginInfoSize);
 		return result;
 	}
 	public EVRInputError GetActionBindingInfo(ulong action,ref InputBindingInfo_t pOriginInfo,uint unBindingInfoSize,uint unBindingInfoCount,ref uint punReturnedBindingInfoCount)
 	{
 		punReturnedBindingInfoCount = 0;
-		EVRInputError result = FnTable.GetActionBindingInfo(action,ref pOriginInfo,unBindingInfoSize,unBindingInfoCount,ref punReturnedBindingInfoCount);
+		var result = this.FnTable.GetActionBindingInfo(action,ref pOriginInfo,unBindingInfoSize,unBindingInfoCount,ref punReturnedBindingInfoCount);
 		return result;
 	}
 	public EVRInputError ShowActionOrigins(ulong actionSetHandle,ulong ulActionHandle)
 	{
-		EVRInputError result = FnTable.ShowActionOrigins(actionSetHandle,ulActionHandle);
+		var result = this.FnTable.ShowActionOrigins(actionSetHandle,ulActionHandle);
 		return result;
 	}
 	public EVRInputError ShowBindingsForActionSet(VRActiveActionSet_t [] pSets,uint unSizeOfVRSelectedActionSet_t,ulong originToHighlight)
 	{
-		EVRInputError result = FnTable.ShowBindingsForActionSet(pSets,unSizeOfVRSelectedActionSet_t,(uint) pSets.Length,originToHighlight);
+		var result = this.FnTable.ShowBindingsForActionSet(pSets,unSizeOfVRSelectedActionSet_t,(uint) pSets.Length,originToHighlight);
 		return result;
 	}
 	public EVRInputError GetComponentStateForBinding(string pchRenderModelName,string pchComponentName,ref InputBindingInfo_t pOriginInfo,uint unBindingInfoSize,uint unBindingInfoCount,ref RenderModel_ComponentState_t pComponentState)
 	{
-		IntPtr pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
-		IntPtr pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
-		EVRInputError result = FnTable.GetComponentStateForBinding(pchRenderModelNameUtf8,pchComponentNameUtf8,ref pOriginInfo,unBindingInfoSize,unBindingInfoCount,ref pComponentState);
+		var pchRenderModelNameUtf8 = Utils.ToUtf8(pchRenderModelName);
+		var pchComponentNameUtf8 = Utils.ToUtf8(pchComponentName);
+		var result = this.FnTable.GetComponentStateForBinding(pchRenderModelNameUtf8,pchComponentNameUtf8,ref pOriginInfo,unBindingInfoSize,unBindingInfoCount,ref pComponentState);
 		Marshal.FreeHGlobal(pchRenderModelNameUtf8);
 		Marshal.FreeHGlobal(pchComponentNameUtf8);
 		return result;
 	}
 	public bool IsUsingLegacyInput()
 	{
-		bool result = FnTable.IsUsingLegacyInput();
+		var result = this.FnTable.IsUsingLegacyInput();
 		return result;
 	}
 	public EVRInputError OpenBindingUI(string pchAppKey,ulong ulActionSetHandle,ulong ulDeviceHandle,bool bShowOnDesktop)
 	{
-		IntPtr pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
-		EVRInputError result = FnTable.OpenBindingUI(pchAppKeyUtf8,ulActionSetHandle,ulDeviceHandle,bShowOnDesktop);
+		var pchAppKeyUtf8 = Utils.ToUtf8(pchAppKey);
+		var result = this.FnTable.OpenBindingUI(pchAppKeyUtf8,ulActionSetHandle,ulDeviceHandle,bShowOnDesktop);
 		Marshal.FreeHGlobal(pchAppKeyUtf8);
 		return result;
 	}
 	public EVRInputError GetBindingVariant(ulong ulDevicePath,System.Text.StringBuilder pchVariantArray,uint unVariantArraySize)
 	{
-		EVRInputError result = FnTable.GetBindingVariant(ulDevicePath,pchVariantArray,unVariantArraySize);
+		var result = this.FnTable.GetBindingVariant(ulDevicePath,pchVariantArray,unVariantArraySize);
 		return result;
 	}
 }
@@ -4247,40 +4088,40 @@ public class CVRIOBuffer
 	IVRIOBuffer FnTable;
 	internal CVRIOBuffer(IntPtr pInterface)
 	{
-		FnTable = (IVRIOBuffer)Marshal.PtrToStructure(pInterface, typeof(IVRIOBuffer));
+            this.FnTable = (IVRIOBuffer)Marshal.PtrToStructure(pInterface, typeof(IVRIOBuffer));
 	}
 	public EIOBufferError Open(string pchPath,EIOBufferMode mode,uint unElementSize,uint unElements,ref ulong pulBuffer)
 	{
-		IntPtr pchPathUtf8 = Utils.ToUtf8(pchPath);
+		var pchPathUtf8 = Utils.ToUtf8(pchPath);
 		pulBuffer = 0;
-		EIOBufferError result = FnTable.Open(pchPathUtf8,mode,unElementSize,unElements,ref pulBuffer);
+		var result = this.FnTable.Open(pchPathUtf8,mode,unElementSize,unElements,ref pulBuffer);
 		Marshal.FreeHGlobal(pchPathUtf8);
 		return result;
 	}
 	public EIOBufferError Close(ulong ulBuffer)
 	{
-		EIOBufferError result = FnTable.Close(ulBuffer);
+		var result = this.FnTable.Close(ulBuffer);
 		return result;
 	}
 	public EIOBufferError Read(ulong ulBuffer,IntPtr pDst,uint unBytes,ref uint punRead)
 	{
 		punRead = 0;
-		EIOBufferError result = FnTable.Read(ulBuffer,pDst,unBytes,ref punRead);
+		var result = this.FnTable.Read(ulBuffer,pDst,unBytes,ref punRead);
 		return result;
 	}
 	public EIOBufferError Write(ulong ulBuffer,IntPtr pSrc,uint unBytes)
 	{
-		EIOBufferError result = FnTable.Write(ulBuffer,pSrc,unBytes);
+		var result = this.FnTable.Write(ulBuffer,pSrc,unBytes);
 		return result;
 	}
 	public ulong PropertyContainer(ulong ulBuffer)
 	{
-		ulong result = FnTable.PropertyContainer(ulBuffer);
+		var result = this.FnTable.PropertyContainer(ulBuffer);
 		return result;
 	}
 	public bool HasReaders(ulong ulBuffer)
 	{
-		bool result = FnTable.HasReaders(ulBuffer);
+		var result = this.FnTable.HasReaders(ulBuffer);
 		return result;
 	}
 }
@@ -4291,31 +4132,31 @@ public class CVRSpatialAnchors
 	IVRSpatialAnchors FnTable;
 	internal CVRSpatialAnchors(IntPtr pInterface)
 	{
-		FnTable = (IVRSpatialAnchors)Marshal.PtrToStructure(pInterface, typeof(IVRSpatialAnchors));
+            this.FnTable = (IVRSpatialAnchors)Marshal.PtrToStructure(pInterface, typeof(IVRSpatialAnchors));
 	}
 	public EVRSpatialAnchorError CreateSpatialAnchorFromDescriptor(string pchDescriptor,ref uint pHandleOut)
 	{
-		IntPtr pchDescriptorUtf8 = Utils.ToUtf8(pchDescriptor);
+		var pchDescriptorUtf8 = Utils.ToUtf8(pchDescriptor);
 		pHandleOut = 0;
-		EVRSpatialAnchorError result = FnTable.CreateSpatialAnchorFromDescriptor(pchDescriptorUtf8,ref pHandleOut);
+		var result = this.FnTable.CreateSpatialAnchorFromDescriptor(pchDescriptorUtf8,ref pHandleOut);
 		Marshal.FreeHGlobal(pchDescriptorUtf8);
 		return result;
 	}
 	public EVRSpatialAnchorError CreateSpatialAnchorFromPose(uint unDeviceIndex,ETrackingUniverseOrigin eOrigin,ref SpatialAnchorPose_t pPose,ref uint pHandleOut)
 	{
 		pHandleOut = 0;
-		EVRSpatialAnchorError result = FnTable.CreateSpatialAnchorFromPose(unDeviceIndex,eOrigin,ref pPose,ref pHandleOut);
+		var result = this.FnTable.CreateSpatialAnchorFromPose(unDeviceIndex,eOrigin,ref pPose,ref pHandleOut);
 		return result;
 	}
 	public EVRSpatialAnchorError GetSpatialAnchorPose(uint unHandle,ETrackingUniverseOrigin eOrigin,ref SpatialAnchorPose_t pPoseOut)
 	{
-		EVRSpatialAnchorError result = FnTable.GetSpatialAnchorPose(unHandle,eOrigin,ref pPoseOut);
+		var result = this.FnTable.GetSpatialAnchorPose(unHandle,eOrigin,ref pPoseOut);
 		return result;
 	}
 	public EVRSpatialAnchorError GetSpatialAnchorDescriptor(uint unHandle,System.Text.StringBuilder pchDescriptorOut,ref uint punDescriptorBufferLenInOut)
 	{
 		punDescriptorBufferLenInOut = 0;
-		EVRSpatialAnchorError result = FnTable.GetSpatialAnchorDescriptor(unHandle,pchDescriptorOut,ref punDescriptorBufferLenInOut);
+		var result = this.FnTable.GetSpatialAnchorDescriptor(unHandle,pchDescriptorOut,ref punDescriptorBufferLenInOut);
 		return result;
 	}
 }
@@ -4326,32 +4167,32 @@ public class CVRDebug
 	IVRDebug FnTable;
 	internal CVRDebug(IntPtr pInterface)
 	{
-		FnTable = (IVRDebug)Marshal.PtrToStructure(pInterface, typeof(IVRDebug));
+            this.FnTable = (IVRDebug)Marshal.PtrToStructure(pInterface, typeof(IVRDebug));
 	}
 	public EVRDebugError EmitVrProfilerEvent(string pchMessage)
 	{
-		IntPtr pchMessageUtf8 = Utils.ToUtf8(pchMessage);
-		EVRDebugError result = FnTable.EmitVrProfilerEvent(pchMessageUtf8);
+		var pchMessageUtf8 = Utils.ToUtf8(pchMessage);
+		var result = this.FnTable.EmitVrProfilerEvent(pchMessageUtf8);
 		Marshal.FreeHGlobal(pchMessageUtf8);
 		return result;
 	}
 	public EVRDebugError BeginVrProfilerEvent(ref ulong pHandleOut)
 	{
 		pHandleOut = 0;
-		EVRDebugError result = FnTable.BeginVrProfilerEvent(ref pHandleOut);
+		var result = this.FnTable.BeginVrProfilerEvent(ref pHandleOut);
 		return result;
 	}
 	public EVRDebugError FinishVrProfilerEvent(ulong hHandle,string pchMessage)
 	{
-		IntPtr pchMessageUtf8 = Utils.ToUtf8(pchMessage);
-		EVRDebugError result = FnTable.FinishVrProfilerEvent(hHandle,pchMessageUtf8);
+		var pchMessageUtf8 = Utils.ToUtf8(pchMessage);
+		var result = this.FnTable.FinishVrProfilerEvent(hHandle,pchMessageUtf8);
 		Marshal.FreeHGlobal(pchMessageUtf8);
 		return result;
 	}
 	public uint DriverDebugRequest(uint unDeviceIndex,string pchRequest,System.Text.StringBuilder pchResponseBuffer,uint unResponseBufferSize)
 	{
-		IntPtr pchRequestUtf8 = Utils.ToUtf8(pchRequest);
-		uint result = FnTable.DriverDebugRequest(unDeviceIndex,pchRequestUtf8,pchResponseBuffer,unResponseBufferSize);
+		var pchRequestUtf8 = Utils.ToUtf8(pchRequest);
+		var result = this.FnTable.DriverDebugRequest(unDeviceIndex,pchRequestUtf8,pchResponseBuffer,unResponseBufferSize);
 		Marshal.FreeHGlobal(pchRequestUtf8);
 		return result;
 	}
@@ -4363,26 +4204,26 @@ public class CVRProperties
 	IVRProperties FnTable;
 	internal CVRProperties(IntPtr pInterface)
 	{
-		FnTable = (IVRProperties)Marshal.PtrToStructure(pInterface, typeof(IVRProperties));
+            this.FnTable = (IVRProperties)Marshal.PtrToStructure(pInterface, typeof(IVRProperties));
 	}
 	public ETrackedPropertyError ReadPropertyBatch(ulong ulContainerHandle,ref PropertyRead_t pBatch,uint unBatchEntryCount)
 	{
-		ETrackedPropertyError result = FnTable.ReadPropertyBatch(ulContainerHandle,ref pBatch,unBatchEntryCount);
+		var result = this.FnTable.ReadPropertyBatch(ulContainerHandle,ref pBatch,unBatchEntryCount);
 		return result;
 	}
 	public ETrackedPropertyError WritePropertyBatch(ulong ulContainerHandle,ref PropertyWrite_t pBatch,uint unBatchEntryCount)
 	{
-		ETrackedPropertyError result = FnTable.WritePropertyBatch(ulContainerHandle,ref pBatch,unBatchEntryCount);
+		var result = this.FnTable.WritePropertyBatch(ulContainerHandle,ref pBatch,unBatchEntryCount);
 		return result;
 	}
 	public string GetPropErrorNameFromEnum(ETrackedPropertyError error)
 	{
-		IntPtr result = FnTable.GetPropErrorNameFromEnum(error);
+		var result = this.FnTable.GetPropErrorNameFromEnum(error);
 		return Marshal.PtrToStringAnsi(result);
 	}
 	public ulong TrackedDeviceToPropertyContainer(uint nDevice)
 	{
-		ulong result = FnTable.TrackedDeviceToPropertyContainer(nDevice);
+		var result = this.FnTable.TrackedDeviceToPropertyContainer(nDevice);
 		return result;
 	}
 }
@@ -4393,30 +4234,30 @@ public class CVRPaths
 	IVRPaths FnTable;
 	internal CVRPaths(IntPtr pInterface)
 	{
-		FnTable = (IVRPaths)Marshal.PtrToStructure(pInterface, typeof(IVRPaths));
+            this.FnTable = (IVRPaths)Marshal.PtrToStructure(pInterface, typeof(IVRPaths));
 	}
 	public ETrackedPropertyError ReadPathBatch(ulong ulRootHandle,ref PathRead_t pBatch,uint unBatchEntryCount)
 	{
-		ETrackedPropertyError result = FnTable.ReadPathBatch(ulRootHandle,ref pBatch,unBatchEntryCount);
+		var result = this.FnTable.ReadPathBatch(ulRootHandle,ref pBatch,unBatchEntryCount);
 		return result;
 	}
 	public ETrackedPropertyError WritePathBatch(ulong ulRootHandle,ref PathWrite_t pBatch,uint unBatchEntryCount)
 	{
-		ETrackedPropertyError result = FnTable.WritePathBatch(ulRootHandle,ref pBatch,unBatchEntryCount);
+		var result = this.FnTable.WritePathBatch(ulRootHandle,ref pBatch,unBatchEntryCount);
 		return result;
 	}
 	public ETrackedPropertyError StringToHandle(ref ulong pHandle,string pchPath)
 	{
 		pHandle = 0;
-		IntPtr pchPathUtf8 = Utils.ToUtf8(pchPath);
-		ETrackedPropertyError result = FnTable.StringToHandle(ref pHandle,pchPathUtf8);
+		var pchPathUtf8 = Utils.ToUtf8(pchPath);
+		var result = this.FnTable.StringToHandle(ref pHandle,pchPathUtf8);
 		Marshal.FreeHGlobal(pchPathUtf8);
 		return result;
 	}
 	public ETrackedPropertyError HandleToString(ulong pHandle,string pchBuffer,uint unBufferSize,ref uint punBufferSizeUsed)
 	{
 		punBufferSizeUsed = 0;
-		ETrackedPropertyError result = FnTable.HandleToString(pHandle,pchBuffer,unBufferSize,ref punBufferSizeUsed);
+		var result = this.FnTable.HandleToString(pHandle,pchBuffer,unBufferSize,ref punBufferSizeUsed);
 		return result;
 	}
 }
@@ -4427,61 +4268,61 @@ public class CVRBlockQueue
 	IVRBlockQueue FnTable;
 	internal CVRBlockQueue(IntPtr pInterface)
 	{
-		FnTable = (IVRBlockQueue)Marshal.PtrToStructure(pInterface, typeof(IVRBlockQueue));
+            this.FnTable = (IVRBlockQueue)Marshal.PtrToStructure(pInterface, typeof(IVRBlockQueue));
 	}
 	public EBlockQueueError Create(ref ulong pulQueueHandle,string pchPath,uint unBlockDataSize,uint unBlockHeaderSize,uint unBlockCount)
 	{
 		pulQueueHandle = 0;
-		IntPtr pchPathUtf8 = Utils.ToUtf8(pchPath);
-		EBlockQueueError result = FnTable.Create(ref pulQueueHandle,pchPathUtf8,unBlockDataSize,unBlockHeaderSize,unBlockCount);
+		var pchPathUtf8 = Utils.ToUtf8(pchPath);
+		var result = this.FnTable.Create(ref pulQueueHandle,pchPathUtf8,unBlockDataSize,unBlockHeaderSize,unBlockCount);
 		Marshal.FreeHGlobal(pchPathUtf8);
 		return result;
 	}
 	public EBlockQueueError Connect(ref ulong pulQueueHandle,string pchPath)
 	{
 		pulQueueHandle = 0;
-		IntPtr pchPathUtf8 = Utils.ToUtf8(pchPath);
-		EBlockQueueError result = FnTable.Connect(ref pulQueueHandle,pchPathUtf8);
+		var pchPathUtf8 = Utils.ToUtf8(pchPath);
+		var result = this.FnTable.Connect(ref pulQueueHandle,pchPathUtf8);
 		Marshal.FreeHGlobal(pchPathUtf8);
 		return result;
 	}
 	public EBlockQueueError Destroy(ulong ulQueueHandle)
 	{
-		EBlockQueueError result = FnTable.Destroy(ulQueueHandle);
+		var result = this.FnTable.Destroy(ulQueueHandle);
 		return result;
 	}
 	public EBlockQueueError AcquireWriteOnlyBlock(ulong ulQueueHandle,ref ulong pulBlockHandle,ref IntPtr ppvBuffer)
 	{
 		pulBlockHandle = 0;
-		EBlockQueueError result = FnTable.AcquireWriteOnlyBlock(ulQueueHandle,ref pulBlockHandle,ref ppvBuffer);
+		var result = this.FnTable.AcquireWriteOnlyBlock(ulQueueHandle,ref pulBlockHandle,ref ppvBuffer);
 		return result;
 	}
 	public EBlockQueueError ReleaseWriteOnlyBlock(ulong ulQueueHandle,ulong ulBlockHandle)
 	{
-		EBlockQueueError result = FnTable.ReleaseWriteOnlyBlock(ulQueueHandle,ulBlockHandle);
+		var result = this.FnTable.ReleaseWriteOnlyBlock(ulQueueHandle,ulBlockHandle);
 		return result;
 	}
 	public EBlockQueueError WaitAndAcquireReadOnlyBlock(ulong ulQueueHandle,ref ulong pulBlockHandle,ref IntPtr ppvBuffer,EBlockQueueReadType eReadType,uint unTimeoutMs)
 	{
 		pulBlockHandle = 0;
-		EBlockQueueError result = FnTable.WaitAndAcquireReadOnlyBlock(ulQueueHandle,ref pulBlockHandle,ref ppvBuffer,eReadType,unTimeoutMs);
+		var result = this.FnTable.WaitAndAcquireReadOnlyBlock(ulQueueHandle,ref pulBlockHandle,ref ppvBuffer,eReadType,unTimeoutMs);
 		return result;
 	}
 	public EBlockQueueError AcquireReadOnlyBlock(ulong ulQueueHandle,ref ulong pulBlockHandle,ref IntPtr ppvBuffer,EBlockQueueReadType eReadType)
 	{
 		pulBlockHandle = 0;
-		EBlockQueueError result = FnTable.AcquireReadOnlyBlock(ulQueueHandle,ref pulBlockHandle,ref ppvBuffer,eReadType);
+		var result = this.FnTable.AcquireReadOnlyBlock(ulQueueHandle,ref pulBlockHandle,ref ppvBuffer,eReadType);
 		return result;
 	}
 	public EBlockQueueError ReleaseReadOnlyBlock(ulong ulQueueHandle,ulong ulBlockHandle)
 	{
-		EBlockQueueError result = FnTable.ReleaseReadOnlyBlock(ulQueueHandle,ulBlockHandle);
+		var result = this.FnTable.ReleaseReadOnlyBlock(ulQueueHandle,ulBlockHandle);
 		return result;
 	}
 	public EBlockQueueError QueueHasReader(ulong ulQueueHandle,ref bool pbHasReaders)
 	{
 		pbHasReaders = false;
-		EBlockQueueError result = FnTable.QueueHasReader(ulQueueHandle,ref pbHasReaders);
+		var result = this.FnTable.QueueHasReader(ulQueueHandle,ref pbHasReaders);
 		return result;
 	}
 }
@@ -6130,23 +5971,17 @@ public enum EBlockQueueReadType
 [StructLayout(LayoutKind.Sequential)] public struct VREvent_Keyboard_t
 {
 	public byte cNewInput0,cNewInput1,cNewInput2,cNewInput3,cNewInput4,cNewInput5,cNewInput6,cNewInput7;
-	public string cNewInput
-	{
-		get
-		{
-			return new string(new char[] {
-				(char)cNewInput0,
-				(char)cNewInput1,
-				(char)cNewInput2,
-				(char)cNewInput3,
-				(char)cNewInput4,
-				(char)cNewInput5,
-				(char)cNewInput6,
-				(char)cNewInput7
-			}).TrimEnd('\0');
-		}
-	}
-	public ulong uUserValue;
+        public string cNewInput => new string(new char[] {
+                (char)this.cNewInput0,
+                (char)this.cNewInput1,
+                (char)this.cNewInput2,
+                (char)this.cNewInput3,
+                (char)this.cNewInput4,
+                (char)this.cNewInput5,
+                (char)this.cNewInput6,
+                (char)this.cNewInput7
+            }).TrimEnd('\0');
+        public ulong uUserValue;
 }
 [StructLayout(LayoutKind.Sequential)] public struct VREvent_Ipd_t
 {
@@ -6624,735 +6459,699 @@ public enum EBlockQueueReadType
 	public ulong devicePath;
 	public uint trackedDeviceIndex;
 	public byte rchRenderModelComponentName0,rchRenderModelComponentName1,rchRenderModelComponentName2,rchRenderModelComponentName3,rchRenderModelComponentName4,rchRenderModelComponentName5,rchRenderModelComponentName6,rchRenderModelComponentName7,rchRenderModelComponentName8,rchRenderModelComponentName9,rchRenderModelComponentName10,rchRenderModelComponentName11,rchRenderModelComponentName12,rchRenderModelComponentName13,rchRenderModelComponentName14,rchRenderModelComponentName15,rchRenderModelComponentName16,rchRenderModelComponentName17,rchRenderModelComponentName18,rchRenderModelComponentName19,rchRenderModelComponentName20,rchRenderModelComponentName21,rchRenderModelComponentName22,rchRenderModelComponentName23,rchRenderModelComponentName24,rchRenderModelComponentName25,rchRenderModelComponentName26,rchRenderModelComponentName27,rchRenderModelComponentName28,rchRenderModelComponentName29,rchRenderModelComponentName30,rchRenderModelComponentName31,rchRenderModelComponentName32,rchRenderModelComponentName33,rchRenderModelComponentName34,rchRenderModelComponentName35,rchRenderModelComponentName36,rchRenderModelComponentName37,rchRenderModelComponentName38,rchRenderModelComponentName39,rchRenderModelComponentName40,rchRenderModelComponentName41,rchRenderModelComponentName42,rchRenderModelComponentName43,rchRenderModelComponentName44,rchRenderModelComponentName45,rchRenderModelComponentName46,rchRenderModelComponentName47,rchRenderModelComponentName48,rchRenderModelComponentName49,rchRenderModelComponentName50,rchRenderModelComponentName51,rchRenderModelComponentName52,rchRenderModelComponentName53,rchRenderModelComponentName54,rchRenderModelComponentName55,rchRenderModelComponentName56,rchRenderModelComponentName57,rchRenderModelComponentName58,rchRenderModelComponentName59,rchRenderModelComponentName60,rchRenderModelComponentName61,rchRenderModelComponentName62,rchRenderModelComponentName63,rchRenderModelComponentName64,rchRenderModelComponentName65,rchRenderModelComponentName66,rchRenderModelComponentName67,rchRenderModelComponentName68,rchRenderModelComponentName69,rchRenderModelComponentName70,rchRenderModelComponentName71,rchRenderModelComponentName72,rchRenderModelComponentName73,rchRenderModelComponentName74,rchRenderModelComponentName75,rchRenderModelComponentName76,rchRenderModelComponentName77,rchRenderModelComponentName78,rchRenderModelComponentName79,rchRenderModelComponentName80,rchRenderModelComponentName81,rchRenderModelComponentName82,rchRenderModelComponentName83,rchRenderModelComponentName84,rchRenderModelComponentName85,rchRenderModelComponentName86,rchRenderModelComponentName87,rchRenderModelComponentName88,rchRenderModelComponentName89,rchRenderModelComponentName90,rchRenderModelComponentName91,rchRenderModelComponentName92,rchRenderModelComponentName93,rchRenderModelComponentName94,rchRenderModelComponentName95,rchRenderModelComponentName96,rchRenderModelComponentName97,rchRenderModelComponentName98,rchRenderModelComponentName99,rchRenderModelComponentName100,rchRenderModelComponentName101,rchRenderModelComponentName102,rchRenderModelComponentName103,rchRenderModelComponentName104,rchRenderModelComponentName105,rchRenderModelComponentName106,rchRenderModelComponentName107,rchRenderModelComponentName108,rchRenderModelComponentName109,rchRenderModelComponentName110,rchRenderModelComponentName111,rchRenderModelComponentName112,rchRenderModelComponentName113,rchRenderModelComponentName114,rchRenderModelComponentName115,rchRenderModelComponentName116,rchRenderModelComponentName117,rchRenderModelComponentName118,rchRenderModelComponentName119,rchRenderModelComponentName120,rchRenderModelComponentName121,rchRenderModelComponentName122,rchRenderModelComponentName123,rchRenderModelComponentName124,rchRenderModelComponentName125,rchRenderModelComponentName126,rchRenderModelComponentName127;
-	public string rchRenderModelComponentName
-	{
-		get
-		{
-			return new string(new char[] {
-				(char)rchRenderModelComponentName0,
-				(char)rchRenderModelComponentName1,
-				(char)rchRenderModelComponentName2,
-				(char)rchRenderModelComponentName3,
-				(char)rchRenderModelComponentName4,
-				(char)rchRenderModelComponentName5,
-				(char)rchRenderModelComponentName6,
-				(char)rchRenderModelComponentName7,
-				(char)rchRenderModelComponentName8,
-				(char)rchRenderModelComponentName9,
-				(char)rchRenderModelComponentName10,
-				(char)rchRenderModelComponentName11,
-				(char)rchRenderModelComponentName12,
-				(char)rchRenderModelComponentName13,
-				(char)rchRenderModelComponentName14,
-				(char)rchRenderModelComponentName15,
-				(char)rchRenderModelComponentName16,
-				(char)rchRenderModelComponentName17,
-				(char)rchRenderModelComponentName18,
-				(char)rchRenderModelComponentName19,
-				(char)rchRenderModelComponentName20,
-				(char)rchRenderModelComponentName21,
-				(char)rchRenderModelComponentName22,
-				(char)rchRenderModelComponentName23,
-				(char)rchRenderModelComponentName24,
-				(char)rchRenderModelComponentName25,
-				(char)rchRenderModelComponentName26,
-				(char)rchRenderModelComponentName27,
-				(char)rchRenderModelComponentName28,
-				(char)rchRenderModelComponentName29,
-				(char)rchRenderModelComponentName30,
-				(char)rchRenderModelComponentName31,
-				(char)rchRenderModelComponentName32,
-				(char)rchRenderModelComponentName33,
-				(char)rchRenderModelComponentName34,
-				(char)rchRenderModelComponentName35,
-				(char)rchRenderModelComponentName36,
-				(char)rchRenderModelComponentName37,
-				(char)rchRenderModelComponentName38,
-				(char)rchRenderModelComponentName39,
-				(char)rchRenderModelComponentName40,
-				(char)rchRenderModelComponentName41,
-				(char)rchRenderModelComponentName42,
-				(char)rchRenderModelComponentName43,
-				(char)rchRenderModelComponentName44,
-				(char)rchRenderModelComponentName45,
-				(char)rchRenderModelComponentName46,
-				(char)rchRenderModelComponentName47,
-				(char)rchRenderModelComponentName48,
-				(char)rchRenderModelComponentName49,
-				(char)rchRenderModelComponentName50,
-				(char)rchRenderModelComponentName51,
-				(char)rchRenderModelComponentName52,
-				(char)rchRenderModelComponentName53,
-				(char)rchRenderModelComponentName54,
-				(char)rchRenderModelComponentName55,
-				(char)rchRenderModelComponentName56,
-				(char)rchRenderModelComponentName57,
-				(char)rchRenderModelComponentName58,
-				(char)rchRenderModelComponentName59,
-				(char)rchRenderModelComponentName60,
-				(char)rchRenderModelComponentName61,
-				(char)rchRenderModelComponentName62,
-				(char)rchRenderModelComponentName63,
-				(char)rchRenderModelComponentName64,
-				(char)rchRenderModelComponentName65,
-				(char)rchRenderModelComponentName66,
-				(char)rchRenderModelComponentName67,
-				(char)rchRenderModelComponentName68,
-				(char)rchRenderModelComponentName69,
-				(char)rchRenderModelComponentName70,
-				(char)rchRenderModelComponentName71,
-				(char)rchRenderModelComponentName72,
-				(char)rchRenderModelComponentName73,
-				(char)rchRenderModelComponentName74,
-				(char)rchRenderModelComponentName75,
-				(char)rchRenderModelComponentName76,
-				(char)rchRenderModelComponentName77,
-				(char)rchRenderModelComponentName78,
-				(char)rchRenderModelComponentName79,
-				(char)rchRenderModelComponentName80,
-				(char)rchRenderModelComponentName81,
-				(char)rchRenderModelComponentName82,
-				(char)rchRenderModelComponentName83,
-				(char)rchRenderModelComponentName84,
-				(char)rchRenderModelComponentName85,
-				(char)rchRenderModelComponentName86,
-				(char)rchRenderModelComponentName87,
-				(char)rchRenderModelComponentName88,
-				(char)rchRenderModelComponentName89,
-				(char)rchRenderModelComponentName90,
-				(char)rchRenderModelComponentName91,
-				(char)rchRenderModelComponentName92,
-				(char)rchRenderModelComponentName93,
-				(char)rchRenderModelComponentName94,
-				(char)rchRenderModelComponentName95,
-				(char)rchRenderModelComponentName96,
-				(char)rchRenderModelComponentName97,
-				(char)rchRenderModelComponentName98,
-				(char)rchRenderModelComponentName99,
-				(char)rchRenderModelComponentName100,
-				(char)rchRenderModelComponentName101,
-				(char)rchRenderModelComponentName102,
-				(char)rchRenderModelComponentName103,
-				(char)rchRenderModelComponentName104,
-				(char)rchRenderModelComponentName105,
-				(char)rchRenderModelComponentName106,
-				(char)rchRenderModelComponentName107,
-				(char)rchRenderModelComponentName108,
-				(char)rchRenderModelComponentName109,
-				(char)rchRenderModelComponentName110,
-				(char)rchRenderModelComponentName111,
-				(char)rchRenderModelComponentName112,
-				(char)rchRenderModelComponentName113,
-				(char)rchRenderModelComponentName114,
-				(char)rchRenderModelComponentName115,
-				(char)rchRenderModelComponentName116,
-				(char)rchRenderModelComponentName117,
-				(char)rchRenderModelComponentName118,
-				(char)rchRenderModelComponentName119,
-				(char)rchRenderModelComponentName120,
-				(char)rchRenderModelComponentName121,
-				(char)rchRenderModelComponentName122,
-				(char)rchRenderModelComponentName123,
-				(char)rchRenderModelComponentName124,
-				(char)rchRenderModelComponentName125,
-				(char)rchRenderModelComponentName126,
-				(char)rchRenderModelComponentName127
-			}).TrimEnd('\0');
-		}
-	}
-}
+        public string rchRenderModelComponentName => new string(new char[] {
+                (char)this.rchRenderModelComponentName0,
+                (char)this.rchRenderModelComponentName1,
+                (char)this.rchRenderModelComponentName2,
+                (char)this.rchRenderModelComponentName3,
+                (char)this.rchRenderModelComponentName4,
+                (char)this.rchRenderModelComponentName5,
+                (char)this.rchRenderModelComponentName6,
+                (char)this.rchRenderModelComponentName7,
+                (char)this.rchRenderModelComponentName8,
+                (char)this.rchRenderModelComponentName9,
+                (char)this.rchRenderModelComponentName10,
+                (char)this.rchRenderModelComponentName11,
+                (char)this.rchRenderModelComponentName12,
+                (char)this.rchRenderModelComponentName13,
+                (char)this.rchRenderModelComponentName14,
+                (char)this.rchRenderModelComponentName15,
+                (char)this.rchRenderModelComponentName16,
+                (char)this.rchRenderModelComponentName17,
+                (char)this.rchRenderModelComponentName18,
+                (char)this.rchRenderModelComponentName19,
+                (char)this.rchRenderModelComponentName20,
+                (char)this.rchRenderModelComponentName21,
+                (char)this.rchRenderModelComponentName22,
+                (char)this.rchRenderModelComponentName23,
+                (char)this.rchRenderModelComponentName24,
+                (char)this.rchRenderModelComponentName25,
+                (char)this.rchRenderModelComponentName26,
+                (char)this.rchRenderModelComponentName27,
+                (char)this.rchRenderModelComponentName28,
+                (char)this.rchRenderModelComponentName29,
+                (char)this.rchRenderModelComponentName30,
+                (char)this.rchRenderModelComponentName31,
+                (char)this.rchRenderModelComponentName32,
+                (char)this.rchRenderModelComponentName33,
+                (char)this.rchRenderModelComponentName34,
+                (char)this.rchRenderModelComponentName35,
+                (char)this.rchRenderModelComponentName36,
+                (char)this.rchRenderModelComponentName37,
+                (char)this.rchRenderModelComponentName38,
+                (char)this.rchRenderModelComponentName39,
+                (char)this.rchRenderModelComponentName40,
+                (char)this.rchRenderModelComponentName41,
+                (char)this.rchRenderModelComponentName42,
+                (char)this.rchRenderModelComponentName43,
+                (char)this.rchRenderModelComponentName44,
+                (char)this.rchRenderModelComponentName45,
+                (char)this.rchRenderModelComponentName46,
+                (char)this.rchRenderModelComponentName47,
+                (char)this.rchRenderModelComponentName48,
+                (char)this.rchRenderModelComponentName49,
+                (char)this.rchRenderModelComponentName50,
+                (char)this.rchRenderModelComponentName51,
+                (char)this.rchRenderModelComponentName52,
+                (char)this.rchRenderModelComponentName53,
+                (char)this.rchRenderModelComponentName54,
+                (char)this.rchRenderModelComponentName55,
+                (char)this.rchRenderModelComponentName56,
+                (char)this.rchRenderModelComponentName57,
+                (char)this.rchRenderModelComponentName58,
+                (char)this.rchRenderModelComponentName59,
+                (char)this.rchRenderModelComponentName60,
+                (char)this.rchRenderModelComponentName61,
+                (char)this.rchRenderModelComponentName62,
+                (char)this.rchRenderModelComponentName63,
+                (char)this.rchRenderModelComponentName64,
+                (char)this.rchRenderModelComponentName65,
+                (char)this.rchRenderModelComponentName66,
+                (char)this.rchRenderModelComponentName67,
+                (char)this.rchRenderModelComponentName68,
+                (char)this.rchRenderModelComponentName69,
+                (char)this.rchRenderModelComponentName70,
+                (char)this.rchRenderModelComponentName71,
+                (char)this.rchRenderModelComponentName72,
+                (char)this.rchRenderModelComponentName73,
+                (char)this.rchRenderModelComponentName74,
+                (char)this.rchRenderModelComponentName75,
+                (char)this.rchRenderModelComponentName76,
+                (char)this.rchRenderModelComponentName77,
+                (char)this.rchRenderModelComponentName78,
+                (char)this.rchRenderModelComponentName79,
+                (char)this.rchRenderModelComponentName80,
+                (char)this.rchRenderModelComponentName81,
+                (char)this.rchRenderModelComponentName82,
+                (char)this.rchRenderModelComponentName83,
+                (char)this.rchRenderModelComponentName84,
+                (char)this.rchRenderModelComponentName85,
+                (char)this.rchRenderModelComponentName86,
+                (char)this.rchRenderModelComponentName87,
+                (char)this.rchRenderModelComponentName88,
+                (char)this.rchRenderModelComponentName89,
+                (char)this.rchRenderModelComponentName90,
+                (char)this.rchRenderModelComponentName91,
+                (char)this.rchRenderModelComponentName92,
+                (char)this.rchRenderModelComponentName93,
+                (char)this.rchRenderModelComponentName94,
+                (char)this.rchRenderModelComponentName95,
+                (char)this.rchRenderModelComponentName96,
+                (char)this.rchRenderModelComponentName97,
+                (char)this.rchRenderModelComponentName98,
+                (char)this.rchRenderModelComponentName99,
+                (char)this.rchRenderModelComponentName100,
+                (char)this.rchRenderModelComponentName101,
+                (char)this.rchRenderModelComponentName102,
+                (char)this.rchRenderModelComponentName103,
+                (char)this.rchRenderModelComponentName104,
+                (char)this.rchRenderModelComponentName105,
+                (char)this.rchRenderModelComponentName106,
+                (char)this.rchRenderModelComponentName107,
+                (char)this.rchRenderModelComponentName108,
+                (char)this.rchRenderModelComponentName109,
+                (char)this.rchRenderModelComponentName110,
+                (char)this.rchRenderModelComponentName111,
+                (char)this.rchRenderModelComponentName112,
+                (char)this.rchRenderModelComponentName113,
+                (char)this.rchRenderModelComponentName114,
+                (char)this.rchRenderModelComponentName115,
+                (char)this.rchRenderModelComponentName116,
+                (char)this.rchRenderModelComponentName117,
+                (char)this.rchRenderModelComponentName118,
+                (char)this.rchRenderModelComponentName119,
+                (char)this.rchRenderModelComponentName120,
+                (char)this.rchRenderModelComponentName121,
+                (char)this.rchRenderModelComponentName122,
+                (char)this.rchRenderModelComponentName123,
+                (char)this.rchRenderModelComponentName124,
+                (char)this.rchRenderModelComponentName125,
+                (char)this.rchRenderModelComponentName126,
+                (char)this.rchRenderModelComponentName127
+            }).TrimEnd('\0');
+    }
 [StructLayout(LayoutKind.Sequential)] public struct InputBindingInfo_t
 {
 	public byte rchDevicePathName0,rchDevicePathName1,rchDevicePathName2,rchDevicePathName3,rchDevicePathName4,rchDevicePathName5,rchDevicePathName6,rchDevicePathName7,rchDevicePathName8,rchDevicePathName9,rchDevicePathName10,rchDevicePathName11,rchDevicePathName12,rchDevicePathName13,rchDevicePathName14,rchDevicePathName15,rchDevicePathName16,rchDevicePathName17,rchDevicePathName18,rchDevicePathName19,rchDevicePathName20,rchDevicePathName21,rchDevicePathName22,rchDevicePathName23,rchDevicePathName24,rchDevicePathName25,rchDevicePathName26,rchDevicePathName27,rchDevicePathName28,rchDevicePathName29,rchDevicePathName30,rchDevicePathName31,rchDevicePathName32,rchDevicePathName33,rchDevicePathName34,rchDevicePathName35,rchDevicePathName36,rchDevicePathName37,rchDevicePathName38,rchDevicePathName39,rchDevicePathName40,rchDevicePathName41,rchDevicePathName42,rchDevicePathName43,rchDevicePathName44,rchDevicePathName45,rchDevicePathName46,rchDevicePathName47,rchDevicePathName48,rchDevicePathName49,rchDevicePathName50,rchDevicePathName51,rchDevicePathName52,rchDevicePathName53,rchDevicePathName54,rchDevicePathName55,rchDevicePathName56,rchDevicePathName57,rchDevicePathName58,rchDevicePathName59,rchDevicePathName60,rchDevicePathName61,rchDevicePathName62,rchDevicePathName63,rchDevicePathName64,rchDevicePathName65,rchDevicePathName66,rchDevicePathName67,rchDevicePathName68,rchDevicePathName69,rchDevicePathName70,rchDevicePathName71,rchDevicePathName72,rchDevicePathName73,rchDevicePathName74,rchDevicePathName75,rchDevicePathName76,rchDevicePathName77,rchDevicePathName78,rchDevicePathName79,rchDevicePathName80,rchDevicePathName81,rchDevicePathName82,rchDevicePathName83,rchDevicePathName84,rchDevicePathName85,rchDevicePathName86,rchDevicePathName87,rchDevicePathName88,rchDevicePathName89,rchDevicePathName90,rchDevicePathName91,rchDevicePathName92,rchDevicePathName93,rchDevicePathName94,rchDevicePathName95,rchDevicePathName96,rchDevicePathName97,rchDevicePathName98,rchDevicePathName99,rchDevicePathName100,rchDevicePathName101,rchDevicePathName102,rchDevicePathName103,rchDevicePathName104,rchDevicePathName105,rchDevicePathName106,rchDevicePathName107,rchDevicePathName108,rchDevicePathName109,rchDevicePathName110,rchDevicePathName111,rchDevicePathName112,rchDevicePathName113,rchDevicePathName114,rchDevicePathName115,rchDevicePathName116,rchDevicePathName117,rchDevicePathName118,rchDevicePathName119,rchDevicePathName120,rchDevicePathName121,rchDevicePathName122,rchDevicePathName123,rchDevicePathName124,rchDevicePathName125,rchDevicePathName126,rchDevicePathName127;
-	public string rchDevicePathName
-	{
-		get
-		{
-			return new string(new char[] {
-				(char)rchDevicePathName0,
-				(char)rchDevicePathName1,
-				(char)rchDevicePathName2,
-				(char)rchDevicePathName3,
-				(char)rchDevicePathName4,
-				(char)rchDevicePathName5,
-				(char)rchDevicePathName6,
-				(char)rchDevicePathName7,
-				(char)rchDevicePathName8,
-				(char)rchDevicePathName9,
-				(char)rchDevicePathName10,
-				(char)rchDevicePathName11,
-				(char)rchDevicePathName12,
-				(char)rchDevicePathName13,
-				(char)rchDevicePathName14,
-				(char)rchDevicePathName15,
-				(char)rchDevicePathName16,
-				(char)rchDevicePathName17,
-				(char)rchDevicePathName18,
-				(char)rchDevicePathName19,
-				(char)rchDevicePathName20,
-				(char)rchDevicePathName21,
-				(char)rchDevicePathName22,
-				(char)rchDevicePathName23,
-				(char)rchDevicePathName24,
-				(char)rchDevicePathName25,
-				(char)rchDevicePathName26,
-				(char)rchDevicePathName27,
-				(char)rchDevicePathName28,
-				(char)rchDevicePathName29,
-				(char)rchDevicePathName30,
-				(char)rchDevicePathName31,
-				(char)rchDevicePathName32,
-				(char)rchDevicePathName33,
-				(char)rchDevicePathName34,
-				(char)rchDevicePathName35,
-				(char)rchDevicePathName36,
-				(char)rchDevicePathName37,
-				(char)rchDevicePathName38,
-				(char)rchDevicePathName39,
-				(char)rchDevicePathName40,
-				(char)rchDevicePathName41,
-				(char)rchDevicePathName42,
-				(char)rchDevicePathName43,
-				(char)rchDevicePathName44,
-				(char)rchDevicePathName45,
-				(char)rchDevicePathName46,
-				(char)rchDevicePathName47,
-				(char)rchDevicePathName48,
-				(char)rchDevicePathName49,
-				(char)rchDevicePathName50,
-				(char)rchDevicePathName51,
-				(char)rchDevicePathName52,
-				(char)rchDevicePathName53,
-				(char)rchDevicePathName54,
-				(char)rchDevicePathName55,
-				(char)rchDevicePathName56,
-				(char)rchDevicePathName57,
-				(char)rchDevicePathName58,
-				(char)rchDevicePathName59,
-				(char)rchDevicePathName60,
-				(char)rchDevicePathName61,
-				(char)rchDevicePathName62,
-				(char)rchDevicePathName63,
-				(char)rchDevicePathName64,
-				(char)rchDevicePathName65,
-				(char)rchDevicePathName66,
-				(char)rchDevicePathName67,
-				(char)rchDevicePathName68,
-				(char)rchDevicePathName69,
-				(char)rchDevicePathName70,
-				(char)rchDevicePathName71,
-				(char)rchDevicePathName72,
-				(char)rchDevicePathName73,
-				(char)rchDevicePathName74,
-				(char)rchDevicePathName75,
-				(char)rchDevicePathName76,
-				(char)rchDevicePathName77,
-				(char)rchDevicePathName78,
-				(char)rchDevicePathName79,
-				(char)rchDevicePathName80,
-				(char)rchDevicePathName81,
-				(char)rchDevicePathName82,
-				(char)rchDevicePathName83,
-				(char)rchDevicePathName84,
-				(char)rchDevicePathName85,
-				(char)rchDevicePathName86,
-				(char)rchDevicePathName87,
-				(char)rchDevicePathName88,
-				(char)rchDevicePathName89,
-				(char)rchDevicePathName90,
-				(char)rchDevicePathName91,
-				(char)rchDevicePathName92,
-				(char)rchDevicePathName93,
-				(char)rchDevicePathName94,
-				(char)rchDevicePathName95,
-				(char)rchDevicePathName96,
-				(char)rchDevicePathName97,
-				(char)rchDevicePathName98,
-				(char)rchDevicePathName99,
-				(char)rchDevicePathName100,
-				(char)rchDevicePathName101,
-				(char)rchDevicePathName102,
-				(char)rchDevicePathName103,
-				(char)rchDevicePathName104,
-				(char)rchDevicePathName105,
-				(char)rchDevicePathName106,
-				(char)rchDevicePathName107,
-				(char)rchDevicePathName108,
-				(char)rchDevicePathName109,
-				(char)rchDevicePathName110,
-				(char)rchDevicePathName111,
-				(char)rchDevicePathName112,
-				(char)rchDevicePathName113,
-				(char)rchDevicePathName114,
-				(char)rchDevicePathName115,
-				(char)rchDevicePathName116,
-				(char)rchDevicePathName117,
-				(char)rchDevicePathName118,
-				(char)rchDevicePathName119,
-				(char)rchDevicePathName120,
-				(char)rchDevicePathName121,
-				(char)rchDevicePathName122,
-				(char)rchDevicePathName123,
-				(char)rchDevicePathName124,
-				(char)rchDevicePathName125,
-				(char)rchDevicePathName126,
-				(char)rchDevicePathName127
-			}).TrimEnd('\0');
-		}
-	}
-	public byte rchInputPathName0,rchInputPathName1,rchInputPathName2,rchInputPathName3,rchInputPathName4,rchInputPathName5,rchInputPathName6,rchInputPathName7,rchInputPathName8,rchInputPathName9,rchInputPathName10,rchInputPathName11,rchInputPathName12,rchInputPathName13,rchInputPathName14,rchInputPathName15,rchInputPathName16,rchInputPathName17,rchInputPathName18,rchInputPathName19,rchInputPathName20,rchInputPathName21,rchInputPathName22,rchInputPathName23,rchInputPathName24,rchInputPathName25,rchInputPathName26,rchInputPathName27,rchInputPathName28,rchInputPathName29,rchInputPathName30,rchInputPathName31,rchInputPathName32,rchInputPathName33,rchInputPathName34,rchInputPathName35,rchInputPathName36,rchInputPathName37,rchInputPathName38,rchInputPathName39,rchInputPathName40,rchInputPathName41,rchInputPathName42,rchInputPathName43,rchInputPathName44,rchInputPathName45,rchInputPathName46,rchInputPathName47,rchInputPathName48,rchInputPathName49,rchInputPathName50,rchInputPathName51,rchInputPathName52,rchInputPathName53,rchInputPathName54,rchInputPathName55,rchInputPathName56,rchInputPathName57,rchInputPathName58,rchInputPathName59,rchInputPathName60,rchInputPathName61,rchInputPathName62,rchInputPathName63,rchInputPathName64,rchInputPathName65,rchInputPathName66,rchInputPathName67,rchInputPathName68,rchInputPathName69,rchInputPathName70,rchInputPathName71,rchInputPathName72,rchInputPathName73,rchInputPathName74,rchInputPathName75,rchInputPathName76,rchInputPathName77,rchInputPathName78,rchInputPathName79,rchInputPathName80,rchInputPathName81,rchInputPathName82,rchInputPathName83,rchInputPathName84,rchInputPathName85,rchInputPathName86,rchInputPathName87,rchInputPathName88,rchInputPathName89,rchInputPathName90,rchInputPathName91,rchInputPathName92,rchInputPathName93,rchInputPathName94,rchInputPathName95,rchInputPathName96,rchInputPathName97,rchInputPathName98,rchInputPathName99,rchInputPathName100,rchInputPathName101,rchInputPathName102,rchInputPathName103,rchInputPathName104,rchInputPathName105,rchInputPathName106,rchInputPathName107,rchInputPathName108,rchInputPathName109,rchInputPathName110,rchInputPathName111,rchInputPathName112,rchInputPathName113,rchInputPathName114,rchInputPathName115,rchInputPathName116,rchInputPathName117,rchInputPathName118,rchInputPathName119,rchInputPathName120,rchInputPathName121,rchInputPathName122,rchInputPathName123,rchInputPathName124,rchInputPathName125,rchInputPathName126,rchInputPathName127;
-	public string rchInputPathName
-	{
-		get
-		{
-			return new string(new char[] {
-				(char)rchInputPathName0,
-				(char)rchInputPathName1,
-				(char)rchInputPathName2,
-				(char)rchInputPathName3,
-				(char)rchInputPathName4,
-				(char)rchInputPathName5,
-				(char)rchInputPathName6,
-				(char)rchInputPathName7,
-				(char)rchInputPathName8,
-				(char)rchInputPathName9,
-				(char)rchInputPathName10,
-				(char)rchInputPathName11,
-				(char)rchInputPathName12,
-				(char)rchInputPathName13,
-				(char)rchInputPathName14,
-				(char)rchInputPathName15,
-				(char)rchInputPathName16,
-				(char)rchInputPathName17,
-				(char)rchInputPathName18,
-				(char)rchInputPathName19,
-				(char)rchInputPathName20,
-				(char)rchInputPathName21,
-				(char)rchInputPathName22,
-				(char)rchInputPathName23,
-				(char)rchInputPathName24,
-				(char)rchInputPathName25,
-				(char)rchInputPathName26,
-				(char)rchInputPathName27,
-				(char)rchInputPathName28,
-				(char)rchInputPathName29,
-				(char)rchInputPathName30,
-				(char)rchInputPathName31,
-				(char)rchInputPathName32,
-				(char)rchInputPathName33,
-				(char)rchInputPathName34,
-				(char)rchInputPathName35,
-				(char)rchInputPathName36,
-				(char)rchInputPathName37,
-				(char)rchInputPathName38,
-				(char)rchInputPathName39,
-				(char)rchInputPathName40,
-				(char)rchInputPathName41,
-				(char)rchInputPathName42,
-				(char)rchInputPathName43,
-				(char)rchInputPathName44,
-				(char)rchInputPathName45,
-				(char)rchInputPathName46,
-				(char)rchInputPathName47,
-				(char)rchInputPathName48,
-				(char)rchInputPathName49,
-				(char)rchInputPathName50,
-				(char)rchInputPathName51,
-				(char)rchInputPathName52,
-				(char)rchInputPathName53,
-				(char)rchInputPathName54,
-				(char)rchInputPathName55,
-				(char)rchInputPathName56,
-				(char)rchInputPathName57,
-				(char)rchInputPathName58,
-				(char)rchInputPathName59,
-				(char)rchInputPathName60,
-				(char)rchInputPathName61,
-				(char)rchInputPathName62,
-				(char)rchInputPathName63,
-				(char)rchInputPathName64,
-				(char)rchInputPathName65,
-				(char)rchInputPathName66,
-				(char)rchInputPathName67,
-				(char)rchInputPathName68,
-				(char)rchInputPathName69,
-				(char)rchInputPathName70,
-				(char)rchInputPathName71,
-				(char)rchInputPathName72,
-				(char)rchInputPathName73,
-				(char)rchInputPathName74,
-				(char)rchInputPathName75,
-				(char)rchInputPathName76,
-				(char)rchInputPathName77,
-				(char)rchInputPathName78,
-				(char)rchInputPathName79,
-				(char)rchInputPathName80,
-				(char)rchInputPathName81,
-				(char)rchInputPathName82,
-				(char)rchInputPathName83,
-				(char)rchInputPathName84,
-				(char)rchInputPathName85,
-				(char)rchInputPathName86,
-				(char)rchInputPathName87,
-				(char)rchInputPathName88,
-				(char)rchInputPathName89,
-				(char)rchInputPathName90,
-				(char)rchInputPathName91,
-				(char)rchInputPathName92,
-				(char)rchInputPathName93,
-				(char)rchInputPathName94,
-				(char)rchInputPathName95,
-				(char)rchInputPathName96,
-				(char)rchInputPathName97,
-				(char)rchInputPathName98,
-				(char)rchInputPathName99,
-				(char)rchInputPathName100,
-				(char)rchInputPathName101,
-				(char)rchInputPathName102,
-				(char)rchInputPathName103,
-				(char)rchInputPathName104,
-				(char)rchInputPathName105,
-				(char)rchInputPathName106,
-				(char)rchInputPathName107,
-				(char)rchInputPathName108,
-				(char)rchInputPathName109,
-				(char)rchInputPathName110,
-				(char)rchInputPathName111,
-				(char)rchInputPathName112,
-				(char)rchInputPathName113,
-				(char)rchInputPathName114,
-				(char)rchInputPathName115,
-				(char)rchInputPathName116,
-				(char)rchInputPathName117,
-				(char)rchInputPathName118,
-				(char)rchInputPathName119,
-				(char)rchInputPathName120,
-				(char)rchInputPathName121,
-				(char)rchInputPathName122,
-				(char)rchInputPathName123,
-				(char)rchInputPathName124,
-				(char)rchInputPathName125,
-				(char)rchInputPathName126,
-				(char)rchInputPathName127
-			}).TrimEnd('\0');
-		}
-	}
-	public byte rchModeName0,rchModeName1,rchModeName2,rchModeName3,rchModeName4,rchModeName5,rchModeName6,rchModeName7,rchModeName8,rchModeName9,rchModeName10,rchModeName11,rchModeName12,rchModeName13,rchModeName14,rchModeName15,rchModeName16,rchModeName17,rchModeName18,rchModeName19,rchModeName20,rchModeName21,rchModeName22,rchModeName23,rchModeName24,rchModeName25,rchModeName26,rchModeName27,rchModeName28,rchModeName29,rchModeName30,rchModeName31,rchModeName32,rchModeName33,rchModeName34,rchModeName35,rchModeName36,rchModeName37,rchModeName38,rchModeName39,rchModeName40,rchModeName41,rchModeName42,rchModeName43,rchModeName44,rchModeName45,rchModeName46,rchModeName47,rchModeName48,rchModeName49,rchModeName50,rchModeName51,rchModeName52,rchModeName53,rchModeName54,rchModeName55,rchModeName56,rchModeName57,rchModeName58,rchModeName59,rchModeName60,rchModeName61,rchModeName62,rchModeName63,rchModeName64,rchModeName65,rchModeName66,rchModeName67,rchModeName68,rchModeName69,rchModeName70,rchModeName71,rchModeName72,rchModeName73,rchModeName74,rchModeName75,rchModeName76,rchModeName77,rchModeName78,rchModeName79,rchModeName80,rchModeName81,rchModeName82,rchModeName83,rchModeName84,rchModeName85,rchModeName86,rchModeName87,rchModeName88,rchModeName89,rchModeName90,rchModeName91,rchModeName92,rchModeName93,rchModeName94,rchModeName95,rchModeName96,rchModeName97,rchModeName98,rchModeName99,rchModeName100,rchModeName101,rchModeName102,rchModeName103,rchModeName104,rchModeName105,rchModeName106,rchModeName107,rchModeName108,rchModeName109,rchModeName110,rchModeName111,rchModeName112,rchModeName113,rchModeName114,rchModeName115,rchModeName116,rchModeName117,rchModeName118,rchModeName119,rchModeName120,rchModeName121,rchModeName122,rchModeName123,rchModeName124,rchModeName125,rchModeName126,rchModeName127;
-	public string rchModeName
-	{
-		get
-		{
-			return new string(new char[] {
-				(char)rchModeName0,
-				(char)rchModeName1,
-				(char)rchModeName2,
-				(char)rchModeName3,
-				(char)rchModeName4,
-				(char)rchModeName5,
-				(char)rchModeName6,
-				(char)rchModeName7,
-				(char)rchModeName8,
-				(char)rchModeName9,
-				(char)rchModeName10,
-				(char)rchModeName11,
-				(char)rchModeName12,
-				(char)rchModeName13,
-				(char)rchModeName14,
-				(char)rchModeName15,
-				(char)rchModeName16,
-				(char)rchModeName17,
-				(char)rchModeName18,
-				(char)rchModeName19,
-				(char)rchModeName20,
-				(char)rchModeName21,
-				(char)rchModeName22,
-				(char)rchModeName23,
-				(char)rchModeName24,
-				(char)rchModeName25,
-				(char)rchModeName26,
-				(char)rchModeName27,
-				(char)rchModeName28,
-				(char)rchModeName29,
-				(char)rchModeName30,
-				(char)rchModeName31,
-				(char)rchModeName32,
-				(char)rchModeName33,
-				(char)rchModeName34,
-				(char)rchModeName35,
-				(char)rchModeName36,
-				(char)rchModeName37,
-				(char)rchModeName38,
-				(char)rchModeName39,
-				(char)rchModeName40,
-				(char)rchModeName41,
-				(char)rchModeName42,
-				(char)rchModeName43,
-				(char)rchModeName44,
-				(char)rchModeName45,
-				(char)rchModeName46,
-				(char)rchModeName47,
-				(char)rchModeName48,
-				(char)rchModeName49,
-				(char)rchModeName50,
-				(char)rchModeName51,
-				(char)rchModeName52,
-				(char)rchModeName53,
-				(char)rchModeName54,
-				(char)rchModeName55,
-				(char)rchModeName56,
-				(char)rchModeName57,
-				(char)rchModeName58,
-				(char)rchModeName59,
-				(char)rchModeName60,
-				(char)rchModeName61,
-				(char)rchModeName62,
-				(char)rchModeName63,
-				(char)rchModeName64,
-				(char)rchModeName65,
-				(char)rchModeName66,
-				(char)rchModeName67,
-				(char)rchModeName68,
-				(char)rchModeName69,
-				(char)rchModeName70,
-				(char)rchModeName71,
-				(char)rchModeName72,
-				(char)rchModeName73,
-				(char)rchModeName74,
-				(char)rchModeName75,
-				(char)rchModeName76,
-				(char)rchModeName77,
-				(char)rchModeName78,
-				(char)rchModeName79,
-				(char)rchModeName80,
-				(char)rchModeName81,
-				(char)rchModeName82,
-				(char)rchModeName83,
-				(char)rchModeName84,
-				(char)rchModeName85,
-				(char)rchModeName86,
-				(char)rchModeName87,
-				(char)rchModeName88,
-				(char)rchModeName89,
-				(char)rchModeName90,
-				(char)rchModeName91,
-				(char)rchModeName92,
-				(char)rchModeName93,
-				(char)rchModeName94,
-				(char)rchModeName95,
-				(char)rchModeName96,
-				(char)rchModeName97,
-				(char)rchModeName98,
-				(char)rchModeName99,
-				(char)rchModeName100,
-				(char)rchModeName101,
-				(char)rchModeName102,
-				(char)rchModeName103,
-				(char)rchModeName104,
-				(char)rchModeName105,
-				(char)rchModeName106,
-				(char)rchModeName107,
-				(char)rchModeName108,
-				(char)rchModeName109,
-				(char)rchModeName110,
-				(char)rchModeName111,
-				(char)rchModeName112,
-				(char)rchModeName113,
-				(char)rchModeName114,
-				(char)rchModeName115,
-				(char)rchModeName116,
-				(char)rchModeName117,
-				(char)rchModeName118,
-				(char)rchModeName119,
-				(char)rchModeName120,
-				(char)rchModeName121,
-				(char)rchModeName122,
-				(char)rchModeName123,
-				(char)rchModeName124,
-				(char)rchModeName125,
-				(char)rchModeName126,
-				(char)rchModeName127
-			}).TrimEnd('\0');
-		}
-	}
-	public byte rchSlotName0,rchSlotName1,rchSlotName2,rchSlotName3,rchSlotName4,rchSlotName5,rchSlotName6,rchSlotName7,rchSlotName8,rchSlotName9,rchSlotName10,rchSlotName11,rchSlotName12,rchSlotName13,rchSlotName14,rchSlotName15,rchSlotName16,rchSlotName17,rchSlotName18,rchSlotName19,rchSlotName20,rchSlotName21,rchSlotName22,rchSlotName23,rchSlotName24,rchSlotName25,rchSlotName26,rchSlotName27,rchSlotName28,rchSlotName29,rchSlotName30,rchSlotName31,rchSlotName32,rchSlotName33,rchSlotName34,rchSlotName35,rchSlotName36,rchSlotName37,rchSlotName38,rchSlotName39,rchSlotName40,rchSlotName41,rchSlotName42,rchSlotName43,rchSlotName44,rchSlotName45,rchSlotName46,rchSlotName47,rchSlotName48,rchSlotName49,rchSlotName50,rchSlotName51,rchSlotName52,rchSlotName53,rchSlotName54,rchSlotName55,rchSlotName56,rchSlotName57,rchSlotName58,rchSlotName59,rchSlotName60,rchSlotName61,rchSlotName62,rchSlotName63,rchSlotName64,rchSlotName65,rchSlotName66,rchSlotName67,rchSlotName68,rchSlotName69,rchSlotName70,rchSlotName71,rchSlotName72,rchSlotName73,rchSlotName74,rchSlotName75,rchSlotName76,rchSlotName77,rchSlotName78,rchSlotName79,rchSlotName80,rchSlotName81,rchSlotName82,rchSlotName83,rchSlotName84,rchSlotName85,rchSlotName86,rchSlotName87,rchSlotName88,rchSlotName89,rchSlotName90,rchSlotName91,rchSlotName92,rchSlotName93,rchSlotName94,rchSlotName95,rchSlotName96,rchSlotName97,rchSlotName98,rchSlotName99,rchSlotName100,rchSlotName101,rchSlotName102,rchSlotName103,rchSlotName104,rchSlotName105,rchSlotName106,rchSlotName107,rchSlotName108,rchSlotName109,rchSlotName110,rchSlotName111,rchSlotName112,rchSlotName113,rchSlotName114,rchSlotName115,rchSlotName116,rchSlotName117,rchSlotName118,rchSlotName119,rchSlotName120,rchSlotName121,rchSlotName122,rchSlotName123,rchSlotName124,rchSlotName125,rchSlotName126,rchSlotName127;
-	public string rchSlotName
-	{
-		get
-		{
-			return new string(new char[] {
-				(char)rchSlotName0,
-				(char)rchSlotName1,
-				(char)rchSlotName2,
-				(char)rchSlotName3,
-				(char)rchSlotName4,
-				(char)rchSlotName5,
-				(char)rchSlotName6,
-				(char)rchSlotName7,
-				(char)rchSlotName8,
-				(char)rchSlotName9,
-				(char)rchSlotName10,
-				(char)rchSlotName11,
-				(char)rchSlotName12,
-				(char)rchSlotName13,
-				(char)rchSlotName14,
-				(char)rchSlotName15,
-				(char)rchSlotName16,
-				(char)rchSlotName17,
-				(char)rchSlotName18,
-				(char)rchSlotName19,
-				(char)rchSlotName20,
-				(char)rchSlotName21,
-				(char)rchSlotName22,
-				(char)rchSlotName23,
-				(char)rchSlotName24,
-				(char)rchSlotName25,
-				(char)rchSlotName26,
-				(char)rchSlotName27,
-				(char)rchSlotName28,
-				(char)rchSlotName29,
-				(char)rchSlotName30,
-				(char)rchSlotName31,
-				(char)rchSlotName32,
-				(char)rchSlotName33,
-				(char)rchSlotName34,
-				(char)rchSlotName35,
-				(char)rchSlotName36,
-				(char)rchSlotName37,
-				(char)rchSlotName38,
-				(char)rchSlotName39,
-				(char)rchSlotName40,
-				(char)rchSlotName41,
-				(char)rchSlotName42,
-				(char)rchSlotName43,
-				(char)rchSlotName44,
-				(char)rchSlotName45,
-				(char)rchSlotName46,
-				(char)rchSlotName47,
-				(char)rchSlotName48,
-				(char)rchSlotName49,
-				(char)rchSlotName50,
-				(char)rchSlotName51,
-				(char)rchSlotName52,
-				(char)rchSlotName53,
-				(char)rchSlotName54,
-				(char)rchSlotName55,
-				(char)rchSlotName56,
-				(char)rchSlotName57,
-				(char)rchSlotName58,
-				(char)rchSlotName59,
-				(char)rchSlotName60,
-				(char)rchSlotName61,
-				(char)rchSlotName62,
-				(char)rchSlotName63,
-				(char)rchSlotName64,
-				(char)rchSlotName65,
-				(char)rchSlotName66,
-				(char)rchSlotName67,
-				(char)rchSlotName68,
-				(char)rchSlotName69,
-				(char)rchSlotName70,
-				(char)rchSlotName71,
-				(char)rchSlotName72,
-				(char)rchSlotName73,
-				(char)rchSlotName74,
-				(char)rchSlotName75,
-				(char)rchSlotName76,
-				(char)rchSlotName77,
-				(char)rchSlotName78,
-				(char)rchSlotName79,
-				(char)rchSlotName80,
-				(char)rchSlotName81,
-				(char)rchSlotName82,
-				(char)rchSlotName83,
-				(char)rchSlotName84,
-				(char)rchSlotName85,
-				(char)rchSlotName86,
-				(char)rchSlotName87,
-				(char)rchSlotName88,
-				(char)rchSlotName89,
-				(char)rchSlotName90,
-				(char)rchSlotName91,
-				(char)rchSlotName92,
-				(char)rchSlotName93,
-				(char)rchSlotName94,
-				(char)rchSlotName95,
-				(char)rchSlotName96,
-				(char)rchSlotName97,
-				(char)rchSlotName98,
-				(char)rchSlotName99,
-				(char)rchSlotName100,
-				(char)rchSlotName101,
-				(char)rchSlotName102,
-				(char)rchSlotName103,
-				(char)rchSlotName104,
-				(char)rchSlotName105,
-				(char)rchSlotName106,
-				(char)rchSlotName107,
-				(char)rchSlotName108,
-				(char)rchSlotName109,
-				(char)rchSlotName110,
-				(char)rchSlotName111,
-				(char)rchSlotName112,
-				(char)rchSlotName113,
-				(char)rchSlotName114,
-				(char)rchSlotName115,
-				(char)rchSlotName116,
-				(char)rchSlotName117,
-				(char)rchSlotName118,
-				(char)rchSlotName119,
-				(char)rchSlotName120,
-				(char)rchSlotName121,
-				(char)rchSlotName122,
-				(char)rchSlotName123,
-				(char)rchSlotName124,
-				(char)rchSlotName125,
-				(char)rchSlotName126,
-				(char)rchSlotName127
-			}).TrimEnd('\0');
-		}
-	}
-	public byte rchInputSourceType0,rchInputSourceType1,rchInputSourceType2,rchInputSourceType3,rchInputSourceType4,rchInputSourceType5,rchInputSourceType6,rchInputSourceType7,rchInputSourceType8,rchInputSourceType9,rchInputSourceType10,rchInputSourceType11,rchInputSourceType12,rchInputSourceType13,rchInputSourceType14,rchInputSourceType15,rchInputSourceType16,rchInputSourceType17,rchInputSourceType18,rchInputSourceType19,rchInputSourceType20,rchInputSourceType21,rchInputSourceType22,rchInputSourceType23,rchInputSourceType24,rchInputSourceType25,rchInputSourceType26,rchInputSourceType27,rchInputSourceType28,rchInputSourceType29,rchInputSourceType30,rchInputSourceType31;
-	public string rchInputSourceType
-	{
-		get
-		{
-			return new string(new char[] {
-				(char)rchInputSourceType0,
-				(char)rchInputSourceType1,
-				(char)rchInputSourceType2,
-				(char)rchInputSourceType3,
-				(char)rchInputSourceType4,
-				(char)rchInputSourceType5,
-				(char)rchInputSourceType6,
-				(char)rchInputSourceType7,
-				(char)rchInputSourceType8,
-				(char)rchInputSourceType9,
-				(char)rchInputSourceType10,
-				(char)rchInputSourceType11,
-				(char)rchInputSourceType12,
-				(char)rchInputSourceType13,
-				(char)rchInputSourceType14,
-				(char)rchInputSourceType15,
-				(char)rchInputSourceType16,
-				(char)rchInputSourceType17,
-				(char)rchInputSourceType18,
-				(char)rchInputSourceType19,
-				(char)rchInputSourceType20,
-				(char)rchInputSourceType21,
-				(char)rchInputSourceType22,
-				(char)rchInputSourceType23,
-				(char)rchInputSourceType24,
-				(char)rchInputSourceType25,
-				(char)rchInputSourceType26,
-				(char)rchInputSourceType27,
-				(char)rchInputSourceType28,
-				(char)rchInputSourceType29,
-				(char)rchInputSourceType30,
-				(char)rchInputSourceType31
-			}).TrimEnd('\0');
-		}
-	}
-}
+        public string rchDevicePathName => new string(new char[] {
+                (char)this.rchDevicePathName0,
+                (char)this.rchDevicePathName1,
+                (char)this.rchDevicePathName2,
+                (char)this.rchDevicePathName3,
+                (char)this.rchDevicePathName4,
+                (char)this.rchDevicePathName5,
+                (char)this.rchDevicePathName6,
+                (char)this.rchDevicePathName7,
+                (char)this.rchDevicePathName8,
+                (char)this.rchDevicePathName9,
+                (char)this.rchDevicePathName10,
+                (char)this.rchDevicePathName11,
+                (char)this.rchDevicePathName12,
+                (char)this.rchDevicePathName13,
+                (char)this.rchDevicePathName14,
+                (char)this.rchDevicePathName15,
+                (char)this.rchDevicePathName16,
+                (char)this.rchDevicePathName17,
+                (char)this.rchDevicePathName18,
+                (char)this.rchDevicePathName19,
+                (char)this.rchDevicePathName20,
+                (char)this.rchDevicePathName21,
+                (char)this.rchDevicePathName22,
+                (char)this.rchDevicePathName23,
+                (char)this.rchDevicePathName24,
+                (char)this.rchDevicePathName25,
+                (char)this.rchDevicePathName26,
+                (char)this.rchDevicePathName27,
+                (char)this.rchDevicePathName28,
+                (char)this.rchDevicePathName29,
+                (char)this.rchDevicePathName30,
+                (char)this.rchDevicePathName31,
+                (char)this.rchDevicePathName32,
+                (char)this.rchDevicePathName33,
+                (char)this.rchDevicePathName34,
+                (char)this.rchDevicePathName35,
+                (char)this.rchDevicePathName36,
+                (char)this.rchDevicePathName37,
+                (char)this.rchDevicePathName38,
+                (char)this.rchDevicePathName39,
+                (char)this.rchDevicePathName40,
+                (char)this.rchDevicePathName41,
+                (char)this.rchDevicePathName42,
+                (char)this.rchDevicePathName43,
+                (char)this.rchDevicePathName44,
+                (char)this.rchDevicePathName45,
+                (char)this.rchDevicePathName46,
+                (char)this.rchDevicePathName47,
+                (char)this.rchDevicePathName48,
+                (char)this.rchDevicePathName49,
+                (char)this.rchDevicePathName50,
+                (char)this.rchDevicePathName51,
+                (char)this.rchDevicePathName52,
+                (char)this.rchDevicePathName53,
+                (char)this.rchDevicePathName54,
+                (char)this.rchDevicePathName55,
+                (char)this.rchDevicePathName56,
+                (char)this.rchDevicePathName57,
+                (char)this.rchDevicePathName58,
+                (char)this.rchDevicePathName59,
+                (char)this.rchDevicePathName60,
+                (char)this.rchDevicePathName61,
+                (char)this.rchDevicePathName62,
+                (char)this.rchDevicePathName63,
+                (char)this.rchDevicePathName64,
+                (char)this.rchDevicePathName65,
+                (char)this.rchDevicePathName66,
+                (char)this.rchDevicePathName67,
+                (char)this.rchDevicePathName68,
+                (char)this.rchDevicePathName69,
+                (char)this.rchDevicePathName70,
+                (char)this.rchDevicePathName71,
+                (char)this.rchDevicePathName72,
+                (char)this.rchDevicePathName73,
+                (char)this.rchDevicePathName74,
+                (char)this.rchDevicePathName75,
+                (char)this.rchDevicePathName76,
+                (char)this.rchDevicePathName77,
+                (char)this.rchDevicePathName78,
+                (char)this.rchDevicePathName79,
+                (char)this.rchDevicePathName80,
+                (char)this.rchDevicePathName81,
+                (char)this.rchDevicePathName82,
+                (char)this.rchDevicePathName83,
+                (char)this.rchDevicePathName84,
+                (char)this.rchDevicePathName85,
+                (char)this.rchDevicePathName86,
+                (char)this.rchDevicePathName87,
+                (char)this.rchDevicePathName88,
+                (char)this.rchDevicePathName89,
+                (char)this.rchDevicePathName90,
+                (char)this.rchDevicePathName91,
+                (char)this.rchDevicePathName92,
+                (char)this.rchDevicePathName93,
+                (char)this.rchDevicePathName94,
+                (char)this.rchDevicePathName95,
+                (char)this.rchDevicePathName96,
+                (char)this.rchDevicePathName97,
+                (char)this.rchDevicePathName98,
+                (char)this.rchDevicePathName99,
+                (char)this.rchDevicePathName100,
+                (char)this.rchDevicePathName101,
+                (char)this.rchDevicePathName102,
+                (char)this.rchDevicePathName103,
+                (char)this.rchDevicePathName104,
+                (char)this.rchDevicePathName105,
+                (char)this.rchDevicePathName106,
+                (char)this.rchDevicePathName107,
+                (char)this.rchDevicePathName108,
+                (char)this.rchDevicePathName109,
+                (char)this.rchDevicePathName110,
+                (char)this.rchDevicePathName111,
+                (char)this.rchDevicePathName112,
+                (char)this.rchDevicePathName113,
+                (char)this.rchDevicePathName114,
+                (char)this.rchDevicePathName115,
+                (char)this.rchDevicePathName116,
+                (char)this.rchDevicePathName117,
+                (char)this.rchDevicePathName118,
+                (char)this.rchDevicePathName119,
+                (char)this.rchDevicePathName120,
+                (char)this.rchDevicePathName121,
+                (char)this.rchDevicePathName122,
+                (char)this.rchDevicePathName123,
+                (char)this.rchDevicePathName124,
+                (char)this.rchDevicePathName125,
+                (char)this.rchDevicePathName126,
+                (char)this.rchDevicePathName127
+            }).TrimEnd('\0');
+        public byte rchInputPathName0,rchInputPathName1,rchInputPathName2,rchInputPathName3,rchInputPathName4,rchInputPathName5,rchInputPathName6,rchInputPathName7,rchInputPathName8,rchInputPathName9,rchInputPathName10,rchInputPathName11,rchInputPathName12,rchInputPathName13,rchInputPathName14,rchInputPathName15,rchInputPathName16,rchInputPathName17,rchInputPathName18,rchInputPathName19,rchInputPathName20,rchInputPathName21,rchInputPathName22,rchInputPathName23,rchInputPathName24,rchInputPathName25,rchInputPathName26,rchInputPathName27,rchInputPathName28,rchInputPathName29,rchInputPathName30,rchInputPathName31,rchInputPathName32,rchInputPathName33,rchInputPathName34,rchInputPathName35,rchInputPathName36,rchInputPathName37,rchInputPathName38,rchInputPathName39,rchInputPathName40,rchInputPathName41,rchInputPathName42,rchInputPathName43,rchInputPathName44,rchInputPathName45,rchInputPathName46,rchInputPathName47,rchInputPathName48,rchInputPathName49,rchInputPathName50,rchInputPathName51,rchInputPathName52,rchInputPathName53,rchInputPathName54,rchInputPathName55,rchInputPathName56,rchInputPathName57,rchInputPathName58,rchInputPathName59,rchInputPathName60,rchInputPathName61,rchInputPathName62,rchInputPathName63,rchInputPathName64,rchInputPathName65,rchInputPathName66,rchInputPathName67,rchInputPathName68,rchInputPathName69,rchInputPathName70,rchInputPathName71,rchInputPathName72,rchInputPathName73,rchInputPathName74,rchInputPathName75,rchInputPathName76,rchInputPathName77,rchInputPathName78,rchInputPathName79,rchInputPathName80,rchInputPathName81,rchInputPathName82,rchInputPathName83,rchInputPathName84,rchInputPathName85,rchInputPathName86,rchInputPathName87,rchInputPathName88,rchInputPathName89,rchInputPathName90,rchInputPathName91,rchInputPathName92,rchInputPathName93,rchInputPathName94,rchInputPathName95,rchInputPathName96,rchInputPathName97,rchInputPathName98,rchInputPathName99,rchInputPathName100,rchInputPathName101,rchInputPathName102,rchInputPathName103,rchInputPathName104,rchInputPathName105,rchInputPathName106,rchInputPathName107,rchInputPathName108,rchInputPathName109,rchInputPathName110,rchInputPathName111,rchInputPathName112,rchInputPathName113,rchInputPathName114,rchInputPathName115,rchInputPathName116,rchInputPathName117,rchInputPathName118,rchInputPathName119,rchInputPathName120,rchInputPathName121,rchInputPathName122,rchInputPathName123,rchInputPathName124,rchInputPathName125,rchInputPathName126,rchInputPathName127;
+        public string rchInputPathName => new string(new char[] {
+                (char)this.rchInputPathName0,
+                (char)this.rchInputPathName1,
+                (char)this.rchInputPathName2,
+                (char)this.rchInputPathName3,
+                (char)this.rchInputPathName4,
+                (char)this.rchInputPathName5,
+                (char)this.rchInputPathName6,
+                (char)this.rchInputPathName7,
+                (char)this.rchInputPathName8,
+                (char)this.rchInputPathName9,
+                (char)this.rchInputPathName10,
+                (char)this.rchInputPathName11,
+                (char)this.rchInputPathName12,
+                (char)this.rchInputPathName13,
+                (char)this.rchInputPathName14,
+                (char)this.rchInputPathName15,
+                (char)this.rchInputPathName16,
+                (char)this.rchInputPathName17,
+                (char)this.rchInputPathName18,
+                (char)this.rchInputPathName19,
+                (char)this.rchInputPathName20,
+                (char)this.rchInputPathName21,
+                (char)this.rchInputPathName22,
+                (char)this.rchInputPathName23,
+                (char)this.rchInputPathName24,
+                (char)this.rchInputPathName25,
+                (char)this.rchInputPathName26,
+                (char)this.rchInputPathName27,
+                (char)this.rchInputPathName28,
+                (char)this.rchInputPathName29,
+                (char)this.rchInputPathName30,
+                (char)this.rchInputPathName31,
+                (char)this.rchInputPathName32,
+                (char)this.rchInputPathName33,
+                (char)this.rchInputPathName34,
+                (char)this.rchInputPathName35,
+                (char)this.rchInputPathName36,
+                (char)this.rchInputPathName37,
+                (char)this.rchInputPathName38,
+                (char)this.rchInputPathName39,
+                (char)this.rchInputPathName40,
+                (char)this.rchInputPathName41,
+                (char)this.rchInputPathName42,
+                (char)this.rchInputPathName43,
+                (char)this.rchInputPathName44,
+                (char)this.rchInputPathName45,
+                (char)this.rchInputPathName46,
+                (char)this.rchInputPathName47,
+                (char)this.rchInputPathName48,
+                (char)this.rchInputPathName49,
+                (char)this.rchInputPathName50,
+                (char)this.rchInputPathName51,
+                (char)this.rchInputPathName52,
+                (char)this.rchInputPathName53,
+                (char)this.rchInputPathName54,
+                (char)this.rchInputPathName55,
+                (char)this.rchInputPathName56,
+                (char)this.rchInputPathName57,
+                (char)this.rchInputPathName58,
+                (char)this.rchInputPathName59,
+                (char)this.rchInputPathName60,
+                (char)this.rchInputPathName61,
+                (char)this.rchInputPathName62,
+                (char)this.rchInputPathName63,
+                (char)this.rchInputPathName64,
+                (char)this.rchInputPathName65,
+                (char)this.rchInputPathName66,
+                (char)this.rchInputPathName67,
+                (char)this.rchInputPathName68,
+                (char)this.rchInputPathName69,
+                (char)this.rchInputPathName70,
+                (char)this.rchInputPathName71,
+                (char)this.rchInputPathName72,
+                (char)this.rchInputPathName73,
+                (char)this.rchInputPathName74,
+                (char)this.rchInputPathName75,
+                (char)this.rchInputPathName76,
+                (char)this.rchInputPathName77,
+                (char)this.rchInputPathName78,
+                (char)this.rchInputPathName79,
+                (char)this.rchInputPathName80,
+                (char)this.rchInputPathName81,
+                (char)this.rchInputPathName82,
+                (char)this.rchInputPathName83,
+                (char)this.rchInputPathName84,
+                (char)this.rchInputPathName85,
+                (char)this.rchInputPathName86,
+                (char)this.rchInputPathName87,
+                (char)this.rchInputPathName88,
+                (char)this.rchInputPathName89,
+                (char)this.rchInputPathName90,
+                (char)this.rchInputPathName91,
+                (char)this.rchInputPathName92,
+                (char)this.rchInputPathName93,
+                (char)this.rchInputPathName94,
+                (char)this.rchInputPathName95,
+                (char)this.rchInputPathName96,
+                (char)this.rchInputPathName97,
+                (char)this.rchInputPathName98,
+                (char)this.rchInputPathName99,
+                (char)this.rchInputPathName100,
+                (char)this.rchInputPathName101,
+                (char)this.rchInputPathName102,
+                (char)this.rchInputPathName103,
+                (char)this.rchInputPathName104,
+                (char)this.rchInputPathName105,
+                (char)this.rchInputPathName106,
+                (char)this.rchInputPathName107,
+                (char)this.rchInputPathName108,
+                (char)this.rchInputPathName109,
+                (char)this.rchInputPathName110,
+                (char)this.rchInputPathName111,
+                (char)this.rchInputPathName112,
+                (char)this.rchInputPathName113,
+                (char)this.rchInputPathName114,
+                (char)this.rchInputPathName115,
+                (char)this.rchInputPathName116,
+                (char)this.rchInputPathName117,
+                (char)this.rchInputPathName118,
+                (char)this.rchInputPathName119,
+                (char)this.rchInputPathName120,
+                (char)this.rchInputPathName121,
+                (char)this.rchInputPathName122,
+                (char)this.rchInputPathName123,
+                (char)this.rchInputPathName124,
+                (char)this.rchInputPathName125,
+                (char)this.rchInputPathName126,
+                (char)this.rchInputPathName127
+            }).TrimEnd('\0');
+        public byte rchModeName0,rchModeName1,rchModeName2,rchModeName3,rchModeName4,rchModeName5,rchModeName6,rchModeName7,rchModeName8,rchModeName9,rchModeName10,rchModeName11,rchModeName12,rchModeName13,rchModeName14,rchModeName15,rchModeName16,rchModeName17,rchModeName18,rchModeName19,rchModeName20,rchModeName21,rchModeName22,rchModeName23,rchModeName24,rchModeName25,rchModeName26,rchModeName27,rchModeName28,rchModeName29,rchModeName30,rchModeName31,rchModeName32,rchModeName33,rchModeName34,rchModeName35,rchModeName36,rchModeName37,rchModeName38,rchModeName39,rchModeName40,rchModeName41,rchModeName42,rchModeName43,rchModeName44,rchModeName45,rchModeName46,rchModeName47,rchModeName48,rchModeName49,rchModeName50,rchModeName51,rchModeName52,rchModeName53,rchModeName54,rchModeName55,rchModeName56,rchModeName57,rchModeName58,rchModeName59,rchModeName60,rchModeName61,rchModeName62,rchModeName63,rchModeName64,rchModeName65,rchModeName66,rchModeName67,rchModeName68,rchModeName69,rchModeName70,rchModeName71,rchModeName72,rchModeName73,rchModeName74,rchModeName75,rchModeName76,rchModeName77,rchModeName78,rchModeName79,rchModeName80,rchModeName81,rchModeName82,rchModeName83,rchModeName84,rchModeName85,rchModeName86,rchModeName87,rchModeName88,rchModeName89,rchModeName90,rchModeName91,rchModeName92,rchModeName93,rchModeName94,rchModeName95,rchModeName96,rchModeName97,rchModeName98,rchModeName99,rchModeName100,rchModeName101,rchModeName102,rchModeName103,rchModeName104,rchModeName105,rchModeName106,rchModeName107,rchModeName108,rchModeName109,rchModeName110,rchModeName111,rchModeName112,rchModeName113,rchModeName114,rchModeName115,rchModeName116,rchModeName117,rchModeName118,rchModeName119,rchModeName120,rchModeName121,rchModeName122,rchModeName123,rchModeName124,rchModeName125,rchModeName126,rchModeName127;
+        public string rchModeName => new string(new char[] {
+                (char)this.rchModeName0,
+                (char)this.rchModeName1,
+                (char)this.rchModeName2,
+                (char)this.rchModeName3,
+                (char)this.rchModeName4,
+                (char)this.rchModeName5,
+                (char)this.rchModeName6,
+                (char)this.rchModeName7,
+                (char)this.rchModeName8,
+                (char)this.rchModeName9,
+                (char)this.rchModeName10,
+                (char)this.rchModeName11,
+                (char)this.rchModeName12,
+                (char)this.rchModeName13,
+                (char)this.rchModeName14,
+                (char)this.rchModeName15,
+                (char)this.rchModeName16,
+                (char)this.rchModeName17,
+                (char)this.rchModeName18,
+                (char)this.rchModeName19,
+                (char)this.rchModeName20,
+                (char)this.rchModeName21,
+                (char)this.rchModeName22,
+                (char)this.rchModeName23,
+                (char)this.rchModeName24,
+                (char)this.rchModeName25,
+                (char)this.rchModeName26,
+                (char)this.rchModeName27,
+                (char)this.rchModeName28,
+                (char)this.rchModeName29,
+                (char)this.rchModeName30,
+                (char)this.rchModeName31,
+                (char)this.rchModeName32,
+                (char)this.rchModeName33,
+                (char)this.rchModeName34,
+                (char)this.rchModeName35,
+                (char)this.rchModeName36,
+                (char)this.rchModeName37,
+                (char)this.rchModeName38,
+                (char)this.rchModeName39,
+                (char)this.rchModeName40,
+                (char)this.rchModeName41,
+                (char)this.rchModeName42,
+                (char)this.rchModeName43,
+                (char)this.rchModeName44,
+                (char)this.rchModeName45,
+                (char)this.rchModeName46,
+                (char)this.rchModeName47,
+                (char)this.rchModeName48,
+                (char)this.rchModeName49,
+                (char)this.rchModeName50,
+                (char)this.rchModeName51,
+                (char)this.rchModeName52,
+                (char)this.rchModeName53,
+                (char)this.rchModeName54,
+                (char)this.rchModeName55,
+                (char)this.rchModeName56,
+                (char)this.rchModeName57,
+                (char)this.rchModeName58,
+                (char)this.rchModeName59,
+                (char)this.rchModeName60,
+                (char)this.rchModeName61,
+                (char)this.rchModeName62,
+                (char)this.rchModeName63,
+                (char)this.rchModeName64,
+                (char)this.rchModeName65,
+                (char)this.rchModeName66,
+                (char)this.rchModeName67,
+                (char)this.rchModeName68,
+                (char)this.rchModeName69,
+                (char)this.rchModeName70,
+                (char)this.rchModeName71,
+                (char)this.rchModeName72,
+                (char)this.rchModeName73,
+                (char)this.rchModeName74,
+                (char)this.rchModeName75,
+                (char)this.rchModeName76,
+                (char)this.rchModeName77,
+                (char)this.rchModeName78,
+                (char)this.rchModeName79,
+                (char)this.rchModeName80,
+                (char)this.rchModeName81,
+                (char)this.rchModeName82,
+                (char)this.rchModeName83,
+                (char)this.rchModeName84,
+                (char)this.rchModeName85,
+                (char)this.rchModeName86,
+                (char)this.rchModeName87,
+                (char)this.rchModeName88,
+                (char)this.rchModeName89,
+                (char)this.rchModeName90,
+                (char)this.rchModeName91,
+                (char)this.rchModeName92,
+                (char)this.rchModeName93,
+                (char)this.rchModeName94,
+                (char)this.rchModeName95,
+                (char)this.rchModeName96,
+                (char)this.rchModeName97,
+                (char)this.rchModeName98,
+                (char)this.rchModeName99,
+                (char)this.rchModeName100,
+                (char)this.rchModeName101,
+                (char)this.rchModeName102,
+                (char)this.rchModeName103,
+                (char)this.rchModeName104,
+                (char)this.rchModeName105,
+                (char)this.rchModeName106,
+                (char)this.rchModeName107,
+                (char)this.rchModeName108,
+                (char)this.rchModeName109,
+                (char)this.rchModeName110,
+                (char)this.rchModeName111,
+                (char)this.rchModeName112,
+                (char)this.rchModeName113,
+                (char)this.rchModeName114,
+                (char)this.rchModeName115,
+                (char)this.rchModeName116,
+                (char)this.rchModeName117,
+                (char)this.rchModeName118,
+                (char)this.rchModeName119,
+                (char)this.rchModeName120,
+                (char)this.rchModeName121,
+                (char)this.rchModeName122,
+                (char)this.rchModeName123,
+                (char)this.rchModeName124,
+                (char)this.rchModeName125,
+                (char)this.rchModeName126,
+                (char)this.rchModeName127
+            }).TrimEnd('\0');
+        public byte rchSlotName0,rchSlotName1,rchSlotName2,rchSlotName3,rchSlotName4,rchSlotName5,rchSlotName6,rchSlotName7,rchSlotName8,rchSlotName9,rchSlotName10,rchSlotName11,rchSlotName12,rchSlotName13,rchSlotName14,rchSlotName15,rchSlotName16,rchSlotName17,rchSlotName18,rchSlotName19,rchSlotName20,rchSlotName21,rchSlotName22,rchSlotName23,rchSlotName24,rchSlotName25,rchSlotName26,rchSlotName27,rchSlotName28,rchSlotName29,rchSlotName30,rchSlotName31,rchSlotName32,rchSlotName33,rchSlotName34,rchSlotName35,rchSlotName36,rchSlotName37,rchSlotName38,rchSlotName39,rchSlotName40,rchSlotName41,rchSlotName42,rchSlotName43,rchSlotName44,rchSlotName45,rchSlotName46,rchSlotName47,rchSlotName48,rchSlotName49,rchSlotName50,rchSlotName51,rchSlotName52,rchSlotName53,rchSlotName54,rchSlotName55,rchSlotName56,rchSlotName57,rchSlotName58,rchSlotName59,rchSlotName60,rchSlotName61,rchSlotName62,rchSlotName63,rchSlotName64,rchSlotName65,rchSlotName66,rchSlotName67,rchSlotName68,rchSlotName69,rchSlotName70,rchSlotName71,rchSlotName72,rchSlotName73,rchSlotName74,rchSlotName75,rchSlotName76,rchSlotName77,rchSlotName78,rchSlotName79,rchSlotName80,rchSlotName81,rchSlotName82,rchSlotName83,rchSlotName84,rchSlotName85,rchSlotName86,rchSlotName87,rchSlotName88,rchSlotName89,rchSlotName90,rchSlotName91,rchSlotName92,rchSlotName93,rchSlotName94,rchSlotName95,rchSlotName96,rchSlotName97,rchSlotName98,rchSlotName99,rchSlotName100,rchSlotName101,rchSlotName102,rchSlotName103,rchSlotName104,rchSlotName105,rchSlotName106,rchSlotName107,rchSlotName108,rchSlotName109,rchSlotName110,rchSlotName111,rchSlotName112,rchSlotName113,rchSlotName114,rchSlotName115,rchSlotName116,rchSlotName117,rchSlotName118,rchSlotName119,rchSlotName120,rchSlotName121,rchSlotName122,rchSlotName123,rchSlotName124,rchSlotName125,rchSlotName126,rchSlotName127;
+        public string rchSlotName => new string(new char[] {
+                (char)this.rchSlotName0,
+                (char)this.rchSlotName1,
+                (char)this.rchSlotName2,
+                (char)this.rchSlotName3,
+                (char)this.rchSlotName4,
+                (char)this.rchSlotName5,
+                (char)this.rchSlotName6,
+                (char)this.rchSlotName7,
+                (char)this.rchSlotName8,
+                (char)this.rchSlotName9,
+                (char)this.rchSlotName10,
+                (char)this.rchSlotName11,
+                (char)this.rchSlotName12,
+                (char)this.rchSlotName13,
+                (char)this.rchSlotName14,
+                (char)this.rchSlotName15,
+                (char)this.rchSlotName16,
+                (char)this.rchSlotName17,
+                (char)this.rchSlotName18,
+                (char)this.rchSlotName19,
+                (char)this.rchSlotName20,
+                (char)this.rchSlotName21,
+                (char)this.rchSlotName22,
+                (char)this.rchSlotName23,
+                (char)this.rchSlotName24,
+                (char)this.rchSlotName25,
+                (char)this.rchSlotName26,
+                (char)this.rchSlotName27,
+                (char)this.rchSlotName28,
+                (char)this.rchSlotName29,
+                (char)this.rchSlotName30,
+                (char)this.rchSlotName31,
+                (char)this.rchSlotName32,
+                (char)this.rchSlotName33,
+                (char)this.rchSlotName34,
+                (char)this.rchSlotName35,
+                (char)this.rchSlotName36,
+                (char)this.rchSlotName37,
+                (char)this.rchSlotName38,
+                (char)this.rchSlotName39,
+                (char)this.rchSlotName40,
+                (char)this.rchSlotName41,
+                (char)this.rchSlotName42,
+                (char)this.rchSlotName43,
+                (char)this.rchSlotName44,
+                (char)this.rchSlotName45,
+                (char)this.rchSlotName46,
+                (char)this.rchSlotName47,
+                (char)this.rchSlotName48,
+                (char)this.rchSlotName49,
+                (char)this.rchSlotName50,
+                (char)this.rchSlotName51,
+                (char)this.rchSlotName52,
+                (char)this.rchSlotName53,
+                (char)this.rchSlotName54,
+                (char)this.rchSlotName55,
+                (char)this.rchSlotName56,
+                (char)this.rchSlotName57,
+                (char)this.rchSlotName58,
+                (char)this.rchSlotName59,
+                (char)this.rchSlotName60,
+                (char)this.rchSlotName61,
+                (char)this.rchSlotName62,
+                (char)this.rchSlotName63,
+                (char)this.rchSlotName64,
+                (char)this.rchSlotName65,
+                (char)this.rchSlotName66,
+                (char)this.rchSlotName67,
+                (char)this.rchSlotName68,
+                (char)this.rchSlotName69,
+                (char)this.rchSlotName70,
+                (char)this.rchSlotName71,
+                (char)this.rchSlotName72,
+                (char)this.rchSlotName73,
+                (char)this.rchSlotName74,
+                (char)this.rchSlotName75,
+                (char)this.rchSlotName76,
+                (char)this.rchSlotName77,
+                (char)this.rchSlotName78,
+                (char)this.rchSlotName79,
+                (char)this.rchSlotName80,
+                (char)this.rchSlotName81,
+                (char)this.rchSlotName82,
+                (char)this.rchSlotName83,
+                (char)this.rchSlotName84,
+                (char)this.rchSlotName85,
+                (char)this.rchSlotName86,
+                (char)this.rchSlotName87,
+                (char)this.rchSlotName88,
+                (char)this.rchSlotName89,
+                (char)this.rchSlotName90,
+                (char)this.rchSlotName91,
+                (char)this.rchSlotName92,
+                (char)this.rchSlotName93,
+                (char)this.rchSlotName94,
+                (char)this.rchSlotName95,
+                (char)this.rchSlotName96,
+                (char)this.rchSlotName97,
+                (char)this.rchSlotName98,
+                (char)this.rchSlotName99,
+                (char)this.rchSlotName100,
+                (char)this.rchSlotName101,
+                (char)this.rchSlotName102,
+                (char)this.rchSlotName103,
+                (char)this.rchSlotName104,
+                (char)this.rchSlotName105,
+                (char)this.rchSlotName106,
+                (char)this.rchSlotName107,
+                (char)this.rchSlotName108,
+                (char)this.rchSlotName109,
+                (char)this.rchSlotName110,
+                (char)this.rchSlotName111,
+                (char)this.rchSlotName112,
+                (char)this.rchSlotName113,
+                (char)this.rchSlotName114,
+                (char)this.rchSlotName115,
+                (char)this.rchSlotName116,
+                (char)this.rchSlotName117,
+                (char)this.rchSlotName118,
+                (char)this.rchSlotName119,
+                (char)this.rchSlotName120,
+                (char)this.rchSlotName121,
+                (char)this.rchSlotName122,
+                (char)this.rchSlotName123,
+                (char)this.rchSlotName124,
+                (char)this.rchSlotName125,
+                (char)this.rchSlotName126,
+                (char)this.rchSlotName127
+            }).TrimEnd('\0');
+        public byte rchInputSourceType0,rchInputSourceType1,rchInputSourceType2,rchInputSourceType3,rchInputSourceType4,rchInputSourceType5,rchInputSourceType6,rchInputSourceType7,rchInputSourceType8,rchInputSourceType9,rchInputSourceType10,rchInputSourceType11,rchInputSourceType12,rchInputSourceType13,rchInputSourceType14,rchInputSourceType15,rchInputSourceType16,rchInputSourceType17,rchInputSourceType18,rchInputSourceType19,rchInputSourceType20,rchInputSourceType21,rchInputSourceType22,rchInputSourceType23,rchInputSourceType24,rchInputSourceType25,rchInputSourceType26,rchInputSourceType27,rchInputSourceType28,rchInputSourceType29,rchInputSourceType30,rchInputSourceType31;
+        public string rchInputSourceType => new string(new char[] {
+                (char)this.rchInputSourceType0,
+                (char)this.rchInputSourceType1,
+                (char)this.rchInputSourceType2,
+                (char)this.rchInputSourceType3,
+                (char)this.rchInputSourceType4,
+                (char)this.rchInputSourceType5,
+                (char)this.rchInputSourceType6,
+                (char)this.rchInputSourceType7,
+                (char)this.rchInputSourceType8,
+                (char)this.rchInputSourceType9,
+                (char)this.rchInputSourceType10,
+                (char)this.rchInputSourceType11,
+                (char)this.rchInputSourceType12,
+                (char)this.rchInputSourceType13,
+                (char)this.rchInputSourceType14,
+                (char)this.rchInputSourceType15,
+                (char)this.rchInputSourceType16,
+                (char)this.rchInputSourceType17,
+                (char)this.rchInputSourceType18,
+                (char)this.rchInputSourceType19,
+                (char)this.rchInputSourceType20,
+                (char)this.rchInputSourceType21,
+                (char)this.rchInputSourceType22,
+                (char)this.rchInputSourceType23,
+                (char)this.rchInputSourceType24,
+                (char)this.rchInputSourceType25,
+                (char)this.rchInputSourceType26,
+                (char)this.rchInputSourceType27,
+                (char)this.rchInputSourceType28,
+                (char)this.rchInputSourceType29,
+                (char)this.rchInputSourceType30,
+                (char)this.rchInputSourceType31
+            }).TrimEnd('\0');
+    }
 [StructLayout(LayoutKind.Sequential)] public struct VRActiveActionSet_t
 {
 	public ulong ulActionSet;
@@ -7448,39 +7247,24 @@ public enum EBlockQueueReadType
 public class OpenVR
 {
 
-	public static uint InitInternal(ref EVRInitError peError, EVRApplicationType eApplicationType)
-	{
-		return OpenVRInterop.InitInternal(ref peError, eApplicationType);
-	}
+        public static uint InitInternal(ref EVRInitError peError, EVRApplicationType eApplicationType) => OpenVRInterop.InitInternal(ref peError, eApplicationType);
 
-	public static uint InitInternal2(ref EVRInitError peError, EVRApplicationType eApplicationType, string pchStartupInfo)
-	{
-		return OpenVRInterop.InitInternal2(ref peError, eApplicationType, pchStartupInfo);
-	}
+        public static uint InitInternal2(ref EVRInitError peError, EVRApplicationType eApplicationType, string pchStartupInfo) => OpenVRInterop.InitInternal2(ref peError, eApplicationType, pchStartupInfo);
 
-	public static void ShutdownInternal()
-	{
-		OpenVRInterop.ShutdownInternal();
-	}
+        public static void ShutdownInternal() => OpenVRInterop.ShutdownInternal();
 
-	public static bool IsHmdPresent()
-	{
-		return OpenVRInterop.IsHmdPresent();
-	}
+        public static bool IsHmdPresent() => OpenVRInterop.IsHmdPresent();
 
-	public static bool IsRuntimeInstalled()
-	{
-		return OpenVRInterop.IsRuntimeInstalled();
-	}
+        public static bool IsRuntimeInstalled() => OpenVRInterop.IsRuntimeInstalled();
 
-	public static string RuntimePath()
+        public static string RuntimePath()
 	{
 		try
 		{
 			uint pathSize = 512;
 			uint requiredPathSize = 512;
-			System.Text.StringBuilder path = new System.Text.StringBuilder((int)pathSize);
-			bool success = OpenVRInterop.GetRuntimePath(path, pathSize, ref requiredPathSize);
+			var path = new System.Text.StringBuilder((int)pathSize);
+			var success = OpenVRInterop.GetRuntimePath(path, pathSize, ref requiredPathSize);
 			if (success == false)
 			{
 				return null;
@@ -7493,27 +7277,15 @@ public class OpenVR
 		}
 	}
 
-	public static string GetStringForHmdError(EVRInitError error)
-	{
-		return Marshal.PtrToStringAnsi(OpenVRInterop.GetStringForHmdError(error));
-	}
+        public static string GetStringForHmdError(EVRInitError error) => Marshal.PtrToStringAnsi(OpenVRInterop.GetStringForHmdError(error));
 
-	public static IntPtr GetGenericInterface(string pchInterfaceVersion, ref EVRInitError peError)
-	{
-		return OpenVRInterop.GetGenericInterface(pchInterfaceVersion, ref peError);
-	}
+        public static IntPtr GetGenericInterface(string pchInterfaceVersion, ref EVRInitError peError) => OpenVRInterop.GetGenericInterface(pchInterfaceVersion, ref peError);
 
-	public static bool IsInterfaceVersionValid(string pchInterfaceVersion)
-	{
-		return OpenVRInterop.IsInterfaceVersionValid(pchInterfaceVersion);
-	}
+        public static bool IsInterfaceVersionValid(string pchInterfaceVersion) => OpenVRInterop.IsInterfaceVersionValid(pchInterfaceVersion);
 
-	public static uint GetInitToken()
-	{
-		return OpenVRInterop.GetInitToken();
-	}
+        public static uint GetInitToken() => OpenVRInterop.GetInitToken();
 
-	public const uint k_nDriverNone = 4294967295;
+        public const uint k_nDriverNone = 4294967295;
 	public const uint k_unMaxDriverDebugResponseSize = 32768;
 	public const uint k_unTrackedDeviceIndex_Hmd = 0;
 	public const uint k_unMaxTrackedDeviceCount = 64;
@@ -7862,271 +7634,271 @@ public class OpenVR
 
 	class COpenVRContext
 	{
-		public COpenVRContext() { Clear(); }
+		public COpenVRContext() { this.Clear(); }
 
 		public void Clear()
 		{
-			m_pVRSystem = null;
-			m_pVRChaperone = null;
-			m_pVRChaperoneSetup = null;
-			m_pVRCompositor = null;
-			m_pVRHeadsetView = null;
-			m_pVROverlay = null;
-			m_pVROverlayView = null;
-			m_pVRRenderModels = null;
-			m_pVRExtendedDisplay = null;
-			m_pVRSettings = null;
-			m_pVRApplications = null;
-			m_pVRScreenshots = null;
-			m_pVRTrackedCamera = null;
-			m_pVRInput = null;
-			m_pVRIOBuffer = null;
-			m_pVRSpatialAnchors = null;
-			m_pVRNotifications = null;
-			m_pVRDebug = null;
+                this.m_pVRSystem = null;
+                this.m_pVRChaperone = null;
+                this.m_pVRChaperoneSetup = null;
+                this.m_pVRCompositor = null;
+                this.m_pVRHeadsetView = null;
+                this.m_pVROverlay = null;
+                this.m_pVROverlayView = null;
+                this.m_pVRRenderModels = null;
+                this.m_pVRExtendedDisplay = null;
+                this.m_pVRSettings = null;
+                this.m_pVRApplications = null;
+                this.m_pVRScreenshots = null;
+                this.m_pVRTrackedCamera = null;
+                this.m_pVRInput = null;
+                this.m_pVRIOBuffer = null;
+                this.m_pVRSpatialAnchors = null;
+                this.m_pVRNotifications = null;
+                this.m_pVRDebug = null;
 		}
 
 		void CheckClear()
 		{
 			if (VRToken != GetInitToken())
 			{
-				Clear();
+                    this.Clear();
 				VRToken = GetInitToken();
 			}
 		}
 
 		public CVRSystem VRSystem()
 		{
-			CheckClear();
-			if (m_pVRSystem == null)
+                this.CheckClear();
+			if (this.m_pVRSystem == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRSystem_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRSystem = new CVRSystem(pInterface);
+                        this.m_pVRSystem = new CVRSystem(pInterface);
 			}
-			return m_pVRSystem;
+			return this.m_pVRSystem;
 		}
 
 		public CVRChaperone VRChaperone()
 		{
-			CheckClear();
-			if (m_pVRChaperone == null)
+                this.CheckClear();
+			if (this.m_pVRChaperone == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRChaperone_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRChaperone = new CVRChaperone(pInterface);
+                        this.m_pVRChaperone = new CVRChaperone(pInterface);
 			}
-			return m_pVRChaperone;
+			return this.m_pVRChaperone;
 		}
 
 		public CVRChaperoneSetup VRChaperoneSetup()
 		{
-			CheckClear();
-			if (m_pVRChaperoneSetup == null)
+                this.CheckClear();
+			if (this.m_pVRChaperoneSetup == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRChaperoneSetup_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRChaperoneSetup = new CVRChaperoneSetup(pInterface);
+                        this.m_pVRChaperoneSetup = new CVRChaperoneSetup(pInterface);
 			}
-			return m_pVRChaperoneSetup;
+			return this.m_pVRChaperoneSetup;
 		}
 
 		public CVRCompositor VRCompositor()
 		{
-			CheckClear();
-			if (m_pVRCompositor == null)
+                this.CheckClear();
+			if (this.m_pVRCompositor == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRCompositor_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRCompositor = new CVRCompositor(pInterface);
+                        this.m_pVRCompositor = new CVRCompositor(pInterface);
 			}
-			return m_pVRCompositor;
+			return this.m_pVRCompositor;
 		}
 
 		public CVRHeadsetView VRHeadsetView()
 		{
-			CheckClear();
-			if (m_pVRHeadsetView == null)
+                this.CheckClear();
+			if (this.m_pVRHeadsetView == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRHeadsetView_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRHeadsetView = new CVRHeadsetView(pInterface);
+                        this.m_pVRHeadsetView = new CVRHeadsetView(pInterface);
 			}
-			return m_pVRHeadsetView;
+			return this.m_pVRHeadsetView;
 		}
 
 		public CVROverlay VROverlay()
 		{
-			CheckClear();
-			if (m_pVROverlay == null)
+                this.CheckClear();
+			if (this.m_pVROverlay == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVROverlay_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVROverlay = new CVROverlay(pInterface);
+                        this.m_pVROverlay = new CVROverlay(pInterface);
 			}
-			return m_pVROverlay;
+			return this.m_pVROverlay;
 		}
 
 		public CVROverlayView VROverlayView()
 		{
-			CheckClear();
-			if (m_pVROverlayView == null)
+                this.CheckClear();
+			if (this.m_pVROverlayView == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVROverlayView_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVROverlayView = new CVROverlayView(pInterface);
+                        this.m_pVROverlayView = new CVROverlayView(pInterface);
 			}
-			return m_pVROverlayView;
+			return this.m_pVROverlayView;
 		}
 
 		public CVRRenderModels VRRenderModels()
 		{
-			CheckClear();
-			if (m_pVRRenderModels == null)
+                this.CheckClear();
+			if (this.m_pVRRenderModels == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRRenderModels_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRRenderModels = new CVRRenderModels(pInterface);
+                        this.m_pVRRenderModels = new CVRRenderModels(pInterface);
 			}
-			return m_pVRRenderModels;
+			return this.m_pVRRenderModels;
 		}
 
 		public CVRExtendedDisplay VRExtendedDisplay()
 		{
-			CheckClear();
-			if (m_pVRExtendedDisplay == null)
+                this.CheckClear();
+			if (this.m_pVRExtendedDisplay == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRExtendedDisplay_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRExtendedDisplay = new CVRExtendedDisplay(pInterface);
+                        this.m_pVRExtendedDisplay = new CVRExtendedDisplay(pInterface);
 			}
-			return m_pVRExtendedDisplay;
+			return this.m_pVRExtendedDisplay;
 		}
 
 		public CVRSettings VRSettings()
 		{
-			CheckClear();
-			if (m_pVRSettings == null)
+                this.CheckClear();
+			if (this.m_pVRSettings == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRSettings_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRSettings = new CVRSettings(pInterface);
+                        this.m_pVRSettings = new CVRSettings(pInterface);
 			}
-			return m_pVRSettings;
+			return this.m_pVRSettings;
 		}
 
 		public CVRApplications VRApplications()
 		{
-			CheckClear();
-			if (m_pVRApplications == null)
+                this.CheckClear();
+			if (this.m_pVRApplications == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRApplications_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRApplications = new CVRApplications(pInterface);
+                        this.m_pVRApplications = new CVRApplications(pInterface);
 			}
-			return m_pVRApplications;
+			return this.m_pVRApplications;
 		}
 
 		public CVRScreenshots VRScreenshots()
 		{
-			CheckClear();
-			if (m_pVRScreenshots == null)
+                this.CheckClear();
+			if (this.m_pVRScreenshots == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRScreenshots_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRScreenshots = new CVRScreenshots(pInterface);
+                        this.m_pVRScreenshots = new CVRScreenshots(pInterface);
 			}
-			return m_pVRScreenshots;
+			return this.m_pVRScreenshots;
 		}
 
 		public CVRTrackedCamera VRTrackedCamera()
 		{
-			CheckClear();
-			if (m_pVRTrackedCamera == null)
+                this.CheckClear();
+			if (this.m_pVRTrackedCamera == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRTrackedCamera_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRTrackedCamera = new CVRTrackedCamera(pInterface);
+                        this.m_pVRTrackedCamera = new CVRTrackedCamera(pInterface);
 			}
-			return m_pVRTrackedCamera;
+			return this.m_pVRTrackedCamera;
 		}
 
 		public CVRInput VRInput()
 		{
-			CheckClear();
-			if (m_pVRInput == null)
+                this.CheckClear();
+			if (this.m_pVRInput == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix+IVRInput_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRInput = new CVRInput(pInterface);
+                        this.m_pVRInput = new CVRInput(pInterface);
 			}
-			return m_pVRInput;
+			return this.m_pVRInput;
 		}
 
 		public CVRIOBuffer VRIOBuffer()
 		{
-			CheckClear();
-			if (m_pVRIOBuffer == null)
+                this.CheckClear();
+			if (this.m_pVRIOBuffer == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix + IVRIOBuffer_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRIOBuffer = new CVRIOBuffer(pInterface);
+                        this.m_pVRIOBuffer = new CVRIOBuffer(pInterface);
 			}
-			return m_pVRIOBuffer;
+			return this.m_pVRIOBuffer;
 		}
 
 		public CVRSpatialAnchors VRSpatialAnchors()
 		{
-			CheckClear();
-			if (m_pVRSpatialAnchors == null)
+                this.CheckClear();
+			if (this.m_pVRSpatialAnchors == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix + IVRSpatialAnchors_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRSpatialAnchors = new CVRSpatialAnchors(pInterface);
+                        this.m_pVRSpatialAnchors = new CVRSpatialAnchors(pInterface);
 			}
-			return m_pVRSpatialAnchors;
+			return this.m_pVRSpatialAnchors;
 		}
 
 		public CVRDebug VRDebug()
 		{
-			CheckClear();
-			if (m_pVRDebug == null)
+                this.CheckClear();
+			if (this.m_pVRDebug == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix + IVRDebug_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRDebug = new CVRDebug(pInterface);
+                        this.m_pVRDebug = new CVRDebug(pInterface);
 			}
-			return m_pVRDebug;
+			return this.m_pVRDebug;
 		}
 
 		public CVRNotifications VRNotifications()
 		{
-			CheckClear();
-			if (m_pVRNotifications == null)
+                this.CheckClear();
+			if (this.m_pVRNotifications == null)
 			{
 				var eError = EVRInitError.None;
 				var pInterface = OpenVRInterop.GetGenericInterface(FnTable_Prefix + IVRNotifications_Version, ref eError);
 				if (pInterface != IntPtr.Zero && eError == EVRInitError.None)
-					m_pVRNotifications = new CVRNotifications(pInterface);
+                        this.m_pVRNotifications = new CVRNotifications(pInterface);
 			}
-			return m_pVRNotifications;
+			return this.m_pVRNotifications;
 		}
 
 		private CVRSystem m_pVRSystem;
@@ -8159,28 +7931,28 @@ public class OpenVR
 		}
 	}
 
-	public static CVRSystem System { get { return OpenVRInternal_ModuleContext.VRSystem(); } }
-	public static CVRChaperone Chaperone { get { return OpenVRInternal_ModuleContext.VRChaperone(); } }
-	public static CVRChaperoneSetup ChaperoneSetup { get { return OpenVRInternal_ModuleContext.VRChaperoneSetup(); } }
-	public static CVRCompositor Compositor { get { return OpenVRInternal_ModuleContext.VRCompositor(); } }
-	public static CVRHeadsetView HeadsetView { get { return OpenVRInternal_ModuleContext.VRHeadsetView(); } }
-	public static CVROverlay Overlay { get { return OpenVRInternal_ModuleContext.VROverlay(); } }
-	public static CVROverlayView OverlayView { get { return OpenVRInternal_ModuleContext.VROverlayView(); } }
-	public static CVRRenderModels RenderModels { get { return OpenVRInternal_ModuleContext.VRRenderModels(); } }
-	public static CVRExtendedDisplay ExtendedDisplay { get { return OpenVRInternal_ModuleContext.VRExtendedDisplay(); } }
-	public static CVRSettings Settings { get { return OpenVRInternal_ModuleContext.VRSettings(); } }
-	public static CVRApplications Applications { get { return OpenVRInternal_ModuleContext.VRApplications(); } }
-	public static CVRScreenshots Screenshots { get { return OpenVRInternal_ModuleContext.VRScreenshots(); } }
-	public static CVRTrackedCamera TrackedCamera { get { return OpenVRInternal_ModuleContext.VRTrackedCamera(); } }
-	public static CVRInput Input { get { return OpenVRInternal_ModuleContext.VRInput(); } }
-	public static CVRIOBuffer IOBuffer { get { return OpenVRInternal_ModuleContext.VRIOBuffer(); } }
-	public static CVRSpatialAnchors SpatialAnchors { get { return OpenVRInternal_ModuleContext.VRSpatialAnchors(); } }
-	public static CVRNotifications Notifications { get { return OpenVRInternal_ModuleContext.VRNotifications(); } }
-	public static CVRDebug Debug { get { return OpenVRInternal_ModuleContext.VRDebug(); } }
+        public static CVRSystem System => OpenVRInternal_ModuleContext.VRSystem();
+        public static CVRChaperone Chaperone => OpenVRInternal_ModuleContext.VRChaperone();
+        public static CVRChaperoneSetup ChaperoneSetup => OpenVRInternal_ModuleContext.VRChaperoneSetup();
+        public static CVRCompositor Compositor => OpenVRInternal_ModuleContext.VRCompositor();
+        public static CVRHeadsetView HeadsetView => OpenVRInternal_ModuleContext.VRHeadsetView();
+        public static CVROverlay Overlay => OpenVRInternal_ModuleContext.VROverlay();
+        public static CVROverlayView OverlayView => OpenVRInternal_ModuleContext.VROverlayView();
+        public static CVRRenderModels RenderModels => OpenVRInternal_ModuleContext.VRRenderModels();
+        public static CVRExtendedDisplay ExtendedDisplay => OpenVRInternal_ModuleContext.VRExtendedDisplay();
+        public static CVRSettings Settings => OpenVRInternal_ModuleContext.VRSettings();
+        public static CVRApplications Applications => OpenVRInternal_ModuleContext.VRApplications();
+        public static CVRScreenshots Screenshots => OpenVRInternal_ModuleContext.VRScreenshots();
+        public static CVRTrackedCamera TrackedCamera => OpenVRInternal_ModuleContext.VRTrackedCamera();
+        public static CVRInput Input => OpenVRInternal_ModuleContext.VRInput();
+        public static CVRIOBuffer IOBuffer => OpenVRInternal_ModuleContext.VRIOBuffer();
+        public static CVRSpatialAnchors SpatialAnchors => OpenVRInternal_ModuleContext.VRSpatialAnchors();
+        public static CVRNotifications Notifications => OpenVRInternal_ModuleContext.VRNotifications();
+        public static CVRDebug Debug => OpenVRInternal_ModuleContext.VRDebug();
 
 
-	/** Finds the active installation of vrclient.dll and initializes it */
-	public static CVRSystem Init(ref EVRInitError peError, EVRApplicationType eApplicationType = EVRApplicationType.VRApplication_Scene, string pchStartupInfo= "")
+        /** Finds the active installation of vrclient.dll and initializes it */
+        public static CVRSystem Init(ref EVRInitError peError, EVRApplicationType eApplicationType = EVRApplicationType.VRApplication_Scene, string pchStartupInfo= "")
 	{
 		try
 		{
@@ -8196,7 +7968,7 @@ public class OpenVR
 		if (peError != EVRInitError.None)
 			return null;
 
-		bool bInterfaceValid = IsInterfaceVersionValid(IVRSystem_Version);
+		var bInterfaceValid = IsInterfaceVersionValid(IVRSystem_Version);
 		if (!bInterfaceValid)
 		{
 			ShutdownInternal();
@@ -8207,17 +7979,10 @@ public class OpenVR
 		return OpenVR.System;
 	}
 
-	/** unloads vrclient.dll. Any interface pointers from the interface are
-	* invalid after this point */
-	public static void Shutdown()
-	{
-		ShutdownInternal();
-	}
-
-}
-
-
-
+        /** unloads vrclient.dll. Any interface pointers from the interface are
+        * invalid after this point */
+        public static void Shutdown() => ShutdownInternal();
+    }
 }
 #endif
 

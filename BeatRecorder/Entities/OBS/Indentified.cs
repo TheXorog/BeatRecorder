@@ -9,5 +9,4 @@ internal class Indentified
     {
         public int negotiatedRpcVersion { get; set; }
     }
-
 }

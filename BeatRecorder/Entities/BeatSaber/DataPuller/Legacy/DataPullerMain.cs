@@ -59,5 +59,4 @@ public class DataPullerMain
         public float startInAdvanceAndClearNotes { get; set; }
         public float startSongTime { get; set; }
     }
-
 }

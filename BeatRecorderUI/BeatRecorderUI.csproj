@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
 	<SelfContained>true</SelfContained>
 	<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -12,11 +12,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Xorog.Logger\Xorog.Logger.csproj" />
+    <ProjectReference Include="..\BeatRecorder\Dependencies\Xorog.Logger\Xorog.Logger.csproj" />
   </ItemGroup>
 
 </Project>

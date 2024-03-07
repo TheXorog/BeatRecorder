@@ -1,6 +1,6 @@
 ﻿using BeatRecorderUI;
 using System.Windows.Forms;
-using static Xorog.UniversalExtensions.UniversalExtensionsEnums;
+using Xorog.UniversalExtensions.Enums;
 
 namespace BeatRecorder.Util;
 
@@ -14,10 +14,9 @@ public class UIHandler
 
         Thread.Sleep(500);
 
-        if (!program.LoadedConfig.HideConsole)
-            ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 2);
-        else
-            ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 0);
+        _ = !program.LoadedConfig.HideConsole
+            ? ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 2)
+            : ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 0);
 
         instance.infoUI = new InfoUI(Program.Version, program.LoadedConfig.DisplayUITopmost);
 
@@ -27,7 +26,7 @@ public class UIHandler
 
             Action UpdateUI = new(() =>
             {
-                string WarningText = "";
+                var WarningText = "";
 
                 if (program.RunningPrerelease)
                     WarningText = "You're running a Pre-Release. Please expect bugs or unfinished features.\n";
@@ -75,7 +74,7 @@ public class UIHandler
                     infoUI.SongAuthorLabel.Location = new Point(infoUI.SongNameLabel.Location.X, infoUI.SongNameLabel.Location.Y + infoUI.SongNameLabel.Height);
                     infoUI.MapperLabel.Text = cur.BeatmapInfo.Creator ?? "Mapper";
 
-                    infoUI.ProgressLabel.Text = $"{TimeSpan.FromSeconds(program.ObsClient.GetRecordingSeconds()).GetShortHumanReadable(TimeFormat.MINUTES)}";
+                    infoUI.ProgressLabel.Text = $"{TimeSpan.FromSeconds(program.ObsClient.GetRecordingSeconds()).GetShortHumanReadable(TimeFormat.Minutes)}";
 
                     infoUI.ScoreLabel.Text = String.Format("{0:n0}", cur.PerformanceInfo.Score);
                     infoUI.ComboLabel.Text = $"{cur.PerformanceInfo?.Combo ?? 0}x";
@@ -112,21 +111,21 @@ public class UIHandler
         {
             _logger.LogDebug("Initializing GUI..");
 
-            instance.infoUI.ShowDialog();
-            ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 5);
+            _ = instance.infoUI.ShowDialog();
+            _ = ConsoleHelper.ShowWindow(ConsoleHelper.GetConsoleWindow(), 5);
 
             if (instance.infoUI.ShowConsoleAgain)
             {
                 instance.infoUI.ShowConsoleAgain = false;
                 instance.infoUI.ShowConsole.Visible = false;
 
-                instance.infoUI.ShowDialog();
+                _ = instance.infoUI.ShowDialog();
             }
 
             if (instance.infoUI.SettingsUpdated)
             {
                 _logger.LogDebug("Settings updated via GUI");
-                Process.Start(Environment.ProcessPath);
+                _ = Process.Start(Environment.ProcessPath);
                 Thread.Sleep(500);
                 Environment.Exit(0);
             }
@@ -140,13 +139,10 @@ public class UIHandler
 
     internal void ShowNotification(string Description, string Title = "", MessageBoxButtons messageBoxButtons = MessageBoxButtons.OK, MessageBoxIcon messageBoxIcon = MessageBoxIcon.None)
     {
-        Action action = new(() =>
-        {
-            MessageBox.Show(Description, Title, messageBoxButtons, messageBoxIcon);
-        });
+        Action action = new(() => MessageBox.Show(Description, Title, messageBoxButtons, messageBoxIcon));
 
-        if (infoUI.InvokeRequired)
-            infoUI.Invoke(action);
+        if (this.infoUI.InvokeRequired)
+            this.infoUI.Invoke(action);
         else
             action();
     }
@@ -155,12 +151,12 @@ public class UIHandler
     {
         Action action = new(() =>
         {
-            infoUI.SettingsRequired = Required;
-            infoUI.OpenSettings_Click(null, null);            
+            this.infoUI.SettingsRequired = Required;
+            this.infoUI.OpenSettings_Click(null, null);            
         });
 
-        if (infoUI.InvokeRequired)
-            infoUI.Invoke(action);
+        if (this.infoUI.InvokeRequired)
+            this.infoUI.Invoke(action);
         else
             action();
     }

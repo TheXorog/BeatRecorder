@@ -9,10 +9,8 @@ internal static class Extensions
     /// <returns></returns>
     internal static string HashEncode(this string input)
     {
-        using var sha256 = SHA256.Create();
-
-        byte[] textBytes = Encoding.ASCII.GetBytes(input);
-        byte[] hash = sha256.ComputeHash(textBytes);
+        var textBytes = Encoding.ASCII.GetBytes(input);
+        var hash = SHA256.HashData(textBytes);
 
         return System.Convert.ToBase64String(hash);
     }
