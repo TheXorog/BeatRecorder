@@ -13,7 +13,7 @@ internal class DataPullerLegacyHandler : BaseBeatSaberHandler
     private WebsocketClient mainSocket { get; set; }
     private WebsocketClient dataSocket { get; set; }
 
-    internal SharedStatus CurrentStatus => new(CurrentMain, CurrentData, CurrentMaxCombo, this);
+    internal SharedStatus CurrentStatus => new(this.CurrentMain, this.CurrentData, this.CurrentMaxCombo, this);
     internal SharedStatus LastCompletedStatus { get; set; }
 
     private DataPullerMain CurrentMain = null;
@@ -39,41 +39,41 @@ internal class DataPullerLegacyHandler : BaseBeatSaberHandler
             }
         });
 
-        Task mainConn = Task.Run(() =>
+        var mainConn = Task.Run(() =>
         {
-            mainSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedConfig.BeatSaberUrl}:{Program.LoadedConfig.BeatSaberPort}/BSDataPuller/MapData"), factory)
+            this.mainSocket = new WebsocketClient(new Uri($"ws://{this.Program.LoadedConfig.BeatSaberUrl}:{this.Program.LoadedConfig.BeatSaberPort}/BSDataPuller/MapData"), factory)
             {
                 ReconnectTimeout = null,
                 ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
             };
 
-            mainSocket.MessageReceived.Subscribe(msg => { MainMessageRecieved(msg.Text); });
-            mainSocket.ReconnectionHappened.Subscribe(type => { Reconnected(type); });
-            mainSocket.DisconnectionHappened.Subscribe(type => { Disconnected(type); });
+            _ = this.mainSocket.MessageReceived.Subscribe(msg => this.MainMessageRecieved(msg.Text));
+            _ = this.mainSocket.ReconnectionHappened.Subscribe(type => this.Reconnected(type));
+            _ = this.mainSocket.DisconnectionHappened.Subscribe(type => this.Disconnected(type));
 
-            mainSocket.Start().Wait();
+            this.mainSocket.Start().Wait();
 
-            while (!mainSocket.IsRunning)
+            while (!this.mainSocket.IsRunning)
                 Thread.Sleep(50);
 
             _logger.LogInfo($"Connected to Beat Saber via DataPuller Main Socket");
         });
 
-        Task dataConn = Task.Run(() =>
+        var dataConn = Task.Run(() =>
         {
-            dataSocket = new WebsocketClient(new Uri($"ws://{Program.LoadedConfig.BeatSaberUrl}:{Program.LoadedConfig.BeatSaberPort}/BSDataPuller/LiveData"), factory)
+            this.dataSocket = new WebsocketClient(new Uri($"ws://{this.Program.LoadedConfig.BeatSaberUrl}:{this.Program.LoadedConfig.BeatSaberPort}/BSDataPuller/LiveData"), factory)
             {
                 ReconnectTimeout = null,
                 ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
             };
 
-            dataSocket.MessageReceived.Subscribe(msg => { DataMessageRecieved(msg.Text); });
-            dataSocket.ReconnectionHappened.Subscribe(type => { Reconnected(type); });
-            dataSocket.DisconnectionHappened.Subscribe(type => { Disconnected(type); });
+            _ = this.dataSocket.MessageReceived.Subscribe(msg => this.DataMessageRecieved(msg.Text));
+            _ = this.dataSocket.ReconnectionHappened.Subscribe(type => this.Reconnected(type));
+            _ = this.dataSocket.DisconnectionHappened.Subscribe(type => this.Disconnected(type));
 
-            dataSocket.Start().Wait();
+            this.dataSocket.Start().Wait();
 
-            while (!dataSocket.IsRunning)
+            while (!this.dataSocket.IsRunning)
                 Thread.Sleep(50);
 
             _logger.LogInfo($"Connected to Beat Saber via DataPuller Data Socket");
@@ -85,8 +85,8 @@ internal class DataPullerLegacyHandler : BaseBeatSaberHandler
         return this;
     }
 
-    public override SharedStatus GetCurrentStatus() => CurrentStatus;
-    public override SharedStatus GetLastCompletedStatus() => LastCompletedStatus;
+    public override SharedStatus GetCurrentStatus() => this.CurrentStatus;
+    public override SharedStatus GetLastCompletedStatus() => this.LastCompletedStatus;
 
     private void MainMessageRecieved(string text)
     {
@@ -102,69 +102,69 @@ internal class DataPullerLegacyHandler : BaseBeatSaberHandler
             return;
         }
 
-        if (InLevel != _status.InLevel)
+        if (this.InLevel != _status.InLevel)
         {
-            if (!InLevel && _status.InLevel)
+            if (!this.InLevel && _status.InLevel)
             {
-                InLevel = true;
+                this.InLevel = true;
                 _logger.LogInfo($"Started playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
-                CurrentMain = _status;
-                CurrentMaxCombo = 0;
+                this.CurrentMain = _status;
+                this.CurrentMaxCombo = 0;
 
-                if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                    Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
+                if (!this.Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                    this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSIngameScene);
 
-                _ = Program.ObsClient.StartRecording();
+                _ = this.Program.ObsClient.StartRecording();
             }
-            else if (InLevel && !_status.InLevel)
+            else if (this.InLevel && !_status.InLevel)
             {
                 Thread.Sleep(500);
-                InLevel = false;
-                IsPaused = false;
+                this.InLevel = false;
+                this.IsPaused = false;
 
                 _logger.LogInfo($"Stopped playing \"{_status.SongName}\" by \"{_status.SongAuthor}\"");
 
-                CurrentMain = _status;
+                this.CurrentMain = _status;
 
-                CurrentStatus.Update(new SharedStatus(CurrentMain, CurrentData, CurrentMaxCombo, this));
-                LastCompletedStatus = CurrentStatus.Clone();
+                this.CurrentStatus.Update(new SharedStatus(this.CurrentMain, this.CurrentData, this.CurrentMaxCombo, this));
+                this.LastCompletedStatus = this.CurrentStatus.Clone();
 
-                _ = Program.ObsClient.StopRecording();
+                _ = this.Program.ObsClient.StopRecording();
 
-                if (!Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
-                    Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSMenuScene);
+                if (!this.Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
+                    this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSMenuScene);
 
-                if (Program.LoadedConfig.PauseRecordingOnIngamePause)
-                    Program.ObsClient.ResumeRecording();
+                if (this.Program.LoadedConfig.PauseRecordingOnIngamePause)
+                    this.Program.ObsClient.ResumeRecording();
             }
         }
 
         if (_status.InLevel)
         {
-            if (IsPaused != _status.LevelPaused)
+            if (this.IsPaused != _status.LevelPaused)
             {
-                if (IsPaused && _status.LevelPaused)
+                if (this.IsPaused && _status.LevelPaused)
                 {
-                    IsPaused = true;
+                    this.IsPaused = true;
                     _logger.LogInfo("Song paused.");
 
-                    if (Program.LoadedConfig.PauseRecordingOnIngamePause)
-                        Program.ObsClient.PauseRecording();
+                    if (this.Program.LoadedConfig.PauseRecordingOnIngamePause)
+                        this.Program.ObsClient.PauseRecording();
 
-                    if (!Program.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
-                        Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSPauseScene);
+                    if (!this.Program.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
+                        this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSPauseScene);
                 }
-                else if (IsPaused && !_status.LevelPaused)
+                else if (this.IsPaused && !_status.LevelPaused)
                 {
-                    IsPaused = false;
+                    this.IsPaused = false;
                     _logger.LogInfo("Song resumed.");
 
-                    if (Program.LoadedConfig.PauseRecordingOnIngamePause)
-                        Program.ObsClient.ResumeRecording();
+                    if (this.Program.LoadedConfig.PauseRecordingOnIngamePause)
+                        this.Program.ObsClient.ResumeRecording();
 
-                    if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                        Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
+                    if (!this.Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                        this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSIngameScene);
                 }
             }
         }
@@ -184,33 +184,33 @@ internal class DataPullerLegacyHandler : BaseBeatSaberHandler
             return;
         }
 
-        if (InLevel && (CurrentData?.unixTimestamp ?? 0) < _status.unixTimestamp)
-            CurrentData = _status;
+        if (this.InLevel && (this.CurrentData?.unixTimestamp ?? 0) < _status.unixTimestamp)
+            this.CurrentData = _status;
 
-        if (CurrentMaxCombo < _status.Combo)
-            CurrentMaxCombo = _status.Combo;
+        if (this.CurrentMaxCombo < _status.Combo)
+            this.CurrentMaxCombo = _status.Combo;
     }
 
     private void Disconnected(DisconnectionInfo msg)
     {
         try
         {
-            Process[] processCollection = Process.GetProcesses();
+            var processCollection = Process.GetProcesses();
 
             if (!processCollection.Any(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")))
             {
-                if (LastWarning != ConnectionTypeWarning.NoProcess)
+                if (this.LastWarning != ConnectionTypeWarning.NoProcess)
                 {
                     _logger.LogWarn($"Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
                 }
-                LastWarning = ConnectionTypeWarning.NoProcess;
+                this.LastWarning = ConnectionTypeWarning.NoProcess;
             }
             else
             {
-                bool FoundWebSocketDll = false;
+                var FoundWebSocketDll = false;
 
-                string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")).MainModule.FileName;
-                InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("\\"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("\\"));
+                var InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")).MainModule.FileName;
+                InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf('\\'), InstallationDirectory.Length - InstallationDirectory.LastIndexOf('\\'));
 
                 if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
                 {
@@ -221,29 +221,29 @@ internal class DataPullerLegacyHandler : BaseBeatSaberHandler
                 }
                 else
                 {
-                    if (LastWarning != ConnectionTypeWarning.NotModded)
+                    if (this.LastWarning != ConnectionTypeWarning.NotModded)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install BSDataPuller: https://bit.ly/3mcvC7g) ({msg.Type})");
                     }
-                    LastWarning = ConnectionTypeWarning.NotModded;
+                    this.LastWarning = ConnectionTypeWarning.NotModded;
                     return;
                 }
 
                 if (FoundWebSocketDll)
                 {
-                    if (LastWarning != ConnectionTypeWarning.ModInstalled)
+                    if (this.LastWarning != ConnectionTypeWarning.ModInstalled)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running and the BSDataPuller modifaction seems to be installed. Please make sure you put in the right port and you installed all of BSDataPuller' dependiencies! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
                     }
-                    LastWarning = ConnectionTypeWarning.ModInstalled;
+                    this.LastWarning = ConnectionTypeWarning.ModInstalled;
                 }
                 else
                 {
-                    if (LastWarning != ConnectionTypeWarning.ModNotInstalled)
+                    if (this.LastWarning != ConnectionTypeWarning.ModNotInstalled)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running but the BSDataPuller modifaction doesn't seem to be installed. Please make sure to install BSDataPuller! (If not installed, please install it: https://bit.ly/3mcvC7g) ({msg.Type})");
                     }
-                    LastWarning = ConnectionTypeWarning.ModNotInstalled;
+                    this.LastWarning = ConnectionTypeWarning.ModNotInstalled;
                 }
             }
         }
@@ -258,8 +258,8 @@ internal class DataPullerLegacyHandler : BaseBeatSaberHandler
         if (msg.Type != ReconnectionType.Initial)
             _logger.LogInfo($"Beat Saber Connection via DataPuller re-established: {msg.Type}");
 
-        LastWarning = ConnectionTypeWarning.Connected;
+        this.LastWarning = ConnectionTypeWarning.Connected;
     }
 
-    internal override bool GetIsRunning() => (mainSocket?.IsRunning ?? false) && (dataSocket?.IsRunning ?? false);
+    internal override bool GetIsRunning() => (this.mainSocket?.IsRunning ?? false) && (this.dataSocket?.IsRunning ?? false);
 }

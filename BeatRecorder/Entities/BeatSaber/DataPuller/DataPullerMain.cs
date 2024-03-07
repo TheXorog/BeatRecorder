@@ -29,6 +29,8 @@ public class DataPullerMain
     public float PP { get; set; }
     public float Star { get; set; }
     public bool IsMultiplayer { get; set; }
+    public int MultiplayerLobbyMaxSize { get; set; }
+    public int MultiplayerLobbyCurrentSize { get; set; }
     public int PreviousRecord { get; set; }
     public string PreviousBSR { get; set; }
     public long UnixTimestamp { get; set; }
@@ -58,5 +60,4 @@ public class DataPullerMain
         public bool StartInAdvanceAndClearNotes { get; set; }
         public float SongStartTime { get; set; }
     }
-
 }

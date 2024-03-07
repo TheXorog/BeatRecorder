@@ -17,5 +17,4 @@ internal class Hello
         public string challenge { get; set; }
         public string salt { get; set; }
     }
-
 }

@@ -10,7 +10,7 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
     ConnectionTypeWarning LastWarning = ConnectionTypeWarning.Connected;
 
     private Program Program = null;
-    internal SharedStatus CurrentStatus => new(Current.status, this);
+    internal SharedStatus CurrentStatus => new(this.Current.status, this);
     internal SharedStatus LastCompletedStatus { get; set; }
 
     private HttpStatus Current = null;
@@ -29,22 +29,22 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
             }
         });
 
-        socket = new WebsocketClient(new Uri($"ws://{program.LoadedConfig.BeatSaberUrl}:{program.LoadedConfig.BeatSaberPort}/socket"), factory)
+        this.socket = new WebsocketClient(new Uri($"ws://{program.LoadedConfig.BeatSaberUrl}:{program.LoadedConfig.BeatSaberPort}/socket"), factory)
         {
             ReconnectTimeout = null,
             ErrorReconnectTimeout = TimeSpan.FromSeconds(3)
         };
 
-        socket.MessageReceived.Subscribe(msg => { MessageReceived(msg.Text); });
-        socket.ReconnectionHappened.Subscribe(type => { Reconnected(type); });
-        socket.DisconnectionHappened.Subscribe(type => { Disconnected(type); });
+        _ = this.socket.MessageReceived.Subscribe(msg => this.MessageReceived(msg.Text));
+        _ = this.socket.ReconnectionHappened.Subscribe(this.Reconnected);
+        _ = this.socket.DisconnectionHappened.Subscribe(this.Disconnected);
 
-        socket.Start().Wait();
+        this.socket.Start().Wait();
         return this;
     }
 
-    public override SharedStatus GetCurrentStatus() => CurrentStatus;
-    public override SharedStatus GetLastCompletedStatus() => LastCompletedStatus;
+    public override SharedStatus GetCurrentStatus() => this.CurrentStatus;
+    public override SharedStatus GetLastCompletedStatus() => this.LastCompletedStatus;
 
     internal void MessageReceived(string e)
     {
@@ -66,10 +66,10 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
             {
                 _logger.LogInfo($"Connected to Beat Saber via Http Status");
 
-                Current = _status;
+                this.Current = _status;
 
-                if (!Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
-                    Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSMenuScene);
+                if (!this.Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
+                    this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSMenuScene);
                 break;
             }
 
@@ -77,26 +77,26 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
             {
                 _logger.LogInfo($"Started playing \"{_status.status.beatmap.songName}\" by \"{_status.status.beatmap.songAuthorName}\"");
 
-                Current = _status;
+                this.Current = _status;
 
-                if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                    Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
+                if (!this.Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                    this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSIngameScene);
 
-                _ = Program.ObsClient.StartRecording();
+                _ = this.Program.ObsClient.StartRecording();
                 break;
             }
 
             case "finished":
             {
                 _logger.LogInfo($"Song finished.");
-                Current.status.performance.finished = true;
+                this.Current.status.performance.finished = true;
                 break;
             }
 
             case "failed":
             {
                 _logger.LogInfo($"Song failed.");
-                Current.status.performance.failed = true;
+                this.Current.status.performance.failed = true;
                 break;
             }
             
@@ -104,11 +104,11 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
             {
                 _logger.LogInfo($"Song paused.");
 
-                if (Program.LoadedConfig.PauseRecordingOnIngamePause)
-                    Program.ObsClient.PauseRecording();
+                if (this.Program.LoadedConfig.PauseRecordingOnIngamePause)
+                    this.Program.ObsClient.PauseRecording();
 
-                if (!Program.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
-                    Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSPauseScene);
+                if (!this.Program.LoadedConfig.OBSPauseScene.IsNullOrWhiteSpace())
+                    this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSPauseScene);
 
                 break;
             }
@@ -117,34 +117,34 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
             {
                 _logger.LogInfo($"Song resumed.");
 
-                if (Program.LoadedConfig.PauseRecordingOnIngamePause)
-                    Program.ObsClient.ResumeRecording();
+                if (this.Program.LoadedConfig.PauseRecordingOnIngamePause)
+                    this.Program.ObsClient.ResumeRecording();
 
-                if (!Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
-                    Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSIngameScene);
+                if (!this.Program.LoadedConfig.OBSIngameScene.IsNullOrWhiteSpace())
+                    this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSIngameScene);
 
                 break;
             }
 
             case "scoreChanged":
             {
-                Current.status.performance = _status.status.performance;
+                this.Current.status.performance = _status.status.performance;
                 break;
             }
 
             case "menu":
             {
-                CurrentStatus.Update(new SharedStatus(_status.status, this));
-                LastCompletedStatus = CurrentStatus.Clone();
-                _logger.LogInfo($"Stopped playing \"{LastCompletedStatus.BeatmapInfo.NameWithSub}\" by \"{LastCompletedStatus.BeatmapInfo.Author}\"");
-                Current = _status;
-                _ = Program.ObsClient.StopRecording();
+                this.CurrentStatus.Update(new SharedStatus(_status.status, this));
+                this.LastCompletedStatus = this.CurrentStatus.Clone();
+                _logger.LogInfo($"Stopped playing \"{this.LastCompletedStatus.BeatmapInfo.NameWithSub}\" by \"{this.LastCompletedStatus.BeatmapInfo.Author}\"");
+                this.Current = _status;
+                _ = this.Program.ObsClient.StopRecording();
 
-                if (!Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
-                    Program.ObsClient.SetCurrentScene(Program.LoadedConfig.OBSMenuScene);
+                if (!this.Program.LoadedConfig.OBSMenuScene.IsNullOrWhiteSpace())
+                    this.Program.ObsClient.SetCurrentScene(this.Program.LoadedConfig.OBSMenuScene);
 
-                if (Program.LoadedConfig.PauseRecordingOnIngamePause)
-                    Program.ObsClient.ResumeRecording();
+                if (this.Program.LoadedConfig.PauseRecordingOnIngamePause)
+                    this.Program.ObsClient.ResumeRecording();
 
                 break;
             }
@@ -156,28 +156,28 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
         if (msg.Type != ReconnectionType.Initial)
             _logger.LogInfo($"Beat Saber Connection via Http Status re-established: {msg.Type}");
 
-        LastWarning = ConnectionTypeWarning.Connected;
+        this.LastWarning = ConnectionTypeWarning.Connected;
     }
 
     internal void Disconnected(DisconnectionInfo msg)
     {
         try
         {
-            Process[] processCollection = Process.GetProcesses();
+            var processCollection = Process.GetProcesses();
 
             if (!processCollection.Any(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")))
             {
-                if (LastWarning != ConnectionTypeWarning.NoProcess)
+                if (this.LastWarning != ConnectionTypeWarning.NoProcess)
                 {
                     _logger.LogWarn($"Couldn't find a BeatSaber process, is BeatSaber started? ({msg.Type})");
                 }
-                LastWarning = ConnectionTypeWarning.NoProcess;
+                this.LastWarning = ConnectionTypeWarning.NoProcess;
             }
             else
             {
-                bool FoundWebSocketDll = false;
+                var FoundWebSocketDll = false;
 
-                string InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")).MainModule.FileName.Replace("\\", "/");
+                var InstallationDirectory = processCollection.First(x => x.ProcessName.ToLower().Replace(" ", "").StartsWith("beatsaber")).MainModule.FileName.Replace("\\", "/");
                 InstallationDirectory = InstallationDirectory.Remove(InstallationDirectory.LastIndexOf("/"), InstallationDirectory.Length - InstallationDirectory.LastIndexOf("/"));
 
                 if (Directory.GetDirectories(InstallationDirectory).Any(x => x.ToLower().EndsWith("plugins")))
@@ -189,29 +189,29 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
                 }
                 else
                 {
-                    if (LastWarning != ConnectionTypeWarning.NotModded)
+                    if (this.LastWarning != ConnectionTypeWarning.NotModded)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Is your game even modded? (If haven't modded it, please do it: https://bit.ly/2TAvenk. If already modded, install beatsaber-http-status: https://bit.ly/3wYX3Dd) ({msg.Type})");
                     }
-                    LastWarning = ConnectionTypeWarning.NotModded;
+                    this.LastWarning = ConnectionTypeWarning.NotModded;
                     return;
                 }
 
                 if (FoundWebSocketDll)
                 {
-                    if (LastWarning != ConnectionTypeWarning.ModInstalled)
+                    if (this.LastWarning != ConnectionTypeWarning.ModInstalled)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running and the beatsaber-http-status modifaction seems to be installed. Please make sure you put in the right port and you installed all of beatsaber-http-status' dependiencies! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
                     }
-                    LastWarning = ConnectionTypeWarning.ModInstalled;
+                    this.LastWarning = ConnectionTypeWarning.ModInstalled;
                 }
                 else
                 {
-                    if (LastWarning != ConnectionTypeWarning.ModNotInstalled)
+                    if (this.LastWarning != ConnectionTypeWarning.ModNotInstalled)
                     {
                         _logger.LogFatal($"Beat Saber seems to be running but the beatsaber-http-status modifaction doesn't seem to be installed. Please make sure to install beatsaber-http-status! (If not installed, please install it: https://bit.ly/3wYX3Dd) ({msg.Type})");
                     }
-                    LastWarning = ConnectionTypeWarning.ModNotInstalled;
+                    this.LastWarning = ConnectionTypeWarning.ModNotInstalled;
                 }
             }
         }
@@ -221,5 +221,5 @@ internal class HttpStatusHandler : BaseBeatSaberHandler
         }
     }
 
-    internal override bool GetIsRunning() => socket?.IsRunning ?? false;
+    internal override bool GetIsRunning() => this.socket?.IsRunning ?? false;
 }

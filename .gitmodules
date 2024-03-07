@@ -1,3 +1,9 @@
 [submodule "BeatRecorder/Util/EasyOpenVR"]
 	path = BeatRecorder/Util/EasyOpenVR
 	url = https://github.com/BOLL7708/EasyOpenVR.git
+[submodule "BeatRecorder/Dependencies/Xorog.UniversalExtensions"]
+	path = BeatRecorder/Dependencies/Xorog.UniversalExtensions
+	url = https://github.com/Fortunevale/Xorog.UniversalExtensions
+[submodule "BeatRecorder/Dependencies/Xorog.Logger"]
+	path = BeatRecorder/Dependencies/Xorog.Logger
+	url = https://github.com/Fortunevale/Xorog.Logger

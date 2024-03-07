@@ -34,5 +34,4 @@ public class BeatSaberPlus
         public int missCount { get; set; }
         public float currentHealth { get; set; }
     }
-
 }

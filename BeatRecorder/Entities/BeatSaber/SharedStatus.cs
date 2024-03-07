@@ -7,7 +7,7 @@ public class SharedStatus
 {
     public SharedStatus(HttpStatus.Status status, BaseBeatSaberHandler baseBeatSaberHandler)
     {
-        GameInfo = new()
+        this.GameInfo = new()
         {
             ModUsed = Mod.HttpStatus,
             ModVersion = status.game?.pluginVersion,
@@ -56,7 +56,7 @@ public class SharedStatus
     
     public SharedStatus(BeatSaberPlus status, Game game, int MaxCombo, BaseBeatSaberHandler baseBeatSaberHandler)
     {
-        GameInfo = game;
+        this.GameInfo = game;
 
         this.BeatmapInfo = new()
         {
@@ -77,7 +77,7 @@ public class SharedStatus
         }
         catch { }
 
-        string Rank = "E";
+        var Rank = "E";
 
         if (v >= 90)
             Rank = "SS";
@@ -111,7 +111,7 @@ public class SharedStatus
 
     public SharedStatus(DataPullerMain main, DataPullerData data, int MaxCombo, BaseBeatSaberHandler baseBeatSaberHandler)
     {
-        GameInfo = new()
+        this.GameInfo = new()
         {
             ModUsed = Mod.Datapuller,
             ModVersion = main?.PluginVersion,
@@ -131,7 +131,7 @@ public class SharedStatus
             CustomDifficulty = main?.CustomDifficultyLabel
         };
 
-        PerformanceInfo = new()
+        this.PerformanceInfo = new()
         {
             RawScore = data?.Score,
             Score = data?.ScoreWithMultipliers,
@@ -148,7 +148,7 @@ public class SharedStatus
 
     public SharedStatus(Entities.Legacy.DataPullerMain main, Entities.Legacy.DataPullerData data, int MaxCombo, BaseBeatSaberHandler baseBeatSaberHandler)
     {
-        GameInfo = new()
+        this.GameInfo = new()
         {
             ModUsed = Mod.Datapuller,
             ModVersion = main?.PluginVersion,
@@ -168,7 +168,7 @@ public class SharedStatus
             CustomDifficulty = main?.CustomDifficultyLabel
         };
 
-        PerformanceInfo = new()
+        this.PerformanceInfo = new()
         {
             RawScore = data?.Score,
             Score = data?.ScoreWithMultipliers,
@@ -187,37 +187,37 @@ public class SharedStatus
 
     public void Update(SharedStatus newStatus)
     {
-        if (GameInfo.ModUsed != newStatus.GameInfo.ModUsed)
+        if (this.GameInfo.ModUsed != newStatus.GameInfo.ModUsed)
             throw new InvalidOperationException("Mod used cannot be updated.");
 
-        GameInfo.ModVersion = newStatus.GameInfo.ModVersion ?? GameInfo.ModVersion;
-        GameInfo.GameVersion = newStatus.GameInfo.GameVersion ?? GameInfo.GameVersion;
+        this.GameInfo.ModVersion = newStatus.GameInfo.ModVersion ?? this.GameInfo.ModVersion;
+        this.GameInfo.GameVersion = newStatus.GameInfo.GameVersion ?? this.GameInfo.GameVersion;
 
-        BeatmapInfo.Name = newStatus.BeatmapInfo.Name ?? BeatmapInfo.Name;
-        BeatmapInfo.SubName = newStatus.BeatmapInfo.SubName ?? BeatmapInfo.SubName;
-        BeatmapInfo.Author = newStatus.BeatmapInfo.Author ?? BeatmapInfo.Author;
-        BeatmapInfo.Creator = newStatus.BeatmapInfo.Creator ?? BeatmapInfo.Creator;
-        BeatmapInfo.Cover = newStatus.BeatmapInfo.Cover ?? BeatmapInfo.Cover;
-        BeatmapInfo.Bpm = newStatus.BeatmapInfo.Bpm ?? BeatmapInfo.Bpm;
-        BeatmapInfo.NoteJumpSpeed = newStatus.BeatmapInfo.NoteJumpSpeed ?? BeatmapInfo.NoteJumpSpeed;
-        BeatmapInfo.Difficulty = newStatus.BeatmapInfo.Difficulty ?? BeatmapInfo.Difficulty;
-        BeatmapInfo.NoteCount = newStatus.BeatmapInfo.NoteCount ?? BeatmapInfo.NoteCount;
-        BeatmapInfo.BombCount = newStatus.BeatmapInfo.BombCount ?? BeatmapInfo.BombCount;
-        BeatmapInfo.WallCount = newStatus.BeatmapInfo.WallCount ?? BeatmapInfo.WallCount;
-        BeatmapInfo.CustomDifficulty = newStatus.BeatmapInfo.CustomDifficulty ?? BeatmapInfo.CustomDifficulty;
+        this.BeatmapInfo.Name = newStatus.BeatmapInfo.Name ?? this.BeatmapInfo.Name;
+        this.BeatmapInfo.SubName = newStatus.BeatmapInfo.SubName ?? this.BeatmapInfo.SubName;
+        this.BeatmapInfo.Author = newStatus.BeatmapInfo.Author ?? this.BeatmapInfo.Author;
+        this.BeatmapInfo.Creator = newStatus.BeatmapInfo.Creator ?? this.BeatmapInfo.Creator;
+        this.BeatmapInfo.Cover = newStatus.BeatmapInfo.Cover ?? this.BeatmapInfo.Cover;
+        this.BeatmapInfo.Bpm = newStatus.BeatmapInfo.Bpm ?? this.BeatmapInfo.Bpm;
+        this.BeatmapInfo.NoteJumpSpeed = newStatus.BeatmapInfo.NoteJumpSpeed ?? this.BeatmapInfo.NoteJumpSpeed;
+        this.BeatmapInfo.Difficulty = newStatus.BeatmapInfo.Difficulty ?? this.BeatmapInfo.Difficulty;
+        this.BeatmapInfo.NoteCount = newStatus.BeatmapInfo.NoteCount ?? this.BeatmapInfo.NoteCount;
+        this.BeatmapInfo.BombCount = newStatus.BeatmapInfo.BombCount ?? this.BeatmapInfo.BombCount;
+        this.BeatmapInfo.WallCount = newStatus.BeatmapInfo.WallCount ?? this.BeatmapInfo.WallCount;
+        this.BeatmapInfo.CustomDifficulty = newStatus.BeatmapInfo.CustomDifficulty ?? this.BeatmapInfo.CustomDifficulty;
 
-        PerformanceInfo.Combo = newStatus.PerformanceInfo.Combo ?? PerformanceInfo.Combo;
-        PerformanceInfo.RawScore = newStatus.PerformanceInfo.RawScore ?? PerformanceInfo.RawScore;
-        PerformanceInfo.Score = newStatus.PerformanceInfo.Score ?? PerformanceInfo.Score;
-        PerformanceInfo.Accuracy = newStatus.PerformanceInfo.Accuracy ?? PerformanceInfo.Accuracy;
-        PerformanceInfo.Rank = newStatus.PerformanceInfo.Rank ?? PerformanceInfo.Rank;
-        PerformanceInfo.MissedNoteCount = newStatus.PerformanceInfo.MissedNoteCount ?? PerformanceInfo.MissedNoteCount;
-        PerformanceInfo.BadCutCount = newStatus.PerformanceInfo.BadCutCount ?? PerformanceInfo.BadCutCount;
-        PerformanceInfo.BombHitCount = newStatus.PerformanceInfo.BombHitCount ?? PerformanceInfo.BombHitCount;
-        PerformanceInfo.MaxCombo = newStatus.PerformanceInfo.MaxCombo ?? PerformanceInfo.MaxCombo;
-        PerformanceInfo.SoftFailed = newStatus.PerformanceInfo.SoftFailed ?? PerformanceInfo.SoftFailed;
-        PerformanceInfo.Failed = newStatus.PerformanceInfo.Failed ?? PerformanceInfo.Failed;
-        PerformanceInfo.Finished = newStatus.PerformanceInfo.Finished ?? PerformanceInfo.Finished;
+        this.PerformanceInfo.Combo = newStatus.PerformanceInfo.Combo ?? this.PerformanceInfo.Combo;
+        this.PerformanceInfo.RawScore = newStatus.PerformanceInfo.RawScore ?? this.PerformanceInfo.RawScore;
+        this.PerformanceInfo.Score = newStatus.PerformanceInfo.Score ?? this.PerformanceInfo.Score;
+        this.PerformanceInfo.Accuracy = newStatus.PerformanceInfo.Accuracy ?? this.PerformanceInfo.Accuracy;
+        this.PerformanceInfo.Rank = newStatus.PerformanceInfo.Rank ?? this.PerformanceInfo.Rank;
+        this.PerformanceInfo.MissedNoteCount = newStatus.PerformanceInfo.MissedNoteCount ?? this.PerformanceInfo.MissedNoteCount;
+        this.PerformanceInfo.BadCutCount = newStatus.PerformanceInfo.BadCutCount ?? this.PerformanceInfo.BadCutCount;
+        this.PerformanceInfo.BombHitCount = newStatus.PerformanceInfo.BombHitCount ?? this.PerformanceInfo.BombHitCount;
+        this.PerformanceInfo.MaxCombo = newStatus.PerformanceInfo.MaxCombo ?? this.PerformanceInfo.MaxCombo;
+        this.PerformanceInfo.SoftFailed = newStatus.PerformanceInfo.SoftFailed ?? this.PerformanceInfo.SoftFailed;
+        this.PerformanceInfo.Failed = newStatus.PerformanceInfo.Failed ?? this.PerformanceInfo.Failed;
+        this.PerformanceInfo.Finished = newStatus.PerformanceInfo.Finished ?? this.PerformanceInfo.Finished;
     }
 
     public SharedStatus Clone()
@@ -225,36 +225,36 @@ public class SharedStatus
         var newStatus = new SharedStatus();
 
         newStatus.GameInfo = new();
-        newStatus.GameInfo.ModUsed = GameInfo.ModUsed;
-        newStatus.GameInfo.ModVersion = GameInfo.ModVersion;
-        newStatus.GameInfo.GameVersion = GameInfo.GameVersion;
+        newStatus.GameInfo.ModUsed = this.GameInfo.ModUsed;
+        newStatus.GameInfo.ModVersion = this.GameInfo.ModVersion;
+        newStatus.GameInfo.GameVersion = this.GameInfo.GameVersion;
 
         newStatus.BeatmapInfo = new();
-        newStatus.BeatmapInfo.Name = BeatmapInfo.Name;
-        newStatus.BeatmapInfo.SubName = BeatmapInfo.SubName;
-        newStatus.BeatmapInfo.Author = BeatmapInfo.Author;
-        newStatus.BeatmapInfo.Creator = BeatmapInfo.Creator;
-        newStatus.BeatmapInfo.Cover = BeatmapInfo.Cover;
-        newStatus.BeatmapInfo.Bpm = BeatmapInfo.Bpm;
-        newStatus.BeatmapInfo.NoteJumpSpeed = BeatmapInfo.NoteJumpSpeed;
-        newStatus.BeatmapInfo.Difficulty = BeatmapInfo.Difficulty;
-        newStatus.BeatmapInfo.NoteCount = BeatmapInfo.NoteCount;
-        newStatus.BeatmapInfo.BombCount = BeatmapInfo.BombCount;
-        newStatus.BeatmapInfo.WallCount = BeatmapInfo.WallCount;
-        newStatus.BeatmapInfo.CustomDifficulty = BeatmapInfo.CustomDifficulty;
+        newStatus.BeatmapInfo.Name = this.BeatmapInfo.Name;
+        newStatus.BeatmapInfo.SubName = this.BeatmapInfo.SubName;
+        newStatus.BeatmapInfo.Author = this.BeatmapInfo.Author;
+        newStatus.BeatmapInfo.Creator = this.BeatmapInfo.Creator;
+        newStatus.BeatmapInfo.Cover = this.BeatmapInfo.Cover;
+        newStatus.BeatmapInfo.Bpm = this.BeatmapInfo.Bpm;
+        newStatus.BeatmapInfo.NoteJumpSpeed = this.BeatmapInfo.NoteJumpSpeed;
+        newStatus.BeatmapInfo.Difficulty = this.BeatmapInfo.Difficulty;
+        newStatus.BeatmapInfo.NoteCount = this.BeatmapInfo.NoteCount;
+        newStatus.BeatmapInfo.BombCount = this.BeatmapInfo.BombCount;
+        newStatus.BeatmapInfo.WallCount = this.BeatmapInfo.WallCount;
+        newStatus.BeatmapInfo.CustomDifficulty = this.BeatmapInfo.CustomDifficulty;
 
         newStatus.PerformanceInfo = new();
-        newStatus.PerformanceInfo.RawScore = PerformanceInfo.RawScore;
-        newStatus.PerformanceInfo.Score = PerformanceInfo.Score;
-        newStatus.PerformanceInfo.Accuracy = PerformanceInfo.Accuracy;
-        newStatus.PerformanceInfo.Rank = PerformanceInfo.Rank;
-        newStatus.PerformanceInfo.MissedNoteCount = PerformanceInfo.MissedNoteCount;
-        newStatus.PerformanceInfo.BadCutCount = PerformanceInfo.BadCutCount;
-        newStatus.PerformanceInfo.BombHitCount = PerformanceInfo.BombHitCount;
-        newStatus.PerformanceInfo.MaxCombo = PerformanceInfo.MaxCombo;
-        newStatus.PerformanceInfo.SoftFailed = PerformanceInfo.SoftFailed;
-        newStatus.PerformanceInfo.Failed = PerformanceInfo.Failed;
-        newStatus.PerformanceInfo.Finished = PerformanceInfo.Finished;
+        newStatus.PerformanceInfo.RawScore = this.PerformanceInfo.RawScore;
+        newStatus.PerformanceInfo.Score = this.PerformanceInfo.Score;
+        newStatus.PerformanceInfo.Accuracy = this.PerformanceInfo.Accuracy;
+        newStatus.PerformanceInfo.Rank = this.PerformanceInfo.Rank;
+        newStatus.PerformanceInfo.MissedNoteCount = this.PerformanceInfo.MissedNoteCount;
+        newStatus.PerformanceInfo.BadCutCount = this.PerformanceInfo.BadCutCount;
+        newStatus.PerformanceInfo.BombHitCount = this.PerformanceInfo.BombHitCount;
+        newStatus.PerformanceInfo.MaxCombo = this.PerformanceInfo.MaxCombo;
+        newStatus.PerformanceInfo.SoftFailed = this.PerformanceInfo.SoftFailed;
+        newStatus.PerformanceInfo.Failed = this.PerformanceInfo.Failed;
+        newStatus.PerformanceInfo.Finished = this.PerformanceInfo.Finished;
         return newStatus;
     }
 
@@ -274,7 +274,7 @@ public class SharedStatus
     {
         public string Name { get; set; }
         public string SubName { get; set; }
-        public string NameWithSub => $"{Name}{(SubName.IsNullOrWhiteSpace() ? "" : $" {SubName}")}";
+        public string NameWithSub => $"{this.Name}{(this.SubName.IsNullOrWhiteSpace() ? "" : $" {this.SubName}")}";
         public string Author { get; set; }
         public string Creator { get; set; }
         public Bitmap Cover { get; set; }
@@ -282,7 +282,7 @@ public class SharedStatus
         public float? Bpm { get; set; }
         public float? NoteJumpSpeed { get; set; }
         public string Difficulty { get; set; }
-        public string CustomDifficulty { get => (_CustomDifficulty.IsNullOrWhiteSpace() ? Difficulty : _CustomDifficulty); set { _CustomDifficulty = value; } }
+        public string CustomDifficulty { get => (this._CustomDifficulty.IsNullOrWhiteSpace() ? this.Difficulty : this._CustomDifficulty); set => this._CustomDifficulty = value; }
         public long? NoteCount { get; set; }
         public long? BombCount { get; set; }
         public long? WallCount { get; set; }
@@ -299,7 +299,7 @@ public class SharedStatus
         public long? MissedNoteCount { get; set; } = 0;
         public long? BadCutCount { get; set; } = 0;
         public long? BombHitCount { get; set; } = 0;
-        public long? CombinedMisses { get => MissedNoteCount + BadCutCount + BombHitCount; }
+        public long? CombinedMisses => this.MissedNoteCount + this.BadCutCount + this.BombHitCount;
         public long? Combo { get; set; }
         public long? MaxCombo { get; set; }
         public bool? SoftFailed { get; set; }

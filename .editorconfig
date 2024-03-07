@@ -20,3 +20,15 @@ dotnet_diagnostic.IDE0017.severity = silent
 
 # IDE0180: Use tuple to swap values
 dotnet_diagnostic.IDE0180.severity = silent
+
+# IDE0028: Simplify collection initialization
+dotnet_diagnostic.IDE0028.severity = silent
+
+# CA1507: Use nameof to express symbol names
+dotnet_diagnostic.CA1507.severity = silent
+
+# SYSLIB1054: Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
+dotnet_diagnostic.SYSLIB1054.severity = silent
+
+# IDE0251: Make member 'readonly'
+dotnet_diagnostic.IDE0251.severity = silent

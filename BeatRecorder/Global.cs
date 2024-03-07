@@ -18,12 +18,9 @@ global using System.Drawing.Imaging;
 
 global using Xorog.UniversalExtensions;
 global using Xorog.Logger;
-global using Xorog.Logger.Enums;
-global using static Xorog.Logger.Logger;
 global using static BeatRecorder.Log;
 global using System.Runtime.InteropServices;
 
 global using BeatRecorder;
-global using Websocket.Client.Models;
 global using System.ComponentModel;
 

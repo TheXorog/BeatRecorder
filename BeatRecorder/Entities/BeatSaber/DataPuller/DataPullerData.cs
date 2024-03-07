@@ -25,5 +25,4 @@ public class DataPullerData
         public int PostSwing { get; set; }
         public int CenterSwing { get; set; }
     }
-
 }

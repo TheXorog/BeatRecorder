@@ -3,6 +3,7 @@ using BeatRecorder.Util;
 using BeatRecorder.Util.BeatSaber;
 using BeatRecorder.Util.OBS;
 using System.Reflection;
+using Xorog.Logger;
 
 namespace BeatRecorder;
 
@@ -31,7 +32,7 @@ public class Program
 
         if (!Directory.Exists("logs"))
             Directory.CreateDirectory("logs");
-        _logger = StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", Xorog.Logger.Enums.LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
+        _logger = LoggerClient.StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", CustomLogLevel.Info, DateTime.UtcNow.AddDays(-3), false);
 
         _ = Task.Run(async () =>
         {
@@ -51,26 +52,26 @@ public class Program
 
         try
         {
-            LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("Settings.json"));
+            this.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("Settings.json"));
 
-            if (LoadedConfig.Mod is not "http-status" and not "datapuller" and not "beatsaberplus")
-                throw new ArgumentException($"Invalid mod selected: {LoadedConfig.Mod}");
+            if (this.LoadedConfig.Mod is not "http-status" and not "datapuller" and not "beatsaberplus")
+                throw new ArgumentException($"Invalid mod selected: {this.LoadedConfig.Mod}");
 
-            _logger.ChangeLogLevel(LoadedConfig.ConsoleLogLevel);
+            _logger.ChangeLogLevel(this.LoadedConfig.ConsoleLogLevel);
 
             #if DEBUG
-            _logger.ChangeLogLevel(LogLevel.TRACE);
+            _logger.ChangeLogLevel(CustomLogLevel.Trace);
             #endif
 
-            if (!string.IsNullOrWhiteSpace(LoadedConfig.OBSPassword))
-                _logger.AddBlacklist(LoadedConfig.OBSPassword);
+            if (!string.IsNullOrWhiteSpace(this.LoadedConfig.OBSPassword))
+                _logger.AddBlacklist(this.LoadedConfig.OBSPassword);
 
             _logger.AddBlacklist(Environment.UserName);
             _logger.AddBlacklist(Environment.UserDomainName);
             _logger.AddBlacklist(Environment.MachineName);
 
             _logger.LogInfo("Settings loaded");
-            _logger.LogDebug($"{JsonConvert.SerializeObject(LoadedConfig)}");
+            _logger.LogDebug($"{JsonConvert.SerializeObject(this.LoadedConfig)}");
         }
         catch (Exception ex)
         {
@@ -94,22 +95,22 @@ public class Program
             try
             {
                 var github = new GitHubClient(new ProductHeaderValue("BeatRecorderUpdateCheck"));
-                IReadOnlyList<Release> releases = await github.Repository.Release.GetAll("TheXorog", "BeatRecorder");
+                var releases = await github.Repository.Release.GetAll("TheXorog", "BeatRecorder");
 
-                #if DEBUG
+#if DEBUG
                 Version += "-dev";
-                #endif
+#endif
 
-                RunningPrerelease = (Version.ToLower().Contains("dev") || Version.ToLower().Contains("rc") || Version.ToLower().Contains("beta") || Version.ToLower().Contains("alpha"));
+                this.RunningPrerelease = (Version.Contains("dev", StringComparison.CurrentCultureIgnoreCase) || Version.Contains("rc", StringComparison.CurrentCultureIgnoreCase) || Version.Contains("beta", StringComparison.CurrentCultureIgnoreCase) || Version.Contains("alpha", StringComparison.CurrentCultureIgnoreCase));
 
-                if (RunningPrerelease)
+                if (this.RunningPrerelease)
                     _logger.LogWarn("You're running a pre-release version of BeatRecorder. If you find any bugs, please report them at https://github.com/TheXorog/BeatRecorder");
 
                 Release repo = null;
 
                 foreach (var rel in releases)
                 {
-                    if (rel.Prerelease && RunningPrerelease)
+                    if (rel.Prerelease && this.RunningPrerelease)
                     {
                         repo = rel;
                         break;
@@ -173,30 +174,27 @@ public class Program
                 }
             }
 
-            if (await UseModernSocket())
-                this.ObsClient = ObsHandler.Initialize(this);
-            else
-                this.ObsClient = LegacyObsHandler.Initialize(this);
+            this.ObsClient = await UseModernSocket() ? ObsHandler.Initialize(this) : LegacyObsHandler.Initialize(this);
         });
 
         _ = Task.Run(async () =>
         {
-            while (ObsClient is null)
+            while (this.ObsClient is null)
                 await Task.Delay(100);
 
-            switch (LoadedConfig.Mod)
+            switch (this.LoadedConfig.Mod)
             {
                 case "http-status":
                 {
-                    BeatSaberClient = new HttpStatusHandler().Initialize(this); // 6557
+                    this.BeatSaberClient = new HttpStatusHandler().Initialize(this); // 6557
                     break;
                 }
                 case "datapuller":
                 {
-                    if (LoadedConfig.BeatSaberUseLegacyIfAvailable)
-                        BeatSaberClient = new DataPullerLegacyHandler().Initialize(this); // 2946
+                    if (this.LoadedConfig.BeatSaberUseLegacyIfAvailable)
+                        this.BeatSaberClient = new DataPullerLegacyHandler().Initialize(this); // 2946
                     else
-                        BeatSaberClient = new DataPullerHandler().Initialize(this);
+                        this.BeatSaberClient = new DataPullerHandler().Initialize(this);
                     break;
                 }
                 case "beatsaberplus":
@@ -204,7 +202,7 @@ public class Program
                     _logger.LogFatal("BeatSaberPlus Integration is currently incomplete. BSP does not provide a way of knowing if a song was failed or finished, making filenames always seem like the song was finished.");
                     _logger.LogFatal("To continue anyways, wait 10 seconds.");
                     await Task.Delay(10000);
-                    BeatSaberClient = new BeatSaberPlusHandler().Initialize(this); // 2947
+                    this.BeatSaberClient = new BeatSaberPlusHandler().Initialize(this); // 2947
                     break;
                 }
             }

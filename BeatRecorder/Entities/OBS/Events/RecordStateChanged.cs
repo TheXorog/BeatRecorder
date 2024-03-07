@@ -17,5 +17,4 @@ internal class RecordStateChanged
         public string outputPath { get; set; }
         public string outputState { get; set; }
     }
-
 }
